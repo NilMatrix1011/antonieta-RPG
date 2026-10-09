@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arena do Vazio — RPG de turnos</title>
+<style>
+:root{color-scheme:dark;font-family:'Courier New',monospace;color:#eee;background:#000}*{box-sizing:border-box}body{margin:0;background:#000}button,input,select,textarea{font:inherit}button{cursor:pointer;background:#000;border:1px solid #555;color:#eee;padding:11px 15px;transition:border-color .15s}button:hover{border-color:#fff;background:#111}button:disabled{opacity:.35;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid white;outline-offset:3px}.primary{background:#eee;color:#000;border-color:#eee}.primary:hover{background:white;color:#000}header{max-width:1440px;margin:auto;padding:26px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid #292929}.brand{font-weight:bold;letter-spacing:4px;font-size:20px}.eyebrow{font-size:11px;color:#999;letter-spacing:3px;margin-bottom:8px}.tools{display:flex;gap:8px;flex-wrap:wrap}.tools button{font-size:12px}main{max-width:1440px;margin:auto;padding:24px 32px}.topline{display:flex;gap:20px;align-items:center;justify-content:space-between;margin-bottom:20px}.topline .label{margin:0}.settings{display:flex;gap:18px;flex-wrap:wrap}.toggle{font-size:12px;color:#bbb;display:flex;gap:8px;align-items:center}.toggle input{width:auto;accent-color:#fff}.status{font-size:12px;letter-spacing:1px}.hud-top{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid #333}.hud-tools{display:flex;gap:8px}.hud-tools button{font-size:11px;padding:7px 9px}.hud-tools button[aria-pressed=true]{border-color:#fff}.queue{display:flex;gap:8px;overflow:auto;padding:10px 18px;min-height:42px;border-bottom:1px solid #333}.queue span{white-space:nowrap;padding:5px 9px;font-size:11px;color:#888}.queue .current{background:#eee;color:#000}.battlefield{position:relative;height:540px;background:#000;overflow:hidden}.enemy-line{position:absolute;top:6%;left:12%;right:12%}.ally-line{position:absolute;bottom:2%;left:2%;right:2%}.team{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,150px);gap:12px;align-items:end;justify-content:center}.ally-line .team{grid-auto-columns:minmax(0,170px)}.fighter{position:relative;background:none;border:0;min-width:0;width:100%;padding:8px 5px;color:#bbb;isolation:isolate}.fighter:hover{background:transparent;color:#fff}.fighter:focus-visible{outline-offset:0}.fighter.target:after{content:'▼';position:absolute;top:-16px;left:0;right:0;color:#fff;animation:blink 1s steps(2) infinite}.fighter.active:before{content:'TURNO';position:absolute;bottom:-12px;left:0;right:0;font-size:10px;letter-spacing:2px;color:white}.visual{height:130px;display:flex;justify-content:center;align-items:end;margin-bottom:8px}.ally-line .visual{height:170px}.visual img,.visual svg{width:100%;max-height:100%;height:100%;object-fit:contain;image-rendering:pixelated;display:block}.fighter .name{display:block;overflow-wrap:anywhere;font-size:12px}.fighter .life{font-size:11px;color:#999;display:block;margin-top:5px}.fighter.dead{opacity:.25;filter:grayscale(1)}.fighter.dead .visual{transform:rotate(80deg);transform-origin:center 80%}.fighter.hit{animation:hit .3s steps(2) 2}.fighter.guard .name:after{content:' ◇'}.damage{position:absolute;top:5px;left:0;right:0;color:white;font-size:22px;pointer-events:none;animation:float .9s forwards}.team-label{font-size:10px;color:#777;letter-spacing:3px;text-align:center;margin:14px 0 22px}.ally-line .team-label{margin-top:28px;margin-bottom:10px}.empty{border:1px dashed #333;padding:30px;color:#777;font-size:12px}.controls{border:1px solid #777;background:#000}.hud-panes{display:grid;grid-template-columns:.9fr 1.5fr 1.15fr}.pane{padding:18px;border-right:1px solid #333;min-width:0}.pane:last-child{border:0}.label{color:#999;letter-spacing:2px;font-size:10px;margin-bottom:12px;overflow-wrap:anywhere}.actor{font-size:19px;margin-bottom:10px;overflow-wrap:anywhere}.detail{color:#aaa;font-size:12px;line-height:1.8}.commands{display:grid;grid-template-columns:1fr 1fr;gap:8px}.commands button{text-align:left;font-size:12px;padding:10px;min-width:0;overflow-wrap:anywhere}.commands button span{display:block;color:#aaa;font-size:10px;margin-top:6px;line-height:1.4}.secondary-commands{margin-top:8px;grid-template-columns:1fr 1fr 1.4fr}.log{font-size:12px;line-height:1.6;height:130px;overflow:auto;color:#aaa}.log p{margin:0 0 8px}.log p:first-child{color:white}.roster{margin-top:30px}.roster-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.roster-head h2{font-size:13px;font-weight:normal;letter-spacing:3px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}.card{padding:16px;border:1px solid #333;display:flex;flex-direction:column;gap:10px}.card-top{display:flex;justify-content:space-between;gap:10px}.card-name{font-size:13px;overflow-wrap:anywhere}.card-team{font-size:10px;color:#888}.bar{height:4px;background:#242424}.bar span{display:block;height:100%;background:#ddd}.hidden-health{font-size:11px;color:#aaa;letter-spacing:1px}.card-bottom{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#999}.card-bottom button{font-size:11px;padding:5px 10px}.hint{font-size:11px;color:#999;margin:20px 0;line-height:1.7}dialog{background:#000;color:#eee;border:1px solid #aaa;width:min(660px,94vw);max-height:90dvh;overflow:auto;padding:26px}dialog::backdrop{background:rgba(0,0,0,.85)}.editor-head{display:flex;justify-content:space-between;gap:15px;margin-bottom:22px;align-items:center}.editor-head h2{font-size:18px;margin:0}.editor-head button{font-size:22px;padding:4px 10px}label.field{display:flex;flex-direction:column;gap:8px;font-size:12px;margin-bottom:16px}input,select,textarea{background:#000;color:#fff;border:1px solid #555;padding:10px;width:100%;min-width:0}textarea{resize:vertical;min-height:120px;line-height:1.6}.fields{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;position:sticky;bottom:-26px;background:#000;padding:14px 0;border-top:1px solid #333}.notice{color:#ccc;font-size:12px;min-height:20px;line-height:1.6}#remove{margin-right:auto}.upload{font-size:11px;color:#aaa;line-height:1.7}.footer{display:flex;justify-content:space-between;gap:15px;font-size:10px;color:#888;letter-spacing:1px;padding-top:15px;border-top:1px solid #222}.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #333;padding-top:18px;margin-top:22px}.section-title h3{font-size:12px;font-weight:normal;letter-spacing:2px}.small{font-size:11px;padding:7px 10px}.asset-field{padding:12px 0}.asset-preview img{height:85px;max-width:100%;object-fit:contain;image-rendering:pixelated;margin-bottom:10px}.asset-preview{font-size:11px;color:#888}.attack-row{border:1px solid #444;padding:14px;margin:14px 0}.attack-row-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}.attack-row-head span{font-size:11px;color:#aaa}.attack-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:0 12px}.attack-fields .field{font-size:11px}.attack-row .fields .field{font-size:11px}body.focused{overflow:hidden}#battleScreen.immersive,#battleScreen:fullscreen{position:fixed;inset:0;width:100%;height:100dvh;z-index:1000;background:#000;padding:clamp(10px,2vw,28px);display:flex;flex-direction:column;gap:10px;overflow:auto}#battleScreen.immersive .battlefield,#battleScreen:fullscreen .battlefield{height:auto;flex:1 0 270px;min-height:270px}#battleScreen.immersive .controls{flex:0 0 auto}#battleScreen.immersive .enemy-line{top:2%;left:15%;right:15%}#battleScreen.immersive .ally-line{bottom:0;left:1%;right:1%}#battleScreen.immersive .team{grid-auto-columns:minmax(0,180px)}#battleScreen.immersive .ally-line .team{grid-auto-columns:minmax(0,220px)}#battleScreen.immersive .visual{height:clamp(100px,18vh,220px)}#battleScreen.immersive .ally-line .visual{height:clamp(130px,24vh,285px)}#battleScreen.immersive .team-label{display:none}#battleScreen.immersive .fighter .name{font-size:14px}#battleScreen.immersive .hud-panes .pane{padding:14px 18px}#battleScreen.immersive .log{height:120px}@keyframes blink{50%{opacity:0}}@keyframes hit{50%{transform:translateX(8px);opacity:.3}}@keyframes float{to{transform:translateY(-65px);opacity:0}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}@media(max-width:760px){header{padding:20px;align-items:flex-start;flex-direction:column}main{padding:20px}.brand{font-size:17px}.topline{align-items:flex-start;flex-direction:column;gap:12px}.settings{gap:12px}.battlefield{height:440px}.enemy-line{left:3%;right:3%}.ally-line{left:0;right:0}.team{gap:5px}.visual{height:105px}.ally-line .visual{height:140px}.fighter .name{font-size:11px}.fighter .life{font-size:10px}.hud-panes{grid-template-columns:1fr 1.6fr}.pane{padding:14px}.pane:last-child{grid-column:1/-1;border-top:1px solid #333}.pane:nth-child(2){border-right:0}.log{height:70px}.hud-top{align-items:flex-start;flex-direction:column}.hud-tools{width:100%;justify-content:flex-end}.cards{grid-template-columns:1fr 1fr}.secondary-commands{grid-template-columns:1fr 1fr}.secondary-commands #start{grid-column:1/-1}#battleScreen.immersive .enemy-line{left:5%;right:5%}#battleScreen.immersive .log{height:45px}#battleScreen.immersive .hud-panes .pane{padding:10px}#battleScreen.immersive .visual{height:clamp(75px,12vh,135px)}#battleScreen.immersive .ally-line .visual{height:clamp(95px,16vh,165px)}#battleScreen.immersive .fighter .name{font-size:11px}}@media(max-width:450px){.cards{grid-template-columns:1fr}.tools button{padding:9px}.attack-fields{grid-template-columns:1fr 1fr}.modal-actions{flex-wrap:wrap}.hud-panes{grid-template-columns:1fr}.pane{border:0;border-bottom:1px solid #333}.pane:last-child{grid-column:auto;border-top:0}.actor{font-size:16px;margin:0}.hud-panes .pane:first-child .label{display:none}.hud-panes .pane:first-child{display:flex;justify-content:space-between;gap:10px;align-items:center}.hud-panes .pane:first-child .detail{font-size:10px}.log{height:50px}.enemy-line{left:0;right:0}.team{gap:2px}.fighter{padding:6px 2px}#battleScreen.immersive .queue{display:none}#battleScreen.immersive .hud-top{padding:8px}.commands{gap:5px}.commands button{padding:8px;font-size:11px}.secondary-commands{grid-template-columns:1fr 1fr 1.4fr}.secondary-commands #start{grid-column:auto}.commands button span{font-size:10px}}@media(max-height:680px) and (min-width:761px){#battleScreen.immersive .visual{height:90px}#battleScreen.immersive .ally-line .visual{height:120px}#battleScreen.immersive .battlefield{flex-basis:240px;min-height:240px}#battleScreen.immersive .queue{display:none}#battleScreen.immersive .log{height:100px}}
+/* The focused scene also hides preparation from assistive navigation and fallback screenshots. */
+body.focused>header,body.focused main>:not(#battleScreen){display:none}
+body.focused main{padding:0;margin:0;max-width:none}
+.fighter .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[hidden]{display:none!important}
+.editor-tabs{display:flex;gap:8px;margin-bottom:24px;border-bottom:1px solid #333;padding-bottom:12px}
+.editor-tabs button{flex:1;padding:10px;font-size:12px}
+.editor-tabs button[aria-selected=true]{background:#eee;color:#000;border-color:#eee}
+.item-row{border:1px solid #444;padding:14px;margin:14px 0}
+.item-row-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;font-size:11px;color:#aaa}
+.item-row .toggle{margin:8px 0}
+.item-empty{font-size:12px;color:#999;padding:20px 0}
+.sanity-control{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px;font-size:11px;color:#bbb}
+.sanity-control input{width:68px;padding:6px 8px;font-size:13px}
+.sanity-warning{font-size:11px;color:#fff;margin-top:10px;line-height:1.5;border-left:2px solid #eee;padding-left:8px}
+.secondary-commands{grid-template-columns:1fr 1fr 1fr}
+.secondary-commands #start{grid-column:1/-1;text-align:center}
+.fled-label{font-size:11px;letter-spacing:2px;color:#aaa}
+@media(max-width:450px){.hud-panes .actor-pane{display:block}.hud-panes .actor-pane .detail{margin-top:6px}.sanity-control{margin-top:8px}.sanity-control input{padding:5px 8px}.sanity-warning{margin-top:7px}.editor-tabs{gap:5px}.editor-tabs button{font-size:11px;padding:9px 6px}}
+@media(max-width:450px){.hud-panes .pane.actor-pane{display:block}}
+.fighter.beast .name{color:#fff;text-shadow:0 0 8px #fff}.fighter.beast .name:after{content:' · BESTA';font-size:9px;letter-spacing:1px}.beast-label{color:#fff;letter-spacing:1px}.turn-label{color:#ccc;letter-spacing:1px}
+
+.asset-preview video{height:85px;max-width:100%;object-fit:contain;image-rendering:pixelated;margin-bottom:10px}.attack-media-field{border-top:1px solid #292929;padding-top:12px;margin-top:2px}.attack-media-tools{display:grid;grid-template-columns:1fr 150px;gap:12px;align-items:start}.attack-media-preview{min-height:26px}.attack-media-preview img,.attack-media-preview video{display:block;width:auto;max-width:100%;height:90px;object-fit:contain;image-rendering:pixelated}.attack-media-preview small{color:#888;line-height:1.5}.fighter .visual video{width:100%;max-height:100%;height:100%;object-fit:contain;image-rendering:pixelated;display:block}@media(max-width:560px){.attack-media-tools{grid-template-columns:1fr}}
+.attack-audio-preview audio{width:100%;margin:4px 0 12px}.attack-media-overlay{position:fixed;inset:0;z-index:50000;display:grid;place-items:center;background:#000}.attack-media-overlay[hidden]{display:none!important}.attack-media-overlay-content{position:absolute;inset:0;display:grid;place-items:center}.attack-media-overlay img,.attack-media-overlay video{display:block;width:100vw;height:100dvh;object-fit:contain;background:#000}.attack-media-overlay-close{position:fixed;top:18px;right:20px;z-index:50002;width:46px;height:46px;padding:0;border-color:#aaa;background:rgba(0,0,0,.75);font-size:25px;line-height:1}.attack-media-overlay-hint{position:fixed;left:50%;bottom:18px;z-index:50002;transform:translateX(-50%);color:#aaa;font-size:11px;letter-spacing:2px;background:rgba(0,0,0,.7);padding:7px 10px;pointer-events:none}
+</style>
+</head>
+<body>
+<header><div><div class="eyebrow">COMBATE POR TURNOS · RETRO RPG</div><div class="brand">ARENA DO VAZIO</div></div><div class="tools"><button id="export">Exportar grupo</button><button id="import">Importar grupo</button><button id="add" class="primary" disabled>+ Personagem</button></div></header>
+<main>
+<div class="topline"><div class="label">CONFIGURAÇÃO DA BATALHA</div><div class="settings"><label class="toggle"><input type="checkbox" id="auto" checked> Inimigos automáticos</label><label class="toggle"><input type="checkbox" id="turnMode" checked> Ordem de turnos personalizada</label><label class="toggle"><input type="checkbox" id="hideEnemies"> Ocultar vida dos inimigos</label><label class="toggle"><input type="checkbox" id="fullscreenOnStart" checked> Tela cheia ao iniciar</label></div></div>
+<div id="battleScreen" aria-label="Cena de batalha">
+<section class="battlefield" aria-label="Arena de batalha">
+<div class="enemy-line"><div class="team-label">INIMIGOS</div><div class="team" id="enemies"></div></div>
+<div class="ally-line"><div class="team" id="allies"></div><div class="team-label">HERÓIS</div></div>
+</section>
+<section class="controls" aria-label="HUD de comandos">
+<div class="hud-top"><div class="status" id="status" role="status">PREPARAÇÃO</div><div class="hud-tools"><button id="hideHp" aria-pressed="false">Ocultar vida inimiga</button><button id="fullscreen" aria-pressed="false">Tela cheia</button></div></div>
+<div class="queue" id="queue" aria-label="Ordem dos turnos"></div>
+<div class="hud-panes"><div class="pane actor-pane"><div class="label">PERSONAGEM ATIVO</div><div class="actor" id="actor">Carregando grupo…</div><div class="detail" id="detail"></div><div class="sanity-control" id="sanityControl" hidden><label for="battleSanity">SANIDADE</label><input id="battleSanity" type="number" min="0" max="10" step="1" value="10" aria-label="Sanidade do personagem ativo"><span>/ 10</span></div><div id="sanityWarning" class="sanity-warning" role="status" hidden>Sanidade baixa: 50% de chance extra de errar.</div></div>
+<div class="pane action-pane"><div class="label" id="targetLabel">COMANDOS</div><div class="commands" id="attacks"></div><div class="commands secondary-commands"><button id="defend" disabled>◇ Defender</button><button id="heal" disabled>+ Curar</button><button id="flee" disabled>↗ Fugir</button><button id="start" class="primary" disabled>Iniciar batalha</button></div></div>
+<div class="pane"><div class="label">REGISTRO DE BATALHA</div><div class="log" id="log" role="log" aria-live="polite"></div></div></div>
+</section>
+</div>
+<section class="roster"><div class="roster-head"><h2>PERSONAGENS</h2><span class="detail" id="count"></span></div><div class="cards" id="cards"></div><p class="hint">No modo de turnos personalizado, os menores números agem primeiro. Inimigos automáticos atacam uma das maiores ameaças do grupo. Abaixo de 50% da vida, inimigos entram em Modo Besta e realizam um segundo golpe garantido contra um aliado aleatório. Fugir retira apenas o personagem ativo até a próxima batalha. Defesa reduz o próximo dano à metade; cura recupera 25% da vida (3 usos).</p></section>
+<div class="notice" id="notice" role="status"></div><div class="footer"><span>FUNDO PRETO. SUA HISTÓRIA.</span><span id="saveState">CARREGANDO GRUPO</span></div>
+</main>
+<dialog id="editor"><form id="form" novalidate><div class="editor-head"><h2 id="editorTitle">Adicionar personagem</h2><button type="button" id="cancel" aria-label="Fechar editor">×</button></div>
+<div class="editor-tabs" role="tablist" aria-label="Seções do personagem"><button id="tabCharacter" type="button" role="tab" aria-selected="true" aria-controls="characterTab" data-editor-tab="character">Personagem</button><button id="tabAttacks" type="button" role="tab" aria-selected="false" aria-controls="attacksTab" data-editor-tab="attacks" tabindex="-1">Ataques</button><button id="tabItems" type="button" role="tab" aria-selected="false" aria-controls="itemsTab" data-editor-tab="items" tabindex="-1">Itens</button><button id="tabAbility" type="button" role="tab" aria-selected="false" aria-controls="abilityTab" data-editor-tab="ability" tabindex="-1">Habilidade</button></div>
+<section id="characterTab" role="tabpanel" aria-labelledby="tabCharacter">
+<label class="field">Nome<input id="name" maxlength="30" required placeholder="Nome do personagem"></label>
+<label class="field">Lado<select id="team"><option value="allies">Herói / aliado</option><option value="enemies">Vilão / inimigo</option></select></label>
+<div class="fields"><label class="field">Vida máxima<input id="hp" type="number" min="1" max="9999" value="100" required></label><label class="field">Ataque base<input id="atk" type="number" min="1" max="999" value="20" required></label><label class="field">Defesa base<input id="def" type="number" min="0" max="999" value="5" required></label><label class="field">Ordem do turno<input id="turnOrder" type="number" min="1" max="99" step="1" value="1" required></label><label class="field">Sanidade (0 a 10)<input id="sanity" type="number" min="0" max="10" step="1" value="10" required><input id="sanityRange" type="range" min="0" max="10" step="1" value="10" aria-label="Ajustar sanidade de 0 a 10"></label></div>
+<p class="upload">Sanidade abaixo de 4: aliados têm 50% de chance extra de errar qualquer ataque. Você também pode ajustar a sanidade do personagem ativo pela HUD durante a batalha.</p>
+<div class="section-title"><h3>IMAGEM / GIF / VÍDEO</h3></div>
+<div class="asset-field"><label class="field">Mídia principal<input id="image" type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm"><span class="upload">Vilões usam esta mídia de frente. Imagem ou GIF até 8 MB; MP4 ou WebM até 20 MB.</span></label><div class="asset-preview" id="imagePreview"></div><button type="button" id="clearImage" class="small">Remover mídia</button></div>
+<div class="asset-field" id="backAsset"><label class="field">Mídia de costas (heróis)<input id="backImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm"><span class="upload">Envie a vista de costas para o herói olhar para os vilões. Sem esta mídia, será usada a principal ou o sprite padrão de costas.</span></label><div class="asset-preview" id="backPreview"></div><button type="button" id="clearBack" class="small">Remover mídia de costas</button></div>
+</section>
+<section id="attacksTab" role="tabpanel" aria-labelledby="tabAttacks" hidden><div class="section-title"><h3>ATAQUES</h3><button type="button" id="addAttack" class="small">+ Adicionar ataque</button></div>
+<p class="upload">Físico usa a defesa total; arcano usa metade; perfurante ignora defesa. Potência é uma porcentagem do ataque base. Usos 0 = ilimitados. Cada ataque pode receber mídia em tela cheia e áudio com duração configurável.</p>
+<div id="attackRows"></div>
+</section>
+<section id="itemsTab" role="tabpanel" aria-labelledby="tabItems" hidden><div class="section-title"><h3>ITENS</h3><button type="button" id="addItem" class="small">+ Adicionar item</button></div><p class="upload">Equipe até 8 itens. Cada item soma um bônus fixo de dano a todos os ataques ou um bônus de defesa. Os bônus dos itens equipados se acumulam e não são consumidos.</p><div id="itemRows"></div></section>
+<section id="abilityTab" role="tabpanel" aria-labelledby="tabAbility" hidden><div class="section-title"><h3>HABILIDADE</h3></div><label class="field">Descrição da habilidade<textarea id="abilityText" maxlength="240" placeholder="Ex.: Instinto de sobrevivência — percebe o perigo antes que ele aconteça."></textarea></label><div class="fields"><label class="field">Vantagem aplicada<select id="abilityType"><option value="damage">Dano de ataque</option><option value="defense">Defesa</option></select></label><label class="field">Valor da vantagem<input id="abilityBonus" type="number" min="0" max="999" step="1" value="0" required></label></div><p class="upload">O valor é somado a todos os ataques ou à defesa total enquanto esta habilidade estiver preenchida.</p></section>
+<div class="notice" id="formNotice" role="status"></div><div class="modal-actions"><button type="button" id="remove">Excluir personagem</button><button class="primary" id="saveCharacter" type="submit">Salvar personagem</button></div>
+</form></dialog><input id="importFile" type="file" accept="application/json,.json" hidden>
+<div class="attack-media-overlay" id="attackMediaOverlay" role="dialog" aria-modal="true" aria-label="M&iacute;dia do ataque" hidden><div class="attack-media-overlay-content" id="attackMediaOverlayContent"></div><button class="attack-media-overlay-close" id="closeAttackMedia" type="button" aria-label="Fechar m&iacute;dia do ataque">&times;</button><div class="attack-media-overlay-hint">ESC PARA FECHAR</div></div>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+$('battleScreen').appendChild($('attackMediaOverlay'));
+const KEY = 'arena-vazio-v1', MAX_ASSET = 8 * 1024 * 1024, MAX_VIDEO = 20 * 1024 * 1024, MAX_AUDIO = 20 * 1024 * 1024;
+const TYPES = {physical:'Físico',arcane:'Arcano',piercing:'Perfurante'};
+let chars = [], battle = false, order = [], cursor = 0, round = 1, target = null;
+let logs = [], editing = null, picture = '', backPicture = '', draftAttacks = [], draftItems = [];
+let timer = null, serial = 0, loaded = false, saveSerial = 0, assetSerial = 0, pendingAssets = 0;
+const attackVisuals = new Map(), attackVisualTimers = new Map();
+let attackOverlayTimer=null,activeAttackMediaToken=null,activeAttackAudio=null,attackAudioTimer=null;
+const escape = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mediaTypeOf = s => typeof s === 'string' ? (/^data:([^;,]+);base64,/i.exec(s)?.[1] || '') : '';
+const validMedia = s => {
+ if(typeof s!=='string')return false;
+ const type=mediaTypeOf(s),isImage=/^image\/(png|jpeg|webp|gif)$/i.test(type),isVideo=/^video\/(mp4|webm)$/i.test(type);
+ if(!isImage&&!isVideo||!/^data:[^;,]+;base64,[A-Za-z0-9+/=]+$/i.test(s))return false;
+ return s.length<=Math.ceil((isVideo?MAX_VIDEO:MAX_ASSET)/3)*4+150;
+};
+const validAudio = s => {
+ if(typeof s!=='string')return false;
+ const type=mediaTypeOf(s);
+ if(!/^audio\/(mpeg|mp3|wav|wave|x-wav|vnd\.wave|ogg|mp4|m4a|x-m4a|aac)$/i.test(type)||!/^data:[^;,]+;base64,[A-Za-z0-9+/=]+$/i.test(s))return false;
+ return s.length<=Math.ceil(MAX_AUDIO/3)*4+150;
+};
+const defaultAttacks = () => [
+ {id:crypto.randomUUID(),name:'Atacar',type:'physical',power:100,accuracy:100,uses:0,media:'',mediaType:'',mediaDuration:2,audio:'',audioType:'',audioDuration:3},
+ {id:crypto.randomUUID(),name:'Golpe pesado',type:'physical',power:150,accuracy:75,uses:3,media:'',mediaType:'',mediaDuration:2,audio:'',audioType:'',audioDuration:3}
+];
+const make = (name,team,atk,def,turnOrder=1) => ({id:crypto.randomUUID(),name,team,maxHp:100,hp:100,atk,def,turnOrder,sanity:10,items:[],ability:{text:'',type:'damage',bonus:0},image:'',backImage:'',attacks:defaultAttacks(),guard:false,heals:3,remaining:{},fled:false});
+const itemBonus = (c,type) => c.items.filter(item=>item.equipped&&item.type===type).reduce((total,item)=>total+item.bonus,0);
+const abilityBonus = (c,type) => c.ability?.text&&c.ability.type===type?c.ability.bonus:0;
+const damageBonus = c => itemBonus(c,'damage')+abilityBonus(c,'damage');
+const defenseTotal = c => c.def+itemBonus(c,'defense')+abilityBonus(c,'defense');
+const dbPromise = new Promise(resolve => {
+ let settled=false,timeout=null;
+ const finish=value=>{if(settled){if(value?.close)value.close();return;}settled=true;clearTimeout(timeout);resolve(value);};
+ if (!window.indexedDB) {finish(null);return;}
+ timeout=setTimeout(()=>finish(null),1500);
+ try {
+  const request = indexedDB.open('arena-do-vazio',1);
+  request.onupgradeneeded = () => request.result.createObjectStore('groups');
+  request.onsuccess = () => finish(request.result);
+  request.onerror = request.onblocked = () => finish(null);
+ } catch {finish(null);}
+});
+function settings() {return {auto:$('auto').checked,turnMode:$('turnMode').checked,hideEnemies:$('hideEnemies').checked,fullscreenOnStart:$('fullscreenOnStart').checked};}
+function applySettings(s) {if(!s)return;for(const id of ['auto','turnMode','hideEnemies','fullscreenOnStart']) if(typeof s[id] === 'boolean') $(id).checked=s[id];}
+async function save() {
+ if(!loaded)return;
+ const token=++saveSerial;
+ $('saveState').textContent='SALVANDO GRUPO…';
+ const data={version:6,chars:chars.map(c=>({...c,hp:c.maxHp,guard:false,heals:3,remaining:{},fled:false})),...settings()};
+ let saved=false;
+ const db=await dbPromise;
+ if(db) try {await new Promise((resolve,reject)=>{const tx=db.transaction('groups','readwrite');tx.objectStore('groups').put(data,KEY);tx.oncomplete=resolve;tx.onerror=tx.onabort=reject;});saved=true;}catch{}
+ if(!saved) try {localStorage.setItem(KEY,JSON.stringify(data));saved=true;}catch{}
+ if(token!==saveSerial)return;
+ $('saveState').textContent=saved?'GRUPO SALVO NESTE NAVEGADOR':'USE EXPORTAR PARA SALVAR O GRUPO';
+ if(!saved)$('notice').textContent='O armazenamento do navegador está cheio ou indisponível. Exporte o grupo para preservar personagens e mídias.';
+}
+function validateAttacks(data) {
+ if(data===undefined)return defaultAttacks();
+ if(!Array.isArray(data)||data.length<1||data.length>6)throw Error('Cada personagem deve ter entre 1 e 6 ataques.');
+ return data.map(a=>{
+  if(!a||typeof a.name!=='string'||!a.name.trim()||a.name.length>30||!Object.hasOwn(TYPES,a.type))throw Error('Ataque inválido no arquivo.');
+  for(const [key,min,max] of [['power',10,300],['accuracy',1,100],['uses',0,99]])if(!Number.isInteger(a[key])||a[key]<min||a[key]>max)throw Error('Atributos de ataque inválidos.');
+    const media=a.media||'',mediaType=a.mediaType||mediaTypeOf(media),mediaDuration=a.mediaDuration===undefined?2:a.mediaDuration;
+    const audio=a.audio||'',audioType=a.audioType||mediaTypeOf(audio),audioDuration=a.audioDuration===undefined?3:a.audioDuration;
+   if(media&&!validMedia(media))throw Error('Mídia de ataque inválida ou maior que o limite permitido.');
+   if(typeof mediaType!=='string'||(media&&mediaType!==mediaTypeOf(media)))throw Error('Tipo de mídia de ataque inválido.');
+    if(!Number.isFinite(mediaDuration)||mediaDuration<0.2||mediaDuration>60)throw Error('A duração da imagem deve ficar entre 0,2 e 60 segundos.');
+    if(audio&&!validAudio(audio))throw Error('Áudio de ataque inválido ou maior que o limite permitido.');
+    if(typeof audioType!=='string'||(audio&&audioType!==mediaTypeOf(audio)))throw Error('Tipo de áudio de ataque inválido.');
+    if(!Number.isFinite(audioDuration)||audioDuration<0.2||audioDuration>600)throw Error('A duração do áudio deve ficar entre 0,2 e 600 segundos.');
+    return {id:crypto.randomUUID(),name:a.name.trim(),type:a.type,power:a.power,accuracy:a.accuracy,uses:a.uses,media,mediaType,mediaDuration,audio,audioType,audioDuration};
+ });
+}
+function validateItems(data) {
+ if(data===undefined)return [];
+ if(!Array.isArray(data)||data.length>8)throw Error('Cada personagem aceita até 8 itens.');
+ return data.map(item=>{
+  if(!item||typeof item.name!=='string'||!item.name.trim()||item.name.length>40||!['damage','defense'].includes(item.type)||!Number.isInteger(item.bonus)||item.bonus<0||item.bonus>999||typeof item.equipped!=='boolean')throw Error('Item inválido: confira nome, efeito, bônus (0 a 999) e equipamento.');
+  return {id:crypto.randomUUID(),name:item.name.trim(),type:item.type,bonus:item.bonus,equipped:item.equipped};
+ });
+}
+function validateAbility(data) {
+ if(data===undefined)return {text:'',type:'damage',bonus:0};
+ if(!data||typeof data.text!=='string'||data.text.length>240||!['damage','defense'].includes(data.type)||!Number.isInteger(data.bonus)||data.bonus<0||data.bonus>999)throw Error('Habilidade inválida: confira a descrição, o tipo e o valor da vantagem.');
+ return {text:data.text.trim(),type:data.type,bonus:data.bonus};
+}
+function validate(data) {
+ if(!Array.isArray(data)||data.length>12)throw Error('O arquivo deve conter até 12 personagens.');
+ const counts={allies:0,enemies:0};
+ return data.map((c,index)=>{
+  if(!c||typeof c.name!=='string'||!c.name.trim()||c.name.length>30||!['allies','enemies'].includes(c.team))throw Error('Personagem inválido no arquivo.');
+  if(++counts[c.team]>6)throw Error('Use no máximo 6 personagens por lado.');
+  for(const [key,min,max] of [['maxHp',1,9999],['atk',1,999],['def',0,999]])if(!Number.isInteger(c[key])||c[key]<min||c[key]>max)throw Error('Atributos inválidos no arquivo.');
+  const sanity=c.sanity===undefined?10:c.sanity;
+  const turnOrder=c.turnOrder===undefined?index+1:c.turnOrder;
+  if(!Number.isInteger(sanity)||sanity<0||sanity>10)throw Error('A sanidade deve ser um inteiro de 0 a 10.');
+  if(!Number.isInteger(turnOrder)||turnOrder<1||turnOrder>99)throw Error('A ordem do turno deve ser um inteiro de 1 a 99.');
+  for(const key of ['image','backImage'])if(c[key]&&!validMedia(c[key]))throw Error('Imagem, GIF ou vídeo inválido ou maior que o limite permitido.');
+  return {id:crypto.randomUUID(),name:c.name.trim(),team:c.team,maxHp:c.maxHp,hp:c.maxHp,atk:c.atk,def:c.def,turnOrder,sanity,items:validateItems(c.items),ability:validateAbility(c.ability),image:c.image||'',backImage:c.backImage||'',attacks:validateAttacks(c.attacks),guard:false,heals:3,remaining:{},fled:false};
+ });
+}
+const actor = () => chars.find(c=>c.id===order[cursor]);
+const alive = team => chars.filter(c=>c.team===team&&c.hp>0&&!c.fled);
+const hidden = c => c?.team==='enemies' && $('hideEnemies').checked;
+const usesLeft = (c,a) => a.uses===0?Infinity:(c.remaining[a.id]??a.uses);
+function write(text,concealed=text) {logs.unshift({text,concealed});logs=logs.slice(0,60);}
+function selectDefault() {const a=actor();target=a?alive(a.team==='allies'?'enemies':'allies')[0]?.id:null;}
+function sprite(c) {
+ const back=c.team==='allies';
+ return `<svg viewBox="0 0 32 40" aria-hidden="true" shape-rendering="crispEdges"><path fill="${back?'#ddd':'#888'}" d="M11 3h10v3h3v9h-3v3h-10v-3H8V6h3zM8 19h16v3h3v10h-5v-8h-2v10h2v5h-8V27h-2v12H6v-5h2V24H6v8H1V22h7z"/>${back?'<path fill="#888" d="M8 6h16v7H8zM10 19h12v14H10z"/><path fill="#555" d="M13 20h6v12h-6z"/>':'<path fill="#000" d="M11 9h3v3h-3zm7 0h3v3h-3zM13 14h6v2h-6z"/>'}<path fill="#aaa" d="M27 15h2v13h-2zm-2 11h6v2h-6z"/></svg>`;
+}
+function renderTeam(team) {
+ const container=$(team),members=chars.filter(c=>c.team===team&&!c.fled),a=actor();
+ for(const el of [...container.children])if(!members.some(c=>c.id===el.dataset.id))el.remove();
+ if(!members.length){container.innerHTML=`<div class="empty">${chars.some(c=>c.team===team)?'Nenhum personagem em combate':'+ Adicione personagens'}</div>`;return;}
+ for(const [index,c] of members.entries()) {
+  let el=[...container.children].find(e=>e.dataset.id===c.id);
+  if(!el) {el=document.createElement('button');el.dataset.id=c.id;el.innerHTML='<span class="visual"></span><span class="name"></span><span class="life"></span>';container.append(el);}
+  const position=container.children[index];if(position!==el)container.insertBefore(el,position||null);
+  const hit=el.classList.contains('hit');
+  el.className=`fighter ${c.hp===0?'dead':''} ${c.team==='enemies'&&c.hp>0&&c.hp<c.maxHp*.5?'beast':''} ${battle&&a?.id===c.id?'active':''} ${battle&&target===c.id?'target':''} ${c.guard?'guard':''} ${hit?'hit':''}`;
+  el.setAttribute('aria-label',`${c.name}, ${hidden(c)?'vida oculta':`vida ${c.hp} de ${c.maxHp}`}${battle&&target===c.id?', alvo selecionado':''}`);
+  el.setAttribute('aria-pressed',String(battle&&target===c.id));
+  const attackVisual=attackVisuals.get(c.id);
+  const source=attackVisual?.source||(team==='allies'?(c.backImage||c.image):c.image);
+  const mediaType=attackVisual?.type||mediaTypeOf(source),isVideo=mediaType.startsWith('video/');
+  const key=attackVisual?`attack-${attackVisual.token}`:(source||`default-${team}`);
+  const visual=el.querySelector('.visual');
+  // Keep the same media node across turns so GIFs and videos continue playing.
+  if(el._visualKey!==key) {
+   visual.replaceChildren();
+   if(source){
+    const media=document.createElement(isVideo?'video':'img');media.src=source;
+    if(isVideo){media.autoplay=true;media.muted=true;media.playsInline=true;media.loop=!attackVisual;media.setAttribute('aria-label',c.name);}
+    else media.alt=c.name;
+    visual.append(media);
+   } else visual.innerHTML=sprite(c);
+   el._visualKey=key;
+  }
+  const img=visual.querySelector('img');if(img)img.alt=c.name;
+  el.querySelector('.name').textContent=c.name;
+  el.querySelector('.life').textContent=hidden(c)?(c.hp===0?'DERROTADO':'??? PV'):`${c.hp} / ${c.maxHp} PV`;
+ }
+}
+function render() {
+ const a=actor();renderTeam('allies');renderTeam('enemies');
+ $('cards').innerHTML=chars.map(c=>`<div class="card"><div class="card-top"><span class="card-name">${escape(c.name)}</span><span class="card-team">${c.team==='allies'?'HERÓI':'INIMIGO'}</span></div>${c.fled?'<div class="fled-label">FUGIU DO COMBATE</div>':''}${battle&&c.team==='enemies'&&c.hp>0&&c.hp<c.maxHp*.5?'<div class="beast-label">MODO BESTA</div>':''}${$('turnMode').checked?`<div class="turn-label">ORDEM ${c.turnOrder}</div>`:''}${hidden(c)?'<div class="hidden-health">VIDA OCULTA</div>':`<div class="bar"><span style="width:${c.hp/c.maxHp*100}%"></span></div>`}<div class="card-bottom"><span>${hidden(c)?'PV ???':`${c.hp}/${c.maxHp} PV`} · ATQ ${c.atk}${damageBonus(c)?' (+'+damageBonus(c)+' dano)':''}<br>DEF ${defenseTotal(c)} · SAN ${c.sanity}/10<br>${c.attacks.length} ataques · ${c.items.filter(item=>item.equipped).length} itens equipados${c.ability?.text?' · Habilidade ativa':''}${(c.image.includes('image/gif')||c.backImage.includes('image/gif'))?' · GIF':''}</span><button data-edit="${c.id}" ${battle?'disabled':''}>Editar</button></div></div>`).join('');
+ $('count').textContent=`${chars.length} / 12`;
+ $('queue').innerHTML=battle?order.slice(cursor).concat(order.slice(0,cursor)).filter(id=>{const c=chars.find(c=>c.id===id);return c?.hp>0&&!c.fled;}).map((id,i)=>`<span class="${i===0?'current':''}">${i===0?'▷ ':''}${escape(chars.find(c=>c.id===id).name)}</span>`).join(''):`<span>${$('turnMode').checked?'ORDEM PERSONALIZADA: MENORES NÚMEROS AGEM PRIMEIRO':'TURNOS ALTERNADOS ENTRE HERÓIS E INIMIGOS'}</span>`;
+ if(battle&&a) {
+  $('status').textContent=`RODADA ${String(round).padStart(2,'0')} · ${a.team==='allies'?'TURNO DOS HERÓIS':'TURNO DOS INIMIGOS'}`;
+  $('actor').textContent=a.name;
+  $('detail').textContent=`${hidden(a)?'PV ???':`${a.hp}/${a.maxHp} PV`} · ATQ ${a.atk}${damageBonus(a)?' (+'+damageBonus(a)+' dano)':''} · DEF ${defenseTotal(a)} · CURAS ${a.heals}/3`;
+  $('targetLabel').textContent=`ALVO: ${chars.find(c=>c.id===target)?.name||'—'}`;
+ } else {
+  $('actor').textContent=$('status').textContent==='PREPARAÇÃO'?'Prepare seu grupo':'Batalha encerrada';
+  $('detail').textContent='Edite as fichas ou inicie uma nova batalha.';
+  $('targetLabel').textContent='COMANDOS';
+ }
+ const locked=!battle||(a?.team==='enemies'&&$('auto').checked);
+ $('sanityControl').hidden=!battle;
+ $('sanityWarning').hidden=!battle||a?.team!=='allies'||a?.sanity>=4;
+ if(battle&&a){$('battleSanity').value=a.sanity;$('battleSanity').dataset.id=a.id;}
+ $('attacks').innerHTML=a?a.attacks.map((attack,i)=>`<button ${i===0?'id="attack"':''} data-attack="${attack.id}" ${locked||usesLeft(a,attack)<=0?'disabled':''}>▷ ${escape(attack.name)}<span>${TYPES[attack.type]} · ${attack.power}% · ${attack.accuracy}% acerto · ${attack.uses===0?'∞':usesLeft(a,attack)+' usos'}${attack.media?' · MÍDIA ESPECIAL':''}${attack.audio?' · ÁUDIO':''}</span></button>`).join(''):'<button id="attack" disabled>▷ Ataques do personagem</button>';
+ $('defend').disabled=locked;
+ $('heal').disabled=locked||a?.heals===0||a?.hp===a?.maxHp;
+ $('flee').disabled=!battle;
+ $('start').textContent=battle?'Encerrar batalha':'Iniciar batalha';
+ $('start').disabled=!loaded||(!battle&&(!chars.some(c=>c.team==='allies')||!chars.some(c=>c.team==='enemies')));
+ $('add').disabled=!loaded||battle||chars.length>=12;$('import').disabled=!loaded||battle;
+ $('auto').disabled=battle;
+ $('turnMode').disabled=battle;
+ $('log').innerHTML=logs.map(s=>`<p>${escape($('hideEnemies').checked?s.concealed:s.text)}</p>`).join('');
+ $('hideHp').textContent=$('hideEnemies').checked?'Mostrar vida inimiga':'Ocultar vida inimiga';
+ $('hideHp').setAttribute('aria-pressed',String($('hideEnemies').checked));
+ updateFullscreenButton();
+}
+function updateFullscreenButton() {
+ const active=$('battleScreen').classList.contains('immersive');
+ $('fullscreen').textContent=active?'Sair da tela cheia':'Tela cheia';
+ $('fullscreen').setAttribute('aria-pressed',String(active));
+}
+function enterFullscreen() {
+ const screen=$('battleScreen');screen.classList.add('immersive');document.body.classList.add('focused');updateFullscreenButton();
+ if(screen.requestFullscreen&&!document.fullscreenElement) {
+  try {const promise=screen.requestFullscreen();if(promise?.catch)promise.catch(()=>{});}catch{}
+ }
+}
+function leaveFullscreen() {
+ $('battleScreen').classList.remove('immersive');document.body.classList.remove('focused');updateFullscreenButton();
+ if(document.fullscreenElement&&document.exitFullscreen) {try{const p=document.exitFullscreen();if(p?.catch)p.catch(()=>{});}catch{}}
+}
+$('fullscreen').onclick=()=>{$('battleScreen').classList.contains('immersive')?leaveFullscreen():enterFullscreen();};
+let nativeFullscreen=false;
+document.addEventListener('fullscreenchange',()=>{if(document.fullscreenElement){nativeFullscreen=true;}else if(nativeFullscreen){nativeFullscreen=false;if(!$('attackMediaOverlay').hidden)closeAttackMedia(true);$('battleScreen').classList.remove('immersive');document.body.classList.remove('focused');updateFullscreenButton();}});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(!$('attackMediaOverlay').hidden){e.preventDefault();e.stopImmediatePropagation();closeAttackMedia(true);return;}if(!$('editor').open&&$('battleScreen').classList.contains('immersive'))leaveFullscreen();});
+function stop(message) {
+ clearTimeout(timer);clearAttackVisuals(false);serial++;battle=false;order=[];target=null;
+ write(message);$('status').textContent=message.toUpperCase();render();
+}
+function randomEntry(list) {return list[Math.floor(Math.random()*list.length)];}
+function threatTarget() {
+ const heroes=alive('allies');if(!heroes.length)return null;
+ const maxDamage=Math.max(...heroes.map(c=>c.atk+damageBonus(c)));
+ const maxDefense=Math.max(...heroes.map(defenseTotal));
+ return randomEntry(heroes.filter(c=>c.atk+damageBonus(c)===maxDamage||defenseTotal(c)===maxDefense));
+}
+function schedule() {
+ clearTimeout(timer);
+ if(battle&&actor()?.team==='enemies'&&$('auto').checked) {
+  const token=serial,current=actor().id;
+  timer=setTimeout(()=>{
+   if(!battle||token!==serial||actor()?.id!==current||!$('auto').checked)return;
+   const a=actor(),available=a.attacks.filter(at=>usesLeft(a,at)>0);
+   target=threatTarget()?.id;
+   if(a.hp<a.maxHp*.5&&available.length)act('attack',true,randomEntry(available).id);
+   else if(a.hp<a.maxHp*.35&&a.heals>0)act('heal',true);
+   else if(available.length)act('attack',true,available[Math.floor(Math.random()*available.length)].id);
+   else act('defend',true);
+  },900);
+ }
+}
+function next() {
+ if(!alive('allies').length||!alive('enemies').length){
+  const absent=alive('allies').length?'enemies':'allies';
+  const withdrawal=chars.some(c=>c.team===absent&&c.fled&&c.hp>0);
+  stop(withdrawal?(absent==='allies'?'Os heróis se retiraram. Batalha encerrada.':'Vitória dos heróis por retirada dos inimigos!'):(absent==='enemies'?'Vitória dos heróis!':'Vitória dos inimigos!'));return;
+ }
+ for(let i=0;i<order.length;i++) {
+  cursor++;if(cursor>=order.length){cursor=0;round++;}
+  if(actor()?.hp>0&&!actor().fled){actor().guard=false;selectDefault();render();schedule();return;}
+ }
+}
+function effect(id,amount) {
+ const el=document.querySelector(`[data-id="${id}"]`);if(!el)return;
+ el.classList.add('hit');const popup=document.createElement('span');popup.className='damage';popup.textContent='−'+amount;el.append(popup);
+ setTimeout(()=>{el.classList.remove('hit');popup.remove();},900);
+}
+function gifDuration(source) {
+ try {
+  const bytes=Uint8Array.from(atob(source.slice(source.indexOf(',')+1)),c=>c.charCodeAt(0));
+  let total=0,frames=0;
+  for(let i=0;i<bytes.length-7;i++)if(bytes[i]===0x21&&bytes[i+1]===0xf9&&bytes[i+2]===0x04){
+   const delay=bytes[i+4]|(bytes[i+5]<<8);total+=(delay||10)*10;frames++;i+=7;
+  }
+  return frames?Math.max(300,total):2000;
+ } catch {return 2000;}
+}
+function finishAttackVisual(id,token,shouldRender=true) {
+ if(attackVisuals.get(id)?.token!==token)return;
+ clearTimeout(attackVisualTimers.get(id));attackVisualTimers.delete(id);attackVisuals.delete(id);
+ if(shouldRender)render();
+}
+function clearAttackVisuals(shouldRender=false) {
+ for(const timeout of attackVisualTimers.values())clearTimeout(timeout);
+ attackVisualTimers.clear();attackVisuals.clear();closeAttackMedia(true);if(shouldRender)render();
+}
+function stopAttackAudio() {
+ clearTimeout(attackAudioTimer);attackAudioTimer=null;
+ if(!activeAttackAudio)return;
+ activeAttackAudio.pause();activeAttackAudio.removeAttribute('src');activeAttackAudio.load();activeAttackAudio.remove();activeAttackAudio=null;
+}
+function closeAttackMedia(stopAudio=true) {
+ clearTimeout(attackOverlayTimer);attackOverlayTimer=null;activeAttackMediaToken=null;
+ const host=$('attackMediaOverlayContent');
+ const video=host.querySelector('video');if(video){video.pause();video.removeAttribute('src');video.load();}
+ host.replaceChildren();$('attackMediaOverlay').hidden=true;
+ if(stopAudio)stopAttackAudio();
+}
+$('closeAttackMedia').onclick=()=>closeAttackMedia(true);
+function playAttackAudio(attack) {
+ stopAttackAudio();
+ if(!attack.audio||!validAudio(attack.audio))return;
+ const audio=document.createElement('audio');audio.hidden=true;audio.loop=true;audio.src=attack.audio;document.body.append(audio);activeAttackAudio=audio;
+ const duration=Math.max(.2,Math.min(600,Number(attack.audioDuration)||3));
+ audio.play().then(()=>{if(activeAttackAudio===audio)attackAudioTimer=setTimeout(stopAttackAudio,duration*1000);}).catch(()=>stopAttackAudio());
+}
+function playAttackVisual(character,attack) {
+ closeAttackMedia(false);
+ if(!attack.media||!validMedia(attack.media))return;
+ const type=attack.mediaType||mediaTypeOf(attack.media),token=crypto.randomUUID();
+ activeAttackMediaToken=token;
+ const overlay=$('attackMediaOverlay'),host=$('attackMediaOverlayContent'),media=document.createElement(type.startsWith('video/')?'video':'img');
+ media.src=attack.media;overlay.hidden=false;host.append(media);
+ const finish=()=>{if(activeAttackMediaToken===token)closeAttackMedia(false);};
+ if(type==='image/gif') {
+  attackOverlayTimer=setTimeout(finish,gifDuration(attack.media));
+  return;
+ }
+ if(type.startsWith('video/')) {
+  const armFallback=()=>{
+   const duration=Number.isFinite(media.duration)&&media.duration>0?media.duration*1000:Math.max(200,attack.mediaDuration*1000);
+   clearTimeout(attackOverlayTimer);attackOverlayTimer=setTimeout(finish,duration+250);
+  };
+  media.autoplay=true;media.muted=true;media.playsInline=true;media.loop=false;media.onended=finish;media.onerror=armFallback;
+  if(media.readyState>=1)armFallback();else media.onloadedmetadata=armFallback;
+  media.currentTime=0;media.play().catch(armFallback);return;
+ }
+ attackOverlayTimer=setTimeout(finish,Math.max(200,attack.mediaDuration*1000));
+}
+function resolveStrike(a,attack,victim,{guaranteed=false,beast=false}={}) {
+ if(!guaranteed&&Math.random()*100>=attack.accuracy){write(`${a.name} usa ${attack.name}, mas erra ${victim.name}.`);return null;}
+ const critical=!beast&&Math.random()<.1;
+ const defense=attack.type==='piercing'?0:attack.type==='arcane'?defenseTotal(victim)*.5:defenseTotal(victim);
+ let rolled=Math.max(1,Math.round(a.atk*attack.power/100*(.85+Math.random()*.3)*(critical?1.5:1)+damageBonus(a)-defense));
+ if(victim.guard)rolled=Math.max(1,Math.floor(rolled/2));
+ victim.guard=false;
+ const amount=Math.min(rolled,victim.hp);victim.hp-=amount;
+ const shown=victim.team==='enemies'?rolled:amount;
+ const prefix=beast?'MODO BESTA — ':'';
+ write(`${prefix}${a.name} usa ${attack.name} em ${victim.name}: ${shown} de dano${critical?' — CRÍTICO!':'.'}${victim.hp===0?' '+victim.name+' caiu.':''}`);
+ return {id:victim.id,shown};
+}
+function act(kind,automatic=false,attackId=null) {
+ const a=actor();if(!battle||!a||a.hp<=0||a.fled||(!automatic&&kind!=='flee'&&a.team==='enemies'&&$('auto').checked))return;
+ if(kind==='flee'){a.fled=true;a.guard=false;write(`${a.name} fugiu da batalha e não participará dos próximos turnos.`);next();return;}
+ if(kind==='attack') {
+  const attack=a.attacks.find(at=>at.id===attackId)||a.attacks[0];
+  const victim=chars.find(c=>c.id===target);
+  if(!attack||usesLeft(a,attack)<=0||!victim||victim.team===a.team||victim.hp<=0||victim.fled)return;
+  if(attack.uses>0)a.remaining[attack.id]=usesLeft(a,attack)-1;
+  playAttackVisual(a,attack);
+  playAttackAudio(attack);
+  if(a.team==='allies'&&a.sanity<4&&Math.random()<.5){write(`${a.name} tenta ${attack.name}, mas erra por sanidade baixa (${a.sanity}/10).`);next();return;}
+  const hits=[];
+  const primary=resolveStrike(a,attack,victim);if(primary)hits.push(primary);
+  if(a.team==='enemies'&&a.hp<a.maxHp*.5) {
+   const randomVictim=randomEntry(alive('allies'));
+   if(randomVictim){const extra=resolveStrike(a,attack,randomVictim,{guaranteed:true,beast:true});if(extra)hits.push(extra);}
+  }
+  next();for(const hit of hits)effect(hit.id,hit.shown);return;
+ }
+ if(kind==='defend'){a.guard=true;write(`${a.name} se defende. O próximo dano será reduzido.`);}
+ else if(kind==='heal') {
+  if(a.heals<=0||a.hp===a.maxHp)return;
+  const gain=Math.min(a.maxHp-a.hp,Math.max(1,Math.ceil(a.maxHp*.25)));a.hp+=gain;a.heals--;
+  const text=`${a.name} recupera ${gain} PV. ${a.heals} cura(s) restante(s).`;
+  write(text,a.team==='enemies'?`${a.name} usa uma cura. ${a.heals} cura(s) restante(s).`:text);
+ } else return;
+ next();
+}
+$('start').onclick=()=>{
+ if(battle){stop('Batalha encerrada pelo jogador.');leaveFullscreen();return;}
+ if(!loaded||!chars.some(c=>c.team==='allies')||!chars.some(c=>c.team==='enemies'))return;
+ clearAttackVisuals(false);chars.forEach(c=>{c.hp=c.maxHp;c.heals=3;c.guard=false;c.fled=false;c.remaining=Object.fromEntries(c.attacks.map(a=>[a.id,a.uses]));});
+ battle=true;serial++;round=1;cursor=0;logs=[];
+ const heroes=chars.filter(c=>c.team==='allies'),villains=chars.filter(c=>c.team==='enemies');
+ if($('turnMode').checked)order=[...chars].sort((a,b)=>a.turnOrder-b.turnOrder||chars.indexOf(a)-chars.indexOf(b)).map(c=>c.id);
+ else {order=[];for(let i=0;i<Math.max(heroes.length,villains.length);i++){if(heroes[i])order.push(heroes[i].id);if(villains[i])order.push(villains[i].id);}}
+ write(`A batalha começou em ${$('turnMode').checked?'ordem personalizada':'turnos alternados'}. Selecione um alvo e escolha um ataque.`);selectDefault();render();
+ if($('fullscreenOnStart').checked)enterFullscreen();schedule();
+};
+$('attacks').onclick=e=>{const id=e.target.closest('[data-attack]')?.dataset.attack;if(id)act('attack',false,id);};
+$('defend').onclick=()=>act('defend');$('heal').onclick=()=>act('heal');
+$('flee').onclick=()=>act('flee');
+$('battleSanity').onchange=()=>{
+ const input=$('battleSanity'),value=+input.value,c=chars.find(c=>c.id===input.dataset.id);
+ if(!battle||!c||!input.value||!Number.isInteger(value)||value<0||value>10){input.reportValidity();if(c)input.value=c.sanity;return;}
+ c.sanity=value;render();save();
+};
+for(const team of ['allies','enemies'])$(team).onclick=e=>{
+ const c=chars.find(c=>c.id===e.target.closest('[data-id]')?.dataset.id);if(!c)return;
+ if(!battle){openEditor(c.id);return;}
+ if(c.hp>0&&!c.fled&&c.team!==actor()?.team){target=c.id;render();}
+};
+$('auto').onchange=()=>{serial++;render();schedule();save();};
+$('turnMode').onchange=()=>{render();save();};
+$('hideEnemies').onchange=()=>{render();save();};
+$('hideHp').onclick=()=>{$('hideEnemies').checked=!$('hideEnemies').checked;render();save();};
+$('fullscreenOnStart').onchange=()=>save();
+function renderAssetPreviews() {
+ for(const [id,source] of [['imagePreview',picture],['backPreview',backPicture]]){
+   const el=$(id);el.replaceChildren();if(source){const type=mediaTypeOf(source),media=document.createElement(type.startsWith('video/')?'video':'img');media.src=source;if(type.startsWith('video/')){media.muted=true;media.loop=true;media.autoplay=true;media.playsInline=true;media.setAttribute('aria-label','Prévia do vídeo');}else media.alt=type==='image/gif'?'Prévia do GIF animado':'Prévia da imagem';el.append(media);}
+ }
+ $('clearImage').hidden=!picture;$('clearBack').hidden=!backPicture;
+ $('backAsset').hidden=$('team').value!=='allies';
+}
+function legacyAttackRow(a,i) {
+ return `<div class="attack-row" data-index="${i}"><div class="attack-row-head"><span>ATAQUE ${i+1}</span><button class="small" type="button" data-remove-attack="${i}" ${draftAttacks.length===1?'disabled':''}>Remover</button></div><div class="fields"><label class="field">Nome<input data-field="name" maxlength="30" value="${escape(a.name)}" required></label><label class="field">Tipo<select data-field="type">${Object.entries(TYPES).map(([value,name])=>`<option value="${value}" ${a.type===value?'selected':''}>${name}</option>`).join('')}</select></label></div><div class="attack-fields"><label class="field">Potência (%)<input data-field="power" type="number" min="10" max="300" value="${a.power}" required></label><label class="field">Precisão (%)<input data-field="accuracy" type="number" min="1" max="100" value="${a.accuracy}" required></label><label class="field">Usos / batalha<input data-field="uses" type="number" min="0" max="99" value="${a.uses}" required></label></div><div class="attack-media-field"><label class="field">Mídia do ataque especial<input type="file" data-attack-media="${i}" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm"><span class="upload">Opcional: substitui temporariamente a aparência de heróis e vilões ao usar o ataque.</span></label><div class="attack-media-tools"><div class="attack-media-preview" data-attack-preview="${i}"></div><label class="field">Duração da imagem (segundos)<input data-field="mediaDuration" type="number" min="0.2" max="60" step="0.1" value="${a.mediaDuration??2}" required><span class="upload">GIF e vídeo usam a duração real.</span></label></div><button type="button" class="small" data-clear-attack-media="${i}">Remover mídia especial</button></div></div>`;
+}
+function attackRow(a,i) {
+ return `<div class="attack-row" data-index="${i}">
+  <div class="attack-row-head"><span>ATAQUE ${i+1}</span><button class="small" type="button" data-remove-attack="${i}" ${draftAttacks.length===1?'disabled':''}>Remover</button></div>
+  <div class="fields"><label class="field">Nome<input data-field="name" maxlength="30" value="${escape(a.name)}" required></label><label class="field">Tipo<select data-field="type">${Object.entries(TYPES).map(([value,name])=>`<option value="${value}" ${a.type===value?'selected':''}>${name}</option>`).join('')}</select></label></div>
+  <div class="attack-fields"><label class="field">Potência (%)<input data-field="power" type="number" min="10" max="300" value="${a.power}" required></label><label class="field">Precisão (%)<input data-field="accuracy" type="number" min="1" max="100" value="${a.accuracy}" required></label><label class="field">Usos / batalha<input data-field="uses" type="number" min="0" max="99" value="${a.uses}" required></label></div>
+  <div class="attack-media-field"><label class="field">Mídia do ataque especial<input type="file" data-attack-media="${i}" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm"><span class="upload">Opcional: aparece em tela cheia quando o ataque é usado.</span></label><div class="attack-media-tools"><div class="attack-media-preview" data-attack-preview="${i}"></div><label class="field">Duração da imagem (segundos)<input data-field="mediaDuration" type="number" min="0.2" max="60" step="0.1" value="${a.mediaDuration??2}" required><span class="upload">GIF e vídeo usam a duração real.</span></label></div><button type="button" class="small" data-clear-attack-media="${i}">Remover mídia especial</button></div>
+  <div class="attack-media-field"><label class="field">Áudio do ataque<input type="file" data-attack-audio="${i}" accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/ogg,audio/mp4,audio/x-m4a,audio/aac,.mp3,.wav,.ogg,.m4a,.aac"><span class="upload">Opcional: MP3, WAV, OGG, M4A ou AAC até 20 MB.</span></label><div class="attack-media-tools"><div class="attack-audio-preview" data-attack-audio-preview="${i}"></div><label class="field">Duração do áudio (segundos)<input data-field="audioDuration" type="number" min="0.2" max="600" step="0.1" value="${a.audioDuration??3}" required></label></div><button type="button" class="small" data-clear-attack-audio="${i}">Remover áudio</button></div>
+ </div>`;
+}
+function legacyRenderAttackMediaPreviews() {
+ for(const [i,attack] of draftAttacks.entries()){
+  const host=document.querySelector(`[data-attack-preview="${i}"]`),clear=document.querySelector(`[data-clear-attack-media="${i}"]`);if(!host)continue;
+  host.replaceChildren();if(clear)clear.hidden=!attack.media;
+  if(!attack.media){const empty=document.createElement('small');empty.textContent='Sem mídia especial: usa a aparência normal.';host.append(empty);continue;}
+  const type=attack.mediaType||mediaTypeOf(attack.media),media=document.createElement(type.startsWith('video/')?'video':'img');media.src=attack.media;
+  if(type.startsWith('video/')){media.muted=true;media.loop=true;media.autoplay=true;media.playsInline=true;}else media.alt=`Prévia de ${attack.name}`;
+  host.append(media);
+ }
+}
+function renderAttackMediaPreviews() {
+ for(const [i,attack] of draftAttacks.entries()){
+  const mediaHost=document.querySelector(`[data-attack-preview="${i}"]`),mediaClear=document.querySelector(`[data-clear-attack-media="${i}"]`);
+  if(mediaHost){mediaHost.replaceChildren();if(mediaClear)mediaClear.hidden=!attack.media;
+   if(attack.media){const type=attack.mediaType||mediaTypeOf(attack.media),media=document.createElement(type.startsWith('video/')?'video':'img');media.src=attack.media;if(type.startsWith('video/')){media.muted=true;media.loop=true;media.autoplay=true;media.playsInline=true;}else media.alt=`Prévia de ${attack.name}`;mediaHost.append(media);}
+   else{const empty=document.createElement('small');empty.textContent='Sem mídia especial.';mediaHost.append(empty);}}
+  const audioHost=document.querySelector(`[data-attack-audio-preview="${i}"]`),audioClear=document.querySelector(`[data-clear-attack-audio="${i}"]`);
+  if(audioHost){audioHost.replaceChildren();if(audioClear)audioClear.hidden=!attack.audio;
+   if(attack.audio){const audio=document.createElement('audio');audio.src=attack.audio;audio.controls=true;audio.preload='metadata';audioHost.append(audio);}
+   else{const empty=document.createElement('small');empty.textContent='Sem áudio.';audioHost.append(empty);}}
+ }
+}
+function renderAttackRows() {$('attackRows').innerHTML=draftAttacks.map(attackRow).join('');$('addAttack').disabled=draftAttacks.length>=6;renderAttackMediaPreviews();}
+function readAttackRows() {
+ return [...$('attackRows').querySelectorAll('.attack-row')].map((el,i)=>{
+  const get=field=>el.querySelector(`[data-field="${field}"]`).value;
+   const saved=draftAttacks[i]||{};
+    return {id:saved.id||crypto.randomUUID(),name:get('name').trim(),type:get('type'),power:+get('power'),accuracy:+get('accuracy'),uses:+get('uses'),media:saved.media||'',mediaType:saved.mediaType||mediaTypeOf(saved.media),mediaDuration:+get('mediaDuration'),audio:saved.audio||'',audioType:saved.audioType||mediaTypeOf(saved.audio),audioDuration:+get('audioDuration')};
+ });
+}
+function showEditorTab(name) {
+ if(!['character','attacks','items','ability'].includes(name))return;
+ for(const button of document.querySelectorAll('[data-editor-tab]')){
+  const active=button.dataset.editorTab===name;
+  button.setAttribute('aria-selected',String(active));button.tabIndex=active?0:-1;
+  $(button.getAttribute('aria-controls')).hidden=!active;
+ }
+}
+for(const button of document.querySelectorAll('[data-editor-tab]')){
+ button.onclick=()=>showEditorTab(button.dataset.editorTab);
+ button.onkeydown=e=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+  e.preventDefault();const buttons=[...document.querySelectorAll('[data-editor-tab]')],index=buttons.indexOf(button);
+  const next=e.key==='Home'?0:e.key==='End'?buttons.length-1:(index+(e.key==='ArrowRight'?1:-1)+buttons.length)%buttons.length;
+  buttons[next].click();buttons[next].focus();
+ };
+}
+$('sanity').oninput=()=>{const value=+$('sanity').value;if($('sanity').value&&Number.isInteger(value)&&value>=0&&value<=10)$('sanityRange').value=value;};
+$('sanityRange').oninput=()=>{$('sanity').value=$('sanityRange').value;};
+function itemRow(item,i) {
+ return `<div class="item-row" data-item-index="${i}"><div class="item-row-head"><span>ITEM ${i+1}</span><button type="button" class="small" data-remove-item="${i}">Remover</button></div><label class="field">Nome do item<input data-item-field="name" maxlength="40" value="${escape(item.name)}" required></label><div class="fields"><label class="field">Efeito<select data-item-field="type"><option value="damage" ${item.type==='damage'?'selected':''}>Bônus de dano no ataque</option><option value="defense" ${item.type==='defense'?'selected':''}>Bônus de defesa</option></select></label><label class="field">Bônus fixo<input data-item-field="bonus" type="number" min="0" max="999" step="1" value="${item.bonus}" required></label></div><label class="toggle"><input data-item-field="equipped" type="checkbox" ${item.equipped?'checked':''}> Equipado — aplicar bônus</label></div>`;
+}
+function renderItemRows() {
+ $('itemRows').innerHTML=draftItems.length?draftItems.map(itemRow).join(''):'<div class="item-empty">Nenhum item. Adicione equipamentos para aumentar dano ou defesa.</div>';
+ $('addItem').disabled=draftItems.length>=8;
+}
+function readItemRows() {
+ return [...$('itemRows').querySelectorAll('.item-row')].map((row,i)=>({
+  id:draftItems[i]?.id||crypto.randomUUID(),name:row.querySelector('[data-item-field="name"]').value.trim(),
+  type:row.querySelector('[data-item-field="type"]').value,bonus:+row.querySelector('[data-item-field="bonus"]').value,
+  equipped:row.querySelector('[data-item-field="equipped"]').checked
+ }));
+}
+$('addItem').onclick=()=>{
+ if(draftItems.length>=8)return;draftItems=readItemRows();
+ draftItems.push({id:crypto.randomUUID(),name:'Novo item',type:'damage',bonus:5,equipped:true});renderItemRows();
+};
+$('itemRows').onclick=e=>{
+ const index=e.target.closest('[data-remove-item]')?.dataset.removeItem;if(index===undefined)return;
+ draftItems=readItemRows();draftItems.splice(+index,1);renderItemRows();
+};
+function revealInvalidField(field) {
+ const panel=field.closest('[role="tabpanel"]');
+ if(panel)showEditorTab(panel.id.replace('Tab',''));
+ field.focus();field.reportValidity();
+}
+function openEditor(id=null) {
+ if(battle||!loaded)return;
+ editing=id;assetSerial++;pendingAssets=0;
+ const c=chars.find(c=>c.id===id);$('form').reset();$('saveCharacter').disabled=false;
+ $('editorTitle').textContent=c?'Editar personagem':'Adicionar personagem';$('name').value=c?.name||'';$('team').value=c?.team||'allies';
+ for(const [field,key,value] of [['hp','maxHp',100],['atk','atk',20],['def','def',5],['turnOrder','turnOrder',chars.length+1],['sanity','sanity',10]])$(field).value=c?.[key]??value;
+ $('sanityRange').value=$('sanity').value;
+ picture=c?.image||'';backPicture=c?.backImage||'';draftAttacks=(c?.attacks||defaultAttacks()).map(a=>({...a}));
+ draftItems=(c?.items||[]).map(item=>({...item}));
+ const ability=c?.ability||{text:'',type:'damage',bonus:0};
+ $('abilityText').value=ability.text;$('abilityType').value=ability.type;$('abilityBonus').value=ability.bonus;
+ $('remove').hidden=!c;$('formNotice').textContent='';showEditorTab('character');renderAssetPreviews();renderAttackRows();renderItemRows();
+ $('editor').showModal();$('name').focus();
+}
+$('add').onclick=()=>openEditor();
+$('cards').onclick=e=>{const id=e.target.closest('[data-edit]')?.dataset.edit;if(id)openEditor(id);};
+$('cancel').onclick=()=>$('editor').close();
+$('editor').addEventListener('close',()=>{assetSerial++;pendingAssets=0;document.querySelectorAll('.attack-audio-preview audio').forEach(audio=>audio.pause());});
+$('remove').onclick=()=>{chars=chars.filter(c=>c.id!==editing);$('editor').close();save();render();};
+$('team').onchange=()=>renderAssetPreviews();
+$('clearImage').onclick=()=>{assetVersions.image++;picture='';$('image').value='';renderAssetPreviews();};
+$('clearBack').onclick=()=>{assetVersions.backImage++;backPicture='';$('backImage').value='';renderAssetPreviews();};
+$('addAttack').onclick=()=>{if(draftAttacks.length>=6)return;draftAttacks=readAttackRows();draftAttacks.push({id:crypto.randomUUID(),name:'Novo ataque',type:'arcane',power:120,accuracy:90,uses:3,media:'',mediaType:'',mediaDuration:2,audio:'',audioType:'',audioDuration:3});renderAttackRows();};
+$('attackRows').onclick=e=>{
+ const remove=e.target.closest('[data-remove-attack]')?.dataset.removeAttack;
+ const clear=e.target.closest('[data-clear-attack-media]')?.dataset.clearAttackMedia;
+ const clearAudio=e.target.closest('[data-clear-attack-audio]')?.dataset.clearAttackAudio;
+ if(clear!==undefined){draftAttacks=readAttackRows();draftAttacks[+clear].media='';draftAttacks[+clear].mediaType='';renderAttackRows();return;}
+ if(clearAudio!==undefined){draftAttacks=readAttackRows();draftAttacks[+clearAudio].audio='';draftAttacks[+clearAudio].audioType='';renderAttackRows();return;}
+ if(remove===undefined||draftAttacks.length<=1)return;draftAttacks=readAttackRows();draftAttacks.splice(+remove,1);renderAttackRows();
+};
+$('attackRows').onchange=async e=>{
+ const mediaInput=e.target.closest('[data-attack-media]'),audioInput=e.target.closest('[data-attack-audio]');
+ const input=mediaInput||audioInput;if(!input)return;
+ const isAudio=Boolean(audioInput),file=input.files[0],index=+(isAudio?input.dataset.attackAudio:input.dataset.attackMedia);if(!file)return;
+ const supported=isAudio
+  ? ['audio/mpeg','audio/mp3','audio/wav','audio/wave','audio/x-wav','audio/ogg','audio/mp4','audio/m4a','audio/x-m4a','audio/aac'].includes(file.type)||/\.(mp3|wav|ogg|m4a|aac)$/i.test(file.name)
+  : ['image/png','image/jpeg','image/webp','image/gif','video/mp4','video/webm'].includes(file.type);
+ const max=isAudio?MAX_AUDIO:(file.type.startsWith('video/')?MAX_VIDEO:MAX_ASSET);
+ if(!supported||file.size>max){$('formNotice').textContent=supported?'O arquivo ultrapassa o limite permitido.':(isAudio?'Escolha MP3, WAV, OGG, M4A ou AAC.':'Escolha PNG, JPEG, WebP, GIF, MP4 ou WebM.');input.value='';return;}
+ draftAttacks=readAttackRows();const attackId=draftAttacks[index]?.id,token=assetSerial;pendingAssets++;$('saveCharacter').disabled=true;$('formNotice').textContent=isAudio?'Carregando áudio do ataque…':'Carregando mídia do ataque especial…';
+ try {
+  let source=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file);});
+  if(isAudio&&!validAudio(source)){
+   const extension=/\.([^.]+)$/i.exec(file.name)?.[1]?.toLowerCase(),mime={mp3:'audio/mpeg',wav:'audio/wav',ogg:'audio/ogg',m4a:'audio/mp4',aac:'audio/aac'}[extension];
+   if(mime)source=String(source).replace(/^data:[^;,]*/i,`data:${mime}`);
+  }
+  if(token!==assetSerial)return;draftAttacks=readAttackRows();if(isAudio?!validAudio(source):!validMedia(source))throw Error('Formato inválido.');
+  const attack=draftAttacks.find(a=>a.id===attackId);if(!attack)return;
+  if(isAudio){attack.audio=source;attack.audioType=mediaTypeOf(source);}else{attack.media=source;attack.mediaType=file.type;}
+  renderAttackRows();$('formNotice').textContent=isAudio?'Áudio do ataque carregado.':'Mídia do ataque especial carregada.';
+ } catch {if(token===assetSerial)$('formNotice').textContent=isAudio?'Não foi possível ler o áudio do ataque.':'Não foi possível ler a mídia do ataque.';}
+ finally {if(token===assetSerial){pendingAssets--;$('saveCharacter').disabled=pendingAssets>0;}}
+};
+const assetVersions={image:0,backImage:0};
+for(const field of ['image','backImage'])$(field).onchange=async()=>{
+ const file=$(field).files[0];if(!file)return;
+ const supported=['image/png','image/jpeg','image/webp','image/gif','video/mp4','video/webm'].includes(file.type),max=file.type.startsWith('video/')?MAX_VIDEO:MAX_ASSET;
+ if(file.size>max||!supported){$('formNotice').textContent='Escolha uma imagem/GIF de até 8 MB ou vídeo MP4/WebM de até 20 MB.';$(field).value='';return;}
+ const token=assetSerial,version=++assetVersions[field];pendingAssets++;$('saveCharacter').disabled=true;$('formNotice').textContent='Carregando mídia…';
+ try {
+  const source=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file);});
+  if(token!==assetSerial||version!==assetVersions[field])return;
+  if(!validMedia(source))throw Error('Formato inválido.');
+  if(field==='image')picture=source;else backPicture=source;
+  renderAssetPreviews();$('formNotice').textContent='Mídia carregada.';
+ } catch {if(token===assetSerial)$('formNotice').textContent='Não foi possível ler a mídia.';}
+ finally {if(token===assetSerial){pendingAssets--; $('saveCharacter').disabled=pendingAssets>0;}}
+};
+$('form').onsubmit=e=>{
+ e.preventDefault();if(battle||pendingAssets)return;
+ const invalid=$('form').querySelector('input:invalid,select:invalid');if(invalid){revealInvalidField(invalid);return;}
+ const name=$('name').value.trim(),team=$('team').value;
+ if(!name){showEditorTab('character');$('name').focus();$('formNotice').textContent='Digite um nome.';return;}
+ if(chars.filter(c=>c.team===team&&c.id!==editing).length>=6){$('formNotice').textContent='Cada lado aceita até 6 personagens.';return;}
+ let attacks,items,ability;
+ try{attacks=validateAttacks(readAttackRows());}catch(error){showEditorTab('attacks');$('formNotice').textContent=error.message;return;}
+ try{items=validateItems(readItemRows());}catch(error){showEditorTab('items');$('formNotice').textContent=error.message;return;}
+ try{ability=validateAbility({text:$('abilityText').value,type:$('abilityType').value,bonus:+$('abilityBonus').value});}catch(error){showEditorTab('ability');$('formNotice').textContent=error.message;return;}
+ const c={id:editing||crypto.randomUUID(),name,team,maxHp:+$('hp').value,hp:+$('hp').value,atk:+$('atk').value,def:+$('def').value,turnOrder:+$('turnOrder').value,sanity:+$('sanity').value,items,ability,image:picture,backImage:backPicture,attacks,guard:false,heals:3,remaining:{},fled:false};
+ if(editing)chars=chars.map(old=>old.id===editing?c:old);else chars.push(c);
+ $('editor').close();save();render();
+};
+$('export').onclick=()=>{
+ const blob=new Blob([JSON.stringify({version:6,chars,...settings()},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='arena-personagens.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+$('import').onclick=()=>$('importFile').click();
+$('importFile').onchange=async()=>{
+ const file=$('importFile').files[0];if(!file||battle)return;
+ try {
+  if(file.size>150*1024*1024)throw Error('Arquivo grande demais.');
+  const data=JSON.parse(await file.text()),imported=validate(data.chars);
+  // Validation completes before replacing the current group.
+  if(battle)return;
+  chars=imported;applySettings(data);logs=[];order=[];target=null;$('status').textContent='PREPARAÇÃO';save();render();$('notice').textContent='Grupo importado com imagens, GIFs, vídeos e mídias de ataques especiais.';
+ }catch(error){$('notice').textContent='Não foi possível importar: '+error.message;}
+ $('importFile').value='';
+};
+async function init() {
+ let saved=null;const db=await dbPromise;
+ if(db)try{saved=await new Promise((resolve,reject)=>{const req=db.transaction('groups').objectStore('groups').get(KEY);req.onsuccess=()=>resolve(req.result);req.onerror=reject;});}catch{}
+ if(!saved)try{saved=JSON.parse(localStorage.getItem(KEY));}catch{}
+ try {if(saved){chars=validate(saved.chars);applySettings(saved);}else chars=[make('Investigador','allies',23,6,1),make('Sombra','enemies',18,4,2)];}
+ catch {chars=[make('Investigador','allies',23,6,1),make('Sombra','enemies',18,4,2)];$('notice').textContent='O grupo salvo não pôde ser carregado. Você pode restaurá-lo pelo arquivo exportado.';}
+ loaded=true;write('Bem-vindo à Arena do Vazio. Adicione seus personagens ou experimente o duelo inicial.');render();save();
+}
+init();
+})();
+
+</script>
+</body></html>

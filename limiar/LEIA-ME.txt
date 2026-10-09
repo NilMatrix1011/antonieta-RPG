@@ -1,0 +1,13 @@
+LIMIAR — PORTAS E ENIGMAS
+
+Arquivos completos da versão com duas abas. Inclui imagem e três áudios.
+
+Para executar com os áudios da porta funcionando, sirva esta pasta por HTTP.
+Com Python instalado, abra um terminal nesta pasta e execute:
+python -m http.server 8000
+Depois acesse http://localhost:8000 no navegador.
+
+Não abra apenas index.html por duplo clique: o navegador pode bloquear o carregamento dos áudios da porta via file://.
+
+Para hospedar, envie todo o conteúdo desta pasta para uma hospedagem estática.
+Não é necessária instalação de dependências.

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Antonieta — Mesa de RPG</title>
+<style>
+:root{color-scheme:dark;font-family:"Segoe UI",system-ui,sans-serif;background:#050507;color:#f5f5f5}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden}
+body{display:grid;grid-template-rows:auto 1fr;background:#050507}
+.shell-header{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:22px;padding:9px clamp(12px,3vw,34px);border-bottom:1px solid #29292f;background:rgba(7,7,10,.97);box-shadow:0 8px 30px rgba(0,0,0,.32);z-index:10}
+.identity{min-width:0}
+.eyebrow{color:#8e8e99;font-size:10px;letter-spacing:.22em;text-transform:uppercase}
+.title{margin-top:3px;font-family:"Courier New",monospace;font-size:15px;font-weight:700;letter-spacing:.12em;white-space:nowrap}
+.tabs{display:flex;gap:6px;padding:4px;border:1px solid #29292f;border-radius:10px;background:#000}
+.tab{min-width:116px;padding:9px 16px;border:0;border-radius:7px;background:transparent;color:#aaa;font:600 12px/1 inherit;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.tab:hover{background:#15151a;color:#fff}
+.tab[aria-selected="true"]{background:#f0f0f2;color:#09090b}
+.tab:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.workspace{position:relative;min-height:0;background:#000}
+.panel{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.panel[hidden]{display:none}
+@media(max-width:620px){.shell-header{align-items:stretch;flex-direction:column;gap:7px;padding:8px 10px}.identity{text-align:center}.title{font-size:13px}.tabs{width:100%}.tab{flex:1;min-width:0;padding:9px 8px}.workspace{min-height:0}}
+</style>
+</head>
+<body>
+<header class="shell-header">
+  <div class="identity">
+    <div class="eyebrow">Mesa de RPG</div>
+    <div class="title">PROJETO ANTONIETA</div>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Sistemas do RPG">
+    <button class="tab" id="tabMapa" type="button" role="tab" aria-selected="true" aria-controls="panelMapa" tabindex="0" data-panel="mapa">Mapa</button>
+    <button class="tab" id="tabArena" type="button" role="tab" aria-selected="false" aria-controls="panelArena" tabindex="-1" data-panel="arena">Arena</button>
+    <button class="tab" id="tabLimiar" type="button" role="tab" aria-selected="false" aria-controls="panelLimiar" tabindex="-1" data-panel="limiar">Limiar</button>
+  </nav>
+</header>
+<main class="workspace">
+  <iframe class="panel" id="panelMapa" role="tabpanel" aria-labelledby="tabMapa" title="Mapa da Mansão dos Macrados" src="Mapa_RPG_Mansão_dos_Macrados.html" allow="fullscreen" allowfullscreen></iframe>
+  <iframe class="panel" id="panelArena" role="tabpanel" aria-labelledby="tabArena" title="Arena do Vazio" data-src="arena-do-vazio.html" hidden allow="fullscreen" allowfullscreen></iframe>
+  <iframe class="panel" id="panelLimiar" role="tabpanel" aria-labelledby="tabLimiar" title="Limiar — desafios interativos" data-src="limiar/index.html" hidden allow="fullscreen; autoplay" allowfullscreen></iframe>
+</main>
+<script>
+(() => {
+  'use strict';
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  const panels = {
+    mapa:document.getElementById('panelMapa'),
+    arena:document.getElementById('panelArena'),
+    limiar:document.getElementById('panelLimiar')
+  };
+  let limiarReady=false;
+  let pendingLimiarChallenge=null;
+
+  function postToLimiar(kind) {
+    if(!limiarReady||!panels.limiar.contentWindow)return;
+    const targetOrigin=location.protocol==='file:'?'*':location.origin;
+    panels.limiar.contentWindow.postMessage({
+      source:'antonieta-shell',
+      event:'open-challenge',
+      kind
+    },targetOrigin);
+    pendingLimiarChallenge=null;
+  }
+
+  function openLimiarChallenge(kind='door') {
+    if(kind!=='door'&&kind!=='riddle')return;
+    pendingLimiarChallenge=kind;
+    activate('limiar');
+    if(limiarReady)postToLimiar(kind);
+  }
+
+  panels.limiar.addEventListener('load',()=>{
+    if(!panels.limiar.getAttribute('src'))return;
+    limiarReady=true;
+    if(pendingLimiarChallenge)postToLimiar(pendingLimiarChallenge);
+  });
+
+  window.addEventListener('message',event=>{
+    if(location.protocol!=='file:'&&event.origin!==location.origin)return;
+    const data=event.data;
+    if(event.source===panels.mapa.contentWindow){
+      if(!data||data.source!=='antonieta-map'||data.event!=='open-limiar-challenge')return;
+      if(data.kind!=='door'&&data.kind!=='riddle')return;
+      openLimiarChallenge(data.kind);
+      return;
+    }
+    if(event.source===panels.limiar.contentWindow){
+      if(!data||data.source!=='limiar'||data.version!==1||data.event!=='challenge-result')return;
+      if(data.kind!=='door'||data.outcome!=='success')return;
+      activate('mapa');
+      requestAnimationFrame(()=>panels.mapa.focus());
+    }
+  });
+
+  function activate(name, updateHash=true) {
+    if (!panels[name]) name='mapa';
+    tabs.forEach(tab => {
+      const active=tab.dataset.panel===name;
+      tab.setAttribute('aria-selected',String(active));
+      tab.tabIndex=active?0:-1;
+    });
+    Object.entries(panels).forEach(([key,panel]) => {
+      const active=key===name;
+      panel.hidden=!active;
+      if(active&&!panel.getAttribute('src')&&panel.dataset.src)panel.src=panel.dataset.src;
+    });
+    if(updateHash)history.replaceState(null,'','#'+name);
+  }
+
+  tabs.forEach((tab,index) => {
+    tab.addEventListener('click',()=>activate(tab.dataset.panel));
+    tab.addEventListener('keydown',event=>{
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+      event.preventDefault();
+      const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(index+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+      tabs[next].focus();tabs[next].click();
+    });
+  });
+  const initialPanel=location.hash.slice(1)||'mapa';
+  const requestedChallenge=new URLSearchParams(location.search).get('challenge');
+  if(initialPanel==='limiar'&&(requestedChallenge==='door'||requestedChallenge==='riddle')){
+    pendingLimiarChallenge=requestedChallenge;
+  }
+  activate(initialPanel,false);
+})();
+</script>
+</body>
+</html>

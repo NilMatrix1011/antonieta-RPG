@@ -1,0 +1,2787 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mansão dos Macrados | Gerado RpgForge V3</title>
+    
+    <style>
+        :root { --main-color: #040411; --bg-gradient: radial-gradient(circle, rgba(16,10,25,1) 0%, rgba(0,0,0,1) 100%); --ambient-glow: rgba(4,4,17,0.3); }
+        /* CSS BASE - ENGRENAGEM PRINCIPAL */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg-gradient); color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+ 
+        /* LABEL FLUTUANTE DE LOCALIZAÇÃO */
+        .location-label { position: fixed; bottom: 20px; left: 25px; text-align: left; z-index: 2000; pointer-events: none; }
+        .location-name { font-weight: 700; font-size: 1.1em; text-transform: uppercase; letter-spacing: 3px; color: var(--main-color); text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 0 20px var(--ambient-glow); }
+        .location-hint { font-size: 0.65em; color: rgba(255,255,255,0.35); letter-spacing: 1px; margin-top: 3px; }
+
+        /* MENU DE CONTEXTO (Botão Direito) */
+        .ctx-menu { position: fixed; z-index: 9999; background: rgba(12,12,16,0.97); border: 1px solid var(--main-color); border-radius: 10px; padding: 6px; display: none; flex-direction: column; gap: 3px; min-width: 180px; max-width: 210px; box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 20px var(--ambient-glow); backdrop-filter: blur(12px); animation: ctxFadeIn 0.15s ease; }
+        .ctx-menu.open { display: flex; }
+        @keyframes ctxFadeIn { from { opacity:0; transform: scale(0.92); } to { opacity:1; transform: scale(1); } }
+        .ctx-sep { height: 1px; background: rgba(255,255,255,0.1); margin: 4px 0; }
+        .ctx-title { font-size: 0.62em; text-transform: uppercase; letter-spacing: 1.5px; color: var(--main-color); padding: 3px 8px; opacity: 0.7; }
+        .btn-ui { display: block; width: 100%; padding: 8px 11px; background: transparent; border: none; border-radius: 7px; color: #fff; text-align: left; cursor: pointer; transition: 0.2s; font-size: 0.78em; font-family: inherit; }
+        .btn-ui:hover { background: rgba(255,255,255,0.08); color: var(--main-color); padding-left: 15px; }
+        .btn-ui:disabled { opacity: 0.35; cursor: not-allowed; }
+        .btn-ui:disabled:hover { background: transparent; color: rgba(255,255,255,0.6); padding-left: 11px; }
+        .btn-ui.btn-back { color: rgba(255,255,255,0.6); }
+        .floating-back-btn { position: fixed; top: 18px; left: 22px; z-index: 2200; display: none; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(12,12,18,0.92); border: 1px solid rgba(255,255,255,0.32); border-radius: 8px; color: #fff; font-size: 0.76em; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.85), 0 0 15px rgba(255,255,255,0.06); backdrop-filter: blur(10px); transition: all 0.2s ease; }
+        .floating-back-btn:hover { background: rgba(255,255,255,0.15); border-color: #ffd700; color: #ffd700; transform: translateX(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.95), 0 0 20px rgba(255,215,0,0.35); }
+        .floating-back-btn span { font-size: 1.15em; line-height: 1; }
+        .ctx-tip { padding: 3px 10px; font-size: 0.66em; color: rgba(255,255,255,0.35); line-height: 1.35; }
+
+        /* O CONTAINER MESTRE */
+        .viewport { width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .map-anchor { position: relative; display: inline-flex; box-shadow: 0 20px 80px rgba(0,0,0,0.9); }
+        .map-anchor img { display: block; max-width: 100vw; max-height: 100vh; object-fit: contain; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+        
+        /* THE HOTSPOTS (Agora com VISIBILIDADE variavel!) */
+        .hs-marker-viz { position: absolute; transform: translate(-50%, -50%); width: 25px; height: 25px; border-radius: 50%; pointer-events: auto; cursor: pointer; transition: all 0.3s; z-index: 20; }
+        .hs-marker-viz[data-vis="visible"] { background: var(--main-color); border: 2px solid #fff; box-shadow: 0 0 15px var(--ambient-glow); }
+        .hs-marker-viz[data-vis="visible"]:hover { transform: translate(-50%, -50%) scale(1.3); }
+        .hs-marker-viz[data-vis="semi"] { width: clamp(38px, 3.5vw, 54px); height: clamp(38px, 3.5vw, 54px); background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.28); backdrop-filter: blur(1.5px); -webkit-backdrop-filter: blur(1.5px); box-shadow: 0 0 12px rgba(255,255,255,.08); }
+        .hs-marker-viz[data-vis="semi"]:hover { transform: translate(-50%, -50%) scale(1.3); background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.3); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+        .hs-marker-viz[data-vis="invisible"] { width: 46px; height: 46px; background: transparent; border: none; }
+        .hs-marker-viz[data-vis="invisible"]:hover { background: rgba(255,255,255,0.05); }
+        .hs-marker-viz[role="button"]:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+
+        /* EVENTOS DO MESTRE */
+        .event-marker { display: grid; place-items: center; }
+        .event-marker::before { content: '\2726'; color: #fff; font-size: 15px; line-height: 1; text-shadow: 0 0 7px #fff; }
+        .event-marker[data-vis="visible"] { width: 32px; height: 32px; background: #fff; border-color: #fff; box-shadow: 0 0 12px #fff, 0 0 28px var(--main-color); animation: eventPulse 1.7s ease-in-out infinite; }
+        .event-marker[data-vis="visible"]::before { color: var(--main-color); text-shadow: none; }
+        .event-marker[data-vis="semi"]::before { opacity: .42; }
+        .event-marker[data-vis="invisible"]::before { display: none; }
+        .event-marker[data-kind="door"]::before { content: '\1F6AA'; font-size: 18px; filter: none; }
+        .event-marker[data-kind="door"][data-vis="visible"] { border-color: #b9ce80; box-shadow: 0 0 12px #b9ce80, 0 0 28px var(--main-color); }
+        .scenario-marker { display: grid; place-items: center; }
+        .scenario-marker::before { content: '\25C8'; color: #fff; font-size: 15px; line-height: 1; text-shadow: 0 0 8px #fff; }
+        .scenario-marker[data-vis="visible"] { width: 34px; height: 34px; border-color: #e2c87c; box-shadow: 0 0 13px rgba(226,200,124,.85), 0 0 30px var(--ambient-glow); }
+        .scenario-marker[data-vis="semi"]::before { color: #e2c87c; opacity: .68; }
+        .scenario-marker[data-vis="invisible"]::before { display: none; }
+        @keyframes eventPulse { 50% { transform: translate(-50%, -50%) scale(1.13); filter: brightness(1.35); } }
+        .event-modal { position: fixed; inset: 0; z-index: 25000; display: grid; place-items: center; padding: 18px; background: rgba(0,0,0,.82); backdrop-filter: blur(8px); }
+        .event-modal[hidden] { display: none; }
+        .event-card { width: min(540px, 96vw); max-height: 92vh; overflow: auto; padding: 22px; border: 1px solid rgba(255,255,255,.28); border-radius: 12px; background: #0c0c11; box-shadow: 0 24px 80px rgba(0,0,0,.9); }
+        .event-card h2 { margin: 0 0 5px; font-size: 1.08rem; letter-spacing: .08em; text-transform: uppercase; }
+        .event-card p { margin: 0 0 18px; color: rgba(255,255,255,.58); font-size: .78rem; line-height: 1.5; }
+        .event-field { display: grid; gap: 7px; margin: 14px 0; color: rgba(255,255,255,.8); font-size: .78rem; }
+        .event-field[hidden] { display: none; }
+        .event-field input, .event-field select { width: 100%; padding: 10px 11px; border: 1px solid rgba(255,255,255,.24); border-radius: 7px; background: #050507; color: #fff; font: inherit; }
+        .event-field small { color: rgba(255,255,255,.42); line-height: 1.45; }
+        .event-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+        .event-actions button { padding: 9px 13px; border: 1px solid rgba(255,255,255,.35); border-radius: 7px; background: transparent; color: #fff; cursor: pointer; }
+        .event-actions .primary { background: #fff; color: #070709; }
+        .event-actions .danger { margin-right: auto; border-color: #a94f4f; color: #ff9292; }
+        .event-form-status { min-height: 20px; color: #e2c87c; font-size: .75rem; }
+        .event-view-card { width: min(900px, 96vw); }
+        .event-media { display: grid; place-items: center; min-height: 160px; max-height: 70vh; overflow: auto; border-radius: 8px; background: #000; }
+        .event-media img, .event-media video { display: block; max-width: 100%; max-height: 68vh; object-fit: contain; }
+        .hero-create-list { display: grid; gap: 12px; margin-top: 16px; }
+        .hero-create-row { position: relative; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(90px, .6fr); gap: 10px; padding: 14px; border: 1px solid rgba(255,255,255,.16); border-radius: 9px; background: rgba(255,255,255,.035); }
+        .hero-create-row h3 { grid-column: 1 / -1; margin: 0; padding-right: 32px; color: #79d998; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
+        .hero-create-row .event-field { margin: 0; }
+        .hero-create-row .hero-gif-field { grid-column: 1 / -1; }
+        .remove-hero-row { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border: 0; border-radius: 6px; background: transparent; color: #ff9292; font-size: 1.05rem; cursor: pointer; }
+        .remove-hero-row:disabled { opacity: .25; cursor: default; }
+        .add-hero-row { width: 100%; margin-top: 12px; padding: 10px; border: 1px dashed rgba(121,217,152,.6); border-radius: 8px; background: rgba(121,217,152,.06); color: #8ee9ab; cursor: pointer; }
+        @media (max-width: 520px) { .hero-create-row { grid-template-columns: 1fr; } .hero-create-row h3, .hero-create-row .hero-gif-field { grid-column: 1; } }
+
+        /* PERSONAGENS E MULTI-SELECT (VTT) */
+        .char-token { position: absolute; width: 45px; height: 45px; border-radius: 50%; background: #111; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: grab; z-index: 110; transform: translate(-50%, -50%) rotate(0deg); box-shadow: 0 10px 20px rgba(0,0,0,0.8); user-select: none; overflow: visible; transition: box-shadow 0.2s, border-color 0.2s; }
+        .token-face { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: hidden; }
+        .token-face img { width: 100%; height: 100%; display: block; object-fit: cover; pointer-events: none; }
+        .char-token.has-gif { background: transparent; border-color: transparent; border-radius: 0; box-shadow: none; }
+        .char-token.has-gif .token-face { border-radius: 0; overflow: visible; }
+        .char-token.has-gif .token-face img { object-fit: contain; }
+        .char-token.has-gif:active { box-shadow: none; }
+        .char-token.selected { border-color: #ffd700; box-shadow: 0 0 20px rgba(255,215,0,0.8); z-index: 115; }
+        .char-token:active { cursor: grabbing; box-shadow: 0 15px 30px rgba(0,0,0,0.9); }
+        .map-anchor.night-mode .char-token { border-color: #dce9ff; box-shadow: 0 0 13px rgba(150,190,255,.75), 0 0 24px rgba(120,160,255,.35); }
+        .map-anchor.night-mode .char-token.selected { border-color: #ffd700; box-shadow: 0 0 20px rgba(255,215,0,.8), 0 0 28px rgba(120,160,255,.6); }
+        .map-anchor.night-mode .char-token.has-gif .token-face { filter: brightness(1.18) drop-shadow(0 0 7px rgba(160,195,255,.9)); }
+        .char-name { position: absolute; top: 110%; background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 6px; font-size: 0.7em; white-space: nowrap; pointer-events:none; z-index:115; opacity: 0; visibility: hidden; transition: opacity .15s, visibility .15s; }
+        .char-token:hover .char-name, .char-token:focus-within .char-name { opacity: 1; visibility: visible; }
+        .marquee-box { position: absolute; border: 1px dashed #ffd700; background: rgba(255,215,0,0.15); pointer-events: none; z-index: 120; display: none; }
+        
+        .ping-sonar { position: absolute; width: 20px; height: 20px; border: 4px solid #f22; border-radius: 50%; opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: none; z-index: 100; animation: sonarAnim 1s ease-out forwards; }
+        @keyframes sonarAnim { to { opacity: 0; transform: translate(-50%, -50%) scale(8); } }
+        
+        /* SISTEMAS AMBIENTAIS ESPECIAIS */
+        
+        #cctvLayer { position: absolute; inset: 0; pointer-events: none; z-index: 100; display: none; background: repeating-linear-gradient(rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0) 100%); background-size: 100% 4px; animation: scanlines 10s linear infinite; backdrop-filter: blur(0.8px); box-shadow: inset 0 0 30px rgba(0,0,0,0.8); }
+        @keyframes scanlines { from { background-position: 0 0; } to { background-position: 0 100%; } }
+        
+        .cctv-cam { position: absolute; top: 30px; left: 40px; font-family: "Courier New", monospace; font-size: 2.2rem; color: #fff; font-weight: bold; opacity:0.8; text-shadow: 0 0 5px #fff; }
+        .cctv-hud { position: absolute; top: 30px; right: 40px; font-family: "Courier New", monospace; color: #fff; display: flex; flex-direction: column; align-items: flex-end; }
+        .cctv-rec { font-size: 1.8rem; color: red; font-weight: bold; animation: blink 1s infinite; display:flex; align-items:center; gap:12px; text-shadow: 0 0 5px #f00; }
+        .cctv-rec::before { content:''; width:16px; height:16px; background:red; border-radius:50%; box-shadow: 0 0 8px red; }
+        .cctv-date { font-size: 1.3rem; margin-top:8px; opacity:0.9; text-shadow: 0 0 5px #fff; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    
+        
+        .fog-layer { position: absolute; inset: 0; pointer-events: none; z-index: 15; display: none; opacity: 0; transition: opacity 1s ease-in-out; overflow: hidden; mix-blend-mode: screen; }
+        .fog-layer.active { display: block; opacity: 1; }
+        .fog-overlay { position: absolute; inset: -100px; background: radial-gradient(ellipse 600px 400px at 20% 30%, rgba(200, 200, 220, 0.35), transparent 50%), radial-gradient(ellipse 500px 350px at 50% 50%, rgba(210, 210, 230, 0.3), transparent 50%), radial-gradient(ellipse 550px 380px at 80% 70%, rgba(205, 205, 225, 0.33), transparent 50%); animation: fogDriftRight 30s linear infinite; filter: blur(40px); }
+        @keyframes fogDriftRight { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        .fog-veil { position: absolute; inset: -100px; background: radial-gradient(ellipse 550px 370px at 30% 40%, rgba(190, 190, 210, 0.3), transparent 50%), radial-gradient(ellipse 480px 340px at 60% 60%, rgba(185, 185, 205, 0.28), transparent 50%), radial-gradient(ellipse 520px 360px at 90% 20%, rgba(195, 195, 215, 0.32), transparent 50%); animation: fogDriftRight 45s linear infinite; filter: blur(50px); animation-delay: -15s; }
+        .fog-dense-layer { position: absolute; inset: -100px; background: radial-gradient(ellipse 580px 390px at 40% 25%, rgba(180, 180, 200, 0.28), transparent 50%), radial-gradient(ellipse 490px 330px at 70% 75%, rgba(175, 175, 195, 0.25), transparent 50%); animation: fogDriftLeft 40s linear infinite; filter: blur(45px); animation-delay: -10s; }
+        @keyframes fogDriftLeft { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .fog-float-layer { position: absolute; inset: 0; background: radial-gradient(ellipse 650px 420px at 15% 20%, rgba(220, 220, 240, 0.4), transparent 50%), radial-gradient(ellipse 580px 390px at 85% 80%, rgba(210, 210, 230, 0.42), transparent 50%), radial-gradient(ellipse 620px 400px at 45% 55%, rgba(215, 215, 235, 0.38), transparent 50%); animation: fogFloatInPlace1 20s ease-in-out infinite; filter: blur(55px); }
+        @keyframes fogFloatInPlace1 { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 1; } 33% { transform: translate(40px, -30px) scale(1.08); opacity: 0.85; } 66% { transform: translate(-35px, 35px) scale(0.92); opacity: 0.9; } }
+        .fog-ambient-layer { position: absolute; inset: 0; background: radial-gradient(ellipse 700px 450px at 50% 30%, rgba(200, 200, 220, 0.38), transparent 50%), radial-gradient(ellipse 600px 380px at 25% 70%, rgba(190, 190, 210, 0.4), transparent 50%), radial-gradient(ellipse 550px 360px at 75% 45%, rgba(195, 195, 215, 0.36), transparent 50%); animation: fogFloatInPlace2 28s ease-in-out infinite; filter: blur(60px); animation-delay: -7s; }
+        @keyframes fogFloatInPlace2 { 0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 1; } 50% { transform: translate(-45px, 40px) rotate(5deg); opacity: 0.8; } }
+        .fog-pulse-layer { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 0%, transparent 20%, rgba(180, 180, 200, 0.2) 50%, rgba(160, 160, 180, 0.3) 100%); animation: fogPulse 12s ease-in-out infinite; filter: blur(35px); }
+        @keyframes fogPulse { 0%, 100% { opacity: 0.9; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
+        .fog-particles { position: absolute; inset: 0; background-image: radial-gradient(circle 2px at 15% 25%, rgba(170, 255, 190, 0.5), transparent), radial-gradient(circle 1px at 45% 35%, rgba(170, 255, 190, 0.3), transparent), radial-gradient(circle 2px at 75% 15%, rgba(170, 255, 190, 0.4), transparent), radial-gradient(circle 1px at 25% 65%, rgba(170, 255, 190, 0.35), transparent), radial-gradient(circle 2px at 85% 55%, rgba(170, 255, 190, 0.4), transparent), radial-gradient(circle 1px at 55% 75%, rgba(170, 255, 190, 0.3), transparent), radial-gradient(circle 2px at 10% 85%, rgba(170, 255, 190, 0.5), transparent), radial-gradient(circle 1px at 90% 85%, rgba(170, 255, 190, 0.3), transparent), radial-gradient(circle 2px at 40% 50%, rgba(170, 255, 190, 0.4), transparent), radial-gradient(circle 1px at 70% 30%, rgba(170, 255, 190, 0.35), transparent); background-size: 200% 200%; animation: fogParticlesDrift 25s linear infinite; opacity: 0.6; }
+        @keyframes fogParticlesDrift { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+    
+        #flashlightCanvas { pointer-events:none; position:absolute; inset:0; width:100%; height:100%; z-index:90; display:none; }
+        
+        .hs-marker-viz.hs-enemy { background: transparent !important; border: none !important; box-shadow: none !important; width: auto !important; height: auto !important; border-radius: 0 !important; pointer-events: auto; z-index: 15; user-select: none !important; -webkit-user-select: none !important; }
+        .hs-marker-viz.hs-enemy:hover { transform: translate(-50%, -50%) !important; background: transparent !important; border: none !important; box-shadow: none !important; }
+        .hs-enemy video, .hs-enemy img { pointer-events: none; max-width: 800px; max-height: 800px; display: block; user-select: none !important; -webkit-user-drag: none !important; background: transparent !important; outline: none !important; border: none !important; }
+        .hs-enemy.proximity-hidden { display: none !important; }
+        .video-container { background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; }
+        video::-webkit-media-controls, video::-webkit-media-controls-start-playback-button, video::-webkit-media-controls-overlay-play-button, video::-webkit-media-controls-panel, video::-webkit-media-controls-play-button, *::-webkit-media-controls-start-playback-button, *::-webkit-media-controls-overlay-play-button, video::-webkit-media-controls-picture-in-picture-button, video::-webkit-media-controls-enclosure, video::-internal-media-controls-download-button, video::-internal-media-controls-overlay-cast-button { display: none !important; -webkit-appearance: none !important; }
+    
+        #gridCanvas { pointer-events: none; position: absolute; inset: 0; width: 100%; height: 100%; z-index: 10; display: none; }
+        .system-toast { position: fixed; left: 50%; bottom: 76px; z-index: 40000; transform: translate(-50%, 12px); padding: 10px 16px; border: 1px solid rgba(255,255,255,.35); border-radius: 8px; background: rgba(0,0,0,.88); color: #fff; font-size: .85rem; letter-spacing: .04em; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+        .system-toast.visible { opacity: 1; transform: translate(-50%, 0); }
+        .van-event { position: absolute; z-index: 130; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 12px; filter: drop-shadow(0 14px 18px rgba(0,0,0,.8)); }
+        .van-event img { width: 64px; height: 52px; object-fit: contain; pointer-events: auto; cursor: pointer; touch-action: none; }
+        .van-event.draggable img { cursor: grab; }
+        .van-event.draggable img:active { cursor: grabbing; }
+        .van-event.selected img { outline: 2px solid #ffd700; filter: drop-shadow(0 0 8px rgba(255,215,0,.75)); }
+        .van-controls { display: flex; flex-direction: column; align-items: stretch; gap: 7px; min-width: 92px; }
+        .van-controls button { border: 1px solid rgba(255,255,255,.65); border-radius: 7px; padding: 9px 12px; background: rgba(8,8,12,.94); color: #fff; font: 700 .74rem/1 'Segoe UI', sans-serif; letter-spacing: .09em; text-transform: uppercase; cursor: pointer; }
+        .van-controls button:hover, .van-controls button:focus-visible { background: #fff; color: #08080c; outline: none; }
+        .van-controls button:disabled { opacity: .55; cursor: default; background: rgba(8,8,12,.94); color: #fff; }
+        .van-cancel { border-color: #d76565 !important; color: #ff8d8d !important; }
+        .van-status { max-width: 150px; padding: 6px 8px; border-radius: 6px; background: rgba(0,0,0,.82); color: #fff; font-size: .68rem; line-height: 1.3; text-align: center; }
+        .van-event.running { animation: vanStarted .32s ease-in-out 3; }
+        @keyframes vanStarted { 50% { transform: translate(-50%, -50%) translateX(7px); } }
+        @media (max-width: 620px) { .van-event { gap: 6px; } .van-controls { min-width: 76px; } .van-controls button { padding: 7px 8px; font-size: .65rem; } }
+        
+    </style>
+</head>
+<body>
+
+    <!-- Botão Flutuante de Retorno Rápido -->
+    <button class="floating-back-btn" id="btnFloatingBack" type="button" onclick="goBack()" style="display: none;" title="Voltar ao mapa anterior">
+        <span>&#8592;</span> Voltar
+    </button>
+
+    <!-- Label flutuante de localização -->
+    <div class="location-label">
+        <div class="location-name" id="lblLocation">Mansão dos Macrados</div>
+        <div class="location-hint">Botão direito → opções</div>
+    </div>
+    <div class="system-toast" id="systemToast" role="status" aria-live="polite"></div>
+
+    <!-- Menu de Contexto (Botão Direito) -->
+    <div class="ctx-menu" id="ctxMenu">
+        <div class="ctx-title">⚙ Controles do Mestre</div>
+        <div class="ctx-sep"></div>
+        <button class="btn-ui btn-back" id="ctxBtnBack" onclick="goBack(); closeCtxMenu();" disabled>← Voltar ao mapa anterior</button>
+        
+        <button class="btn-ui" onclick="toggleTime(); closeCtxMenu();">🌤️ Dia / Noite</button>
+        <button class="btn-ui" onclick="toggleFog(); closeCtxMenu();">☁️ Névoa</button>
+        <button class="btn-ui" onclick="toggleCCTV(); closeCtxMenu();">🎥 CCTV</button>
+        <button class="btn-ui" onclick="toggleBlackout(); closeCtxMenu();">🔌 Blackout</button>
+        <button class="btn-ui" onclick="toggleGrid(); closeCtxMenu();">🏁 Mostrar/Ocultar Grid</button>
+        <button class="btn-ui" onclick="resetToDay(); closeCtxMenu();">☀️ Forçar Dia (Todos)</button>
+        <div class="ctx-sep"></div>
+        <button class="btn-ui" onclick="spawnHero();" style="color:#55a86d;">➕ Criar Herói</button>
+        <button class="btn-ui" onclick="spawnCustomMonster();" style="color:#bd7777;">👹 Adicionar Vilão/Monstro</button>
+        <button class="btn-ui" onclick="activateVanOfTheHidden(); closeCtxMenu();" style="color:#d6b46a;">🚐 Van dos Ocultos</button>
+        <div class="ctx-sep"></div>
+        <div class="ctx-title">VISIBILIDADE DOS VIL&Otilde;ES</div>
+        <button class="btn-ui" id="enableEnemyProximityButton" onclick="setEnemyProximityMode(true); closeCtxMenu();">Ativar proximidade</button>
+        <button class="btn-ui" id="disableEnemyProximityButton" onclick="setEnemyProximityMode(false); closeCtxMenu();">Desativar proximidade</button>
+        <div class="ctx-sep"></div>
+        <div class="ctx-title" style="opacity:0.4; font-size:0.6em;">📖 DICAS DO SISTEMA</div>
+        <div class="ctx-tip">🗑️ <b>Delete</b> — Remove jogador selecionado</div>
+        <div class="ctx-tip">📐 <b>Alt + Arrastar</b> — Régua de medição</div>
+        <div class="ctx-tip">🔴 <b>Shift + Clique</b> — Ping tático no mapa</div>
+        <div class="ctx-tip">🖱️ <b>Scroll</b> sobre token — Rotaciona</div>
+        <div class="ctx-tip">⌃ + <b>Scroll</b> — Aumenta ou diminui o tamanho</div>
+        <div class="ctx-tip">↔️ <b>← →</b> com token — Espelha token</div>
+        <div class="ctx-tip">🌗 <b>T</b> — Alterna entre dia e noite</div>
+        <div class="ctx-sep"></div>
+        <div class="ctx-title">EVENTOS</div>
+        <button class="btn-ui" onclick="openEventCreator();" style="color:#e2c87c;">&#10010; Adicionar evento</button>
+        <div class="ctx-sep"></div>
+        <div class="ctx-title">CEN&Aacute;RIOS</div>
+        <button class="btn-ui" onclick="openScenarioCreator();" style="color:#8fc9e8;">&#10010; Adicionar cen&aacute;rio</button>
+    </div>
+
+    <div class="event-modal" id="eventCreator" hidden>
+        <form class="event-card" id="eventForm">
+            <h2>Adicionar evento</h2>
+            <p>O marcador ser&aacute; criado no ponto em que o menu do mestre foi aberto. Eventos de porta levam diretamente ao teste correspondente na aba Limiar.</p>
+            <label class="event-field">Tipo de evento
+                <select id="eventKind">
+                    <option value="media">M&iacute;dia ou &aacute;udio</option>
+                    <option value="door">Porta</option>
+                </select>
+            </label>
+            <label class="event-field">Nome do evento
+                <input id="eventTitle" type="text" maxlength="60" required placeholder="Ex.: Apari&ccedil;&atilde;o no corredor">
+            </label>
+            <label class="event-field">Visibilidade do marcador
+                <select id="eventVisibility">
+                    <option value="visible">Brilhante</option>
+                    <option value="semi">Camuflado</option>
+                    <option value="invisible">Invis&iacute;vel</option>
+                </select>
+            </label>
+            <label class="event-field" id="eventVisualField">Token, GIF ou v&iacute;deo (opcional)
+                <input id="eventFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm">
+                <small>PNG, JPEG ou WebP at&eacute; 8 MB; GIF, MP4 ou WebM at&eacute; 20 MB.</small>
+            </label>
+            <label class="event-field" id="eventAudioField">&Aacute;udio do evento (opcional)
+                <input id="eventAudioFile" type="file" accept="audio/mpeg,audio/mp3,audio/wav,audio/wave,audio/x-wav,audio/ogg,audio/mp4,audio/m4a,audio/x-m4a,audio/aac,.mp3,.wav,.ogg,.m4a,.aac">
+                <small>MP3, WAV, OGG, M4A ou AAC at&eacute; 20 MB. O &aacute;udio come&ccedil;a assim que o evento &eacute; acionado.</small>
+            </label>
+            <label class="event-field" id="eventAudioDurationField">Tempo de reprodu&ccedil;&atilde;o do &aacute;udio (segundos)
+                <input id="eventAudioDuration" type="number" min="0.5" max="600" step="0.5" value="10">
+                <small>O som ser&aacute; interrompido ao atingir esse tempo, mesmo que o arquivo seja mais longo.</small>
+            </label>
+            <div class="event-form-status" id="eventFormStatus" role="status" aria-live="polite"></div>
+            <div class="event-actions">
+                <button type="button" onclick="closeEventCreator()">Cancelar</button>
+                <button class="primary" id="saveEventButton" type="submit">Adicionar ao mapa</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="event-modal" id="eventViewer" hidden>
+        <section class="event-card event-view-card" role="dialog" aria-modal="true" aria-labelledby="eventViewerTitle">
+            <h2 id="eventViewerTitle">Evento</h2>
+            <p id="eventViewerDescription">Evento acionado pelo mestre.</p>
+            <div class="event-media" id="eventMedia"></div>
+            <div class="event-actions">
+                <button class="danger" id="deleteEventButton" type="button">Remover evento</button>
+                <button class="primary" id="triggerDoorEventButton" type="button" hidden>Abrir teste da porta</button>
+                <button type="button" onclick="closeEventViewer()">Fechar</button>
+            </div>
+        </section>
+    </div>
+
+    <div class="event-modal" id="scenarioCreator" hidden>
+        <form class="event-card" id="scenarioForm">
+            <h2>Adicionar cen&aacute;rio</h2>
+            <p>Um acesso ser&aacute; criado no ponto em que o menu do mestre foi aberto. Crie um novo mapa ou conecte o marcador a um cen&aacute;rio existente.</p>
+            <label class="event-field">Nome do cen&aacute;rio
+                <input id="scenarioTitle" type="text" maxlength="60" required placeholder="Ex.: Cripta subterr&acirc;nea">
+            </label>
+            <label class="event-field">Tipo de acesso
+                <select id="scenarioMode">
+                    <option value="new">Criar novo mapa</option>
+                    <option value="connect">Conectar a um cen&aacute;rio existente</option>
+                </select>
+            </label>
+            <label class="event-field">Visibilidade do acesso
+                <select id="scenarioVisibility">
+                    <option value="visible">Brilhante</option>
+                    <option value="semi">Camuflado</option>
+                    <option value="invisible">Invis&iacute;vel</option>
+                </select>
+            </label>
+            <label class="event-field" id="scenarioFileField">Imagem do mapa
+                <input id="scenarioFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required>
+                <small>PNG, JPEG ou WebP at&eacute; 8 MB; GIF at&eacute; 20 MB.</small>
+            </label>
+            <label class="event-field" id="scenarioNightFileField">Imagem da vers&atilde;o noturna (opcional)
+                <input id="scenarioNightFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+                <small>Usada automaticamente quando o mapa estiver no modo noite. PNG, JPEG ou WebP at&eacute; 8 MB; GIF at&eacute; 20 MB.</small>
+            </label>
+            <label class="event-field" id="scenarioTargetField" hidden>Cen&aacute;rio de destino
+                <select id="scenarioTarget"></select>
+                <small>Ao selecionar o marcador no mapa, este cen&aacute;rio ser&aacute; aberto.</small>
+            </label>
+            <div class="event-form-status" id="scenarioFormStatus" role="status" aria-live="polite"></div>
+            <div class="event-actions">
+                <button type="button" onclick="closeScenarioCreator()">Cancelar</button>
+                <button class="primary" id="saveScenarioButton" type="submit">Adicionar ao mapa</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="event-modal" id="scenarioViewer" hidden>
+        <section class="event-card" role="dialog" aria-modal="true" aria-labelledby="scenarioViewerTitle">
+            <h2 id="scenarioViewerTitle">Cen&aacute;rio</h2>
+            <p id="scenarioViewerDescription">Gerencie o cen&aacute;rio adicionado ao mapa.</p>
+            <div class="event-actions">
+                <button class="danger" id="deleteScenarioButton" type="button">Remover cen&aacute;rio</button>
+                <button class="primary" id="openScenarioButton" type="button">Abrir cen&aacute;rio</button>
+                <button type="button" onclick="closeScenarioViewer()">Fechar</button>
+            </div>
+        </section>
+    </div>
+
+    <div class="event-modal" id="heroCreator" hidden>
+        <form class="event-card" id="heroForm">
+            <h2>Adicionar heróis</h2>
+            <p>Monte o grupo abaixo. Todos os heróis serão adicionados próximos ao ponto em que o menu do mestre foi aberto.</p>
+            <div class="hero-create-list" id="heroCreateList"></div>
+            <button class="add-hero-row" id="addHeroRowButton" type="button">+ Adicionar outro herói</button>
+            <div class="event-form-status" id="heroFormStatus" role="status" aria-live="polite"></div>
+            <div class="event-actions">
+                <button type="button" onclick="closeHeroCreator()">Cancelar</button>
+                <button class="primary" id="saveHeroesButton" type="submit">Adicionar heróis ao mapa</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="event-modal" id="monsterCreator" hidden>
+        <form class="event-card" id="monsterForm">
+            <h2>Adicionar vil&atilde;o ou monstro</h2>
+            <p>O inimigo ser&aacute; criado no ponto em que o menu do mestre foi aberto.</p>
+            <label class="event-field">Nome
+                <input id="monsterTitle" type="text" maxlength="60" required placeholder="Ex.: Criatura do por&atilde;o">
+            </label>
+            <label class="event-field">Imagem, GIF ou v&iacute;deo
+                <input id="monsterFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm" required>
+                <small>GIF at&eacute; 8 MB; demais imagens e v&iacute;deos at&eacute; 3 MB.</small>
+            </label>
+            <label class="event-field">&Aacute;udio do vil&atilde;o (opcional)
+                <input id="monsterAudioFile" type="file" accept="audio/mpeg,audio/mp3,audio/wav,audio/wave,audio/x-wav,audio/ogg,audio/mp4,audio/m4a,audio/x-m4a,audio/aac,.mp3,.wav,.ogg,.m4a,.aac">
+                <small>MP3, WAV, OGG, M4A ou AAC at&eacute; 20 MB. Toca somente enquanto o vil&atilde;o ainda n&atilde;o foi encontrado.</small>
+            </label>
+            <label class="event-field">Intervalo entre reprodu&ccedil;&otilde;es (segundos)
+                <input id="monsterAudioInterval" type="number" min="1" max="600" step="1" value="15" required>
+                <small>O intervalo come&ccedil;a depois que cada reprodu&ccedil;&atilde;o termina.</small>
+            </label>
+            <label class="event-field">Dist&acirc;ncia de revela&ccedil;&atilde;o (% do mapa)
+                <input id="monsterDetectionDistance" type="number" min="1" max="100" step="1" value="20" required>
+                <small>Usada quando a revela&ccedil;&atilde;o por proximidade estiver ativada.</small>
+            </label>
+            <div class="event-form-status" id="monsterFormStatus" role="status" aria-live="polite"></div>
+            <div class="event-actions">
+                <button type="button" onclick="closeMonsterCreator()">Cancelar</button>
+                <button class="primary" id="saveMonsterButton" type="submit">Adicionar ao mapa</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="viewport">
+        <!-- MATRIZ PRINCIPAL - A LÓGICA ANCORA NELE -->
+        <div class="map-anchor" id="mapAnchor">
+            <img id="bgImage" src="" alt="Fundo" draggable="false" ondragstart="return false;">
+            <canvas id="gridCanvas"></canvas>
+            <div id="hotspotsLayer"></div>
+            <div id="charsLayer"></div>
+            <div id="vanLayer"></div>
+            <div id="marqueeBox" class="marquee-box"></div>
+            <canvas id="flashlightCanvas"></canvas>
+            
+            <div class="fog-layer" id="fogLayer">
+                <div class="fog-pulse-layer"></div>
+                <div class="fog-veil"></div>
+                <div class="fog-overlay"></div>
+                <div class="fog-dense-layer"></div>
+                <div class="fog-float-layer"></div>
+                <div class="fog-ambient-layer"></div>
+                <div class="fog-particles"></div>
+            </div>
+            <div id="cctvLayer">
+                <div class="cctv-cam">LIVE ON</div>
+                <div class="cctv-hud">
+                    <div class="cctv-date" id="cctvClock">2026/04/13 00:00:00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JUMPSCARE / CUTSCENE OVERLAY -->
+    <div id="jumpscareOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 30000; background: #000 center/cover no-repeat; align-items: flex-start; justify-content: center;">
+        <div style="position: relative; width: fit-content; height: fit-content; display: flex; align-items: center; justify-content: center;">
+            <video id="jumpscareVideo" src="" autoplay loop muted playsinline disablePictureInPicture oncontextmenu="return false;" controlsList="nodownload nofullscreen noremoteplayback" style="width: 35vw; max-height: 50vh; object-fit: contain; margin-top: 25vh; pointer-events: none;"></video>
+            <div id="jumpscareShield" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; cursor: pointer;" onclick="toggleJumpscare()"></div>
+        </div>
+    </div>
+
+    <!-- EFEITOS SONOROS PADRÃO -->
+    <audio id="sndLanterna" src="lanterna.mp3" preload="auto"></audio>
+    <audio id="sndBlackout" src="blackout.mp3" preload="auto"></audio>
+    <audio id="sndDayNight" src="luzenoite.mp3" preload="auto"></audio>
+    <audio id="sndTranca" src="tranca.mp3" preload="auto"></audio>
+    <audio id="sndSafeOpen" src="aberto.mp3" preload="auto"></audio>
+    <audio id="sndAnarquico" src="aranquico_laugh.mp3" preload="auto" loop></audio>
+    <audio id="sndZumbi" src="rugido zumbi.mp3" preload="auto" loop></audio>
+    <audio id="sndDominic" src="dominic scream.mp3" preload="auto" loop></audio>
+    <audio id="sndPertubado" src="pertubado de energia_som.mp3" preload="auto" loop></audio>
+    <audio id="sndVulto" src="vulto_som.mp3" preload="auto" loop></audio>
+    <audio id="sndMeaCulpa" src="mea_culpa.mp3" preload="auto" loop></audio>
+    <audio id="sndVanSuccess" src="deu boa.mp3" preload="auto"></audio>
+    <audio id="sndVanFailure" src="deu ruim.mp3" preload="auto"></audio>
+
+    <script>
+        // RPG_FORGE_METADATA_START
+        // const rpgForgeProjectData = {"name":"Mansão dos Macrados","theme":"custom","customThemeName":"Mansão assombrada","customColor":"#040411","showLocationName":true,"locationNamePos":"bottom-left","hasDayNight":true,"keyDayNight":"","hasBlackout":true,"keyBlackout":"","keyTokenLight":"","hasCctv":true,"keyCctv":"","hasFog":true,"keyFog":"","keyGrid":"h","keyResetDay":"r","masterButtons":[],"sectors":[{"id":"andar_1","name":"Mapa Mundi","imgBaseName":"Mapa_Mundi.png","imgNightName":"Mapa_Mundi_noite.png","imgBlackoutName":"","blobBase":null,"blobNight":null,"blobBlackout":null,"hotspots":[{"id":"andar_cidade_arredores","title":"Mapa de Exploração: Cidade e Arredores","visibility":"semi","position":{"top":"33.000%","left":"9.500%"}},{"id":"andar_nova_capital","title":"Centro de Nova Capital","visibility":"semi","position":{"top":"51.810%","left":"90.020%"}}]},{"id":"andar_cidade_arredores","name":"Cidade de Antonieta e Arredores","imgBaseName":"Mapa de Exploração_ Cidade e Arredores(1).png","imgNightName":"ChatGPT Image 30 de set. de 2026, 14_24_42.png","imgBlackoutName":"Cidade de Antonieta_blackout.png","blobBase":"blob:https://cassiano-behemonth.github.io/c4c1c0d3-299d-47b6-b3cf-cf8472446ad7","blobNight":"blob:https://cassiano-behemonth.github.io/13da636a-70b3-424e-a0cb-ed6fa2c61303","blobBlackout":null,"hotspots":[{"id":"andar_2","title":"Farmácia Drogas e Cia","visibility":"semi","position":{"top":"31.290%","left":"13.179%"}},{"id":"andar_3","title":"Loja de armas","visibility":"semi","position":{"top":"32.980%","left":"35.734%"}},{"id":"andar_4","title":"Escola","visibility":"semi","position":{"top":"54.708%","left":"25.951%"}},{"id":"andar_5","title":"Igreja","visibility":"semi","position":{"top":"87.541%","left":"23.505%"}},{"id":"andar_6","title":"Bosque da Vila","visibility":"semi","position":{"top":"44.810%","left":"67.527%"}},{"id":"andar_7","title":"Labirinto","visibility":"semi","position":{"top":"35.877%","left":"81.386%"}},{"id":"andar_8","title":"Mansão Dos Macrados","visibility":"semi","position":{"top":"30.807%","left":"76.359%"}},{"id":"andar_14","title":"Conversar","visibility":"semi","position":{"top":"72.693%","left":"42.391%"}},{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"6.500%","left":"6.500%"}}]},{"id":"andar_nova_capital","name":"Centro de Nova Capital","imgBaseName":"Centro_de_Nova_Capital.png","imgNightName":"Centro_de_Nova_Capital.png","imgBlackoutName":"","blobBase":null,"blobNight":null,"blobBlackout":null,"hotspots":[{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"48.500%","left":"21.500%"}}]},{"id":"andar_2","name":"Farmácia Drogas e CIA","imgBaseName":"ChatGPT Image 30 de set. de 2026, 14_31_56.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/21f7f7b2-aa21-4225-9290-075af4b8e83d","blobNight":null,"blobBlackout":null,"hotspots":[{"id":"andar_15","title":"Conversar","visibility":"semi","position":{"top":"44.085%","left":"68.342%"}}]},{"id":"andar_3","name":"Armaria do Seu Armani","imgBaseName":"c2152cb1-bd5a-4863-b156-233d9d905efd.png","imgNightName":"Balcão de armas e vendedor grisalho.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/fde7d989-0988-4238-b340-5b6b3bba0bca","blobNight":"blob:https://cassiano-behemonth.github.io/dcf1d340-abeb-44d2-bf31-275a0be6df58","blobBlackout":null,"hotspots":[{"id":"andar_13","title":"Conversar","visibility":"semi","position":{"top":"41.912%","left":"67.663%"}}]},{"id":"andar_4","name":"Escola Estadual Antônio Macrado","imgBaseName":"62f4b069-7980-4229-95c0-9c5beb2f4607.png","imgNightName":"Saguão Escolar Sob a Chuva Noturna.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/ad800690-adf6-485b-92c4-145607df63dd","blobNight":"blob:https://cassiano-behemonth.github.io/5c1108f8-fda5-437d-a473-6215f7aa7b64","blobBlackout":null,"hotspots":[{"id":"andar_12","title":"Conversar","visibility":"semi","position":{"top":"56.880%","left":"59.375%"}},{"id":"andar_11","title":"Conversar","visibility":"semi","position":{"top":"53.138%","left":"30.163%"}}]},{"id":"andar_5","name":"Igreja Novos Dias","imgBaseName":"9259071d-78d2-4c0b-bee4-ffc9426ea242.png","imgNightName":"c1c72732-0c15-418e-a77f-67498a97e3b2.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/9877768e-42bc-4b8d-9a80-ea254852d92e","blobNight":"blob:https://cassiano-behemonth.github.io/e7434cfe-2b3f-49bd-8d81-a1a70dc9f9e1","blobBlackout":null,"hotspots":[{"id":"andar_10","title":"*","visibility":"invisible","position":{"top":"55.152%","left":"50.543%"}}]},{"id":"andar_6","name":"Bosque da vila","imgBaseName":"Mapa Gótico do Bosque Noturno.png","imgNightName":"Mapa Noturno do Bosque Assombrado.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/4a25c16f-4a41-4f47-aa7d-a00872cb664c","blobNight":"blob:https://cassiano-behemonth.github.io/d2200299-4d1c-4911-a35c-18df5cb0f326","blobBlackout":null,"hotspots":[]},{"id":"andar_7","name":"Labirinto da Mansão","imgBaseName":"70a6c983-4357-45ec-80cd-5db03c7283ec.png","imgNightName":"82e61193-1d50-4fab-9b95-0c6b6d055ecd.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/75700fc8-fdf9-4216-b37c-c8f5ab1ca2c1","blobNight":"blob:https://cassiano-behemonth.github.io/70130d59-a95b-4930-a415-fdce9896ed15","blobBlackout":null,"hotspots":[]},{"id":"andar_8","name":"Mansão Dos Macrados 1 andar","imgBaseName":"994e6fe9-677a-4fe7-a1fc-0e5e014819d7.png","imgNightName":"e9d56ac7-e985-47f8-a917-ba1f7925fd5d.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/ac5d8454-5b5d-440f-bdcb-21ae63657a4b","blobNight":"blob:https://cassiano-behemonth.github.io/ab3beb3f-6500-436c-853d-a1cb30fb76d4","blobBlackout":null,"hotspots":[{"id":"andar_9","title":"Entrar","visibility":"semi","position":{"top":"7.148%","left":"13.451%"}}]},{"id":"andar_9","name":"Mansão Dos Macrados 2 andar","imgBaseName":"b4236906-0edf-4916-adec-3fc5b2cd3be5.png","imgNightName":"ad4457d4-7bdf-461d-a6e4-c22cafcba0ea.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/89d56fae-d3ba-486b-a27f-0cb7abf93505","blobNight":"blob:https://cassiano-behemonth.github.io/b0159261-60df-484a-9d10-70c696b2dda2","blobBlackout":null,"hotspots":[]},{"id":"andar_10","name":"Subsolo da igreja","imgBaseName":"ChatGPT Image 30 de set. de 2026, 17_32_42.png","imgNightName":"ChatGPT Image 30 de set. de 2026, 17_32_40.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/9c468cfb-9e5f-4ec9-a656-aebb86cd913d","blobNight":"blob:https://cassiano-behemonth.github.io/3cc7ea2f-4143-4966-b294-a4d078660b58","blobBlackout":null,"hotspots":[]},{"id":"andar_11","name":"Conversa com o zelador","imgBaseName":"","imgNightName":"Zelador diante do saguão antigo.png","imgBlackoutName":"","blobBase":null,"blobNight":"blob:https://cassiano-behemonth.github.io/fe1e63ff-bac5-4521-b65c-1b293864c076","blobBlackout":null,"hotspots":[]},{"id":"andar_12","name":"Conversa com a Dona Cecilia","imgBaseName":"Freira na recepção da escola antiga.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/98911459-7375-44c2-b7bb-351742ea7056","blobNight":null,"blobBlackout":null,"hotspots":[]},{"id":"andar_13","name":"Conversa com Seu armani","imgBaseName":"Balcão de armas e vendedor grisalho.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/fd49a6ca-28be-40fb-b56b-d4f8fc37e2e4","blobNight":null,"blobBlackout":null,"hotspots":[]},{"id":"andar_14","name":"Vereador na prefeitura antiga","imgBaseName":"imagem_2026-09-30_202325269.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/1266587a-bf06-4bc6-a652-c753185366fd","blobNight":null,"blobBlackout":null,"hotspots":[]},{"id":"andar_15","name":"Conversa com a senhora Lindasol","imgBaseName":"Farmácia Assombrada do Balcão (1).png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/fe42fc1f-86f1-4702-bef4-c7ce3311d550","blobNight":null,"blobBlackout":null,"hotspots":[]}]};
+        // RPG_FORGE_METADATA_END
+        const THEME_LORE = "Mansão assombrada";
+        const hierarchy = {"andar_1":{"id":"andar_1","name":"Mapa Mundi","imgBaseName":"Mapa_Mundi.png","imgNightName":"Mapa_Mundi.png","imgBlackoutName":"","hotspots":[{"id":"andar_cidade_arredores","title":"Mapa de Exploração: Cidade e Arredores","visibility":"semi","position":{"top":"33.000%","left":"9.500%"}},{"id":"andar_nova_capital","title":"Centro de Nova Capital","visibility":"semi","position":{"top":"51.810%","left":"90.020%"}}]},"andar_cidade_arredores":{"id":"andar_cidade_arredores","name":"Cidade de Antonieta e Arredores","imgBaseName":"Mapa de Exploração_ Cidade e Arredores(1).png","imgNightName":"ChatGPT Image 30 de set. de 2026, 14_24_42.png","imgBlackoutName":"Cidade de Antonieta_blackout.png","hotspots":[{"id":"andar_2","title":"Farmácia Drogas e Cia","visibility":"semi","position":{"top":"31.290%","left":"13.179%"}},{"id":"andar_3","title":"Loja de armas","visibility":"semi","position":{"top":"32.980%","left":"35.734%"}},{"id":"andar_4","title":"Escola","visibility":"semi","position":{"top":"54.708%","left":"25.951%"}},{"id":"andar_5","title":"Igreja","visibility":"semi","position":{"top":"87.541%","left":"23.505%"}},{"id":"andar_6","title":"Bosque da Vila","visibility":"semi","position":{"top":"44.810%","left":"67.527%"}},{"id":"andar_7","title":"Labirinto","visibility":"semi","position":{"top":"35.877%","left":"81.386%"}},{"id":"andar_8","title":"Mansão Dos Macrados","visibility":"semi","position":{"top":"30.807%","left":"76.359%"}},{"id":"andar_14","title":"Conversar","visibility":"semi","position":{"top":"72.693%","left":"42.391%"}},{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"6.500%","left":"6.500%"}}]},"andar_nova_capital":{"id":"andar_nova_capital","name":"Centro de Nova Capital","imgBaseName":"Centro_de_Nova_Capital.png","imgNightName":"Centro_de_Nova_Capital.png","imgBlackoutName":"","hotspots":[{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"48.500%","left":"21.500%"}}]},"andar_2":{"id":"andar_2","name":"Farmácia Drogas e CIA","imgBaseName":"ChatGPT Image 30 de set. de 2026, 14_31_56.png","imgNightName":"Farmácia Drogas e CIA_noite.png","imgBlackoutName":"Farmácia Drogas e CIA_blackout.png","hotspots":[{"id":"andar_15","title":"Conversar","visibility":"semi","position":{"top":"44.085%","left":"68.342%"}}]},"andar_3":{"id":"andar_3","name":"Armaria do Seu Armani","imgBaseName":"c2152cb1-bd5a-4863-b156-233d9d905efd.png","imgNightName":"Balcão de armas e vendedor grisalho.png","imgBlackoutName":"Armaria do Seu Armani_blackout.png","hotspots":[{"id":"andar_13","title":"Conversar","visibility":"semi","position":{"top":"41.912%","left":"67.663%"}}]},"andar_4":{"id":"andar_4","name":"Escola Estadual Antônio Macrado","imgBaseName":"62f4b069-7980-4229-95c0-9c5beb2f4607.png","imgNightName":"Saguão Escolar Sob a Chuva Noturna.png","imgBlackoutName":"Escola Estadual Antônio Macrado_blackout.png","hotspots":[{"id":"andar_12","title":"Conversar","visibility":"semi","position":{"top":"56.880%","left":"59.375%"}},{"id":"andar_11","title":"Conversar","visibility":"semi","position":{"top":"53.138%","left":"30.163%"}}]},"andar_5":{"id":"andar_5","name":"Igreja Novos Dias","imgBaseName":"9259071d-78d2-4c0b-bee4-ffc9426ea242.png","imgNightName":"c1c72732-0c15-418e-a77f-67498a97e3b2.png","imgBlackoutName":"Igreja Novos Dias_blackout.png","hotspots":[{"id":"andar_10","title":"*","visibility":"invisible","position":{"top":"55.152%","left":"50.543%"}}]},"andar_6":{"id":"andar_6","name":"Bosque da vila","imgBaseName":"Mapa Gótico do Bosque Noturno.png","imgNightName":"Mapa Noturno do Bosque Assombrado.png","imgBlackoutName":"Bosque da vila_blackout.png","hotspots":[]},"andar_7":{"id":"andar_7","name":"Labirinto da Mansão","imgBaseName":"70a6c983-4357-45ec-80cd-5db03c7283ec.png","imgNightName":"82e61193-1d50-4fab-9b95-0c6b6d055ecd.png","imgBlackoutName":"Labirinto da Mansão_blackout.png","hotspots":[]},"andar_8":{"id":"andar_8","name":"Mansão Dos Macrados 1 andar","imgBaseName":"994e6fe9-677a-4fe7-a1fc-0e5e014819d7.png","imgNightName":"e9d56ac7-e985-47f8-a917-ba1f7925fd5d.png","imgBlackoutName":"Mansão Dos Macrados 1 andar_blackout.png","hotspots":[{"id":"andar_9","title":"Entrar","visibility":"semi","position":{"top":"7.148%","left":"13.451%"}}]},"andar_9":{"id":"andar_9","name":"Mansão Dos Macrados 2 andar","imgBaseName":"b4236906-0edf-4916-adec-3fc5b2cd3be5.png","imgNightName":"ad4457d4-7bdf-461d-a6e4-c22cafcba0ea.png","imgBlackoutName":"Mansão Dos Macrados 2 andar_blackout.png","hotspots":[]},"andar_10":{"id":"andar_10","name":"Subsolo da igreja","imgBaseName":"ChatGPT Image 30 de set. de 2026, 17_32_42.png","imgNightName":"ChatGPT Image 30 de set. de 2026, 17_32_40.png","imgBlackoutName":"Subsolo da igreja_blackout.png","hotspots":[]},"andar_11":{"id":"andar_11","name":"Conversa com o zelador","imgBaseName":"Conversa com o zelador.png","imgNightName":"Zelador diante do saguão antigo.png","imgBlackoutName":"Conversa com o zelador_blackout.png","hotspots":[]},"andar_12":{"id":"andar_12","name":"Conversa com a Dona Cecilia","imgBaseName":"Freira na recepção da escola antiga.png","imgNightName":"Conversa com a Dona Cecilia_noite.png","imgBlackoutName":"Conversa com a Dona Cecilia_blackout.png","hotspots":[]},"andar_13":{"id":"andar_13","name":"Conversa com Seu armani","imgBaseName":"Balcão de armas e vendedor grisalho.png","imgNightName":"Conversa com Seu armani_noite.png","imgBlackoutName":"Conversa com Seu armani_blackout.png","hotspots":[]},"andar_14":{"id":"andar_14","name":"Vereador na prefeitura antiga","imgBaseName":"imagem_2026-09-30_202325269.png","imgNightName":"Vereador na prefeitura antiga_noite.png","imgBlackoutName":"Vereador na prefeitura antiga_blackout.png","hotspots":[]},"andar_15":{"id":"andar_15","name":"Conversa com a senhora Lindasol","imgBaseName":"Farmácia Assombrada do Balcão (1).png","imgNightName":"Conversa com a senhora Lindasol_noite.png","imgBlackoutName":"Conversa com a senhora Lindasol_blackout.png","hotspots":[]}};
+        hierarchy.andar_1.imgNightName = "Mapa mundi noite.png";
+        hierarchy.andar_14.imgBaseName = "Vereador sorridente diante da prefeitura abandonada.png";
+        const hasDayNight = true;
+        const hasBlackoutFeature = true;
+        
+        let currentId = 'andar_1';
+        let isDay = true;
+        let isBlackout = false;
+        let isCctv = false;
+        let cctvInterval = null;
+        let navHistory = [];
+        let activeEnemyRef = null;
+        let activeEventRef = null;
+        let activeScenarioLink = null;
+        let activeScenarioSourceId = null;
+        let activeEventAudio = null;
+        let activeEventAudioTimer = null;
+        let isF7Down = false, f7SpecialSpawned = false;
+        let isF8Down = false, f8SpecialTriggered = false;
+        let isF9Down = false, f9SpecialSpawned = false;
+        let isF10Down = false, f10SpecialTriggered = false;
+        let spawnCursorX = 50;
+        let spawnCursorY = 50;
+        const TOKEN_MAX_SIZE_PX = 2000;
+        const HERO_BASE_SIZE_PX = 45;
+        const HERO_MIN_SCALE = 0.5;
+        const HERO_MAX_SCALE = TOKEN_MAX_SIZE_PX / HERO_BASE_SIZE_PX;
+        
+        const ctxMenu = document.getElementById('ctxMenu');
+
+        function openCtxMenu(x, y) {
+            updateEnemyProximityControls();
+            ctxMenu.style.left = x + 'px';
+            ctxMenu.style.top  = y + 'px';
+            ctxMenu.classList.add('open');
+            // Ajuste para não sair da tela
+            requestAnimationFrame(() => {
+                const r = ctxMenu.getBoundingClientRect();
+                if (r.right  > window.innerWidth)  ctxMenu.style.left = (x - r.width)  + 'px';
+                if (r.bottom > window.innerHeight) ctxMenu.style.top  = (y - r.height) + 'px';
+            });
+        }
+
+        function closeCtxMenu() { ctxMenu.classList.remove('open'); }
+
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            if (e.target.closest('.event-modal')) return;
+            openCtxMenu(e.clientX, e.clientY);
+            
+            const anc = document.getElementById('mapAnchor');
+            const rect = anc.getBoundingClientRect();
+            spawnCursorX = ((e.clientX - rect.left) / rect.width) * 100;
+            spawnCursorY = ((e.clientY - rect.top) / rect.height) * 100;
+            if (spawnCursorX < 0) spawnCursorX = 0; if (spawnCursorX > 100) spawnCursorX = 100;
+            if (spawnCursorY < 0) spawnCursorY = 0; if (spawnCursorY > 100) spawnCursorY = 100;
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!ctxMenu.contains(e.target)) closeCtxMenu();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCtxMenu();
+                closeEventCreator();
+                closeEventViewer();
+                closeScenarioCreator();
+                closeScenarioViewer();
+                closeHeroCreator();
+                closeMonsterCreator();
+            }
+        });
+        
+        const MAP_STATE_KEY = 'antonieta-map-state-v1';
+        let charsData = {}; 
+        let charID = 0;
+        let tokenDrag = null;
+        let toastTimer = null;
+        let vanState = null;
+        let vanMovementTimer = null;
+        const VAN_MOVEMENT_DURATION_MS = 2 * 60 * 1000;
+        let isEnemyProximityEnabled = false;
+        const customMonsterAudioPlayers = new Map();
+        const customMonsterAudioTimers = new Map();
+        const MAP_ASSET_DB_NAME = 'antonieta-map-assets-v1';
+        let mapAssetDbPromise = null;
+        const mapAssetUrlCache = new Map();
+        const mapAssetLoads = new Map();
+
+        function showToast(message) {
+            const toast = document.getElementById('systemToast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.add('visible');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('visible'), 1800);
+        }
+
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(reader.error || new Error('Nao foi possivel ler o arquivo'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function openEventCreator() {
+            closeCtxMenu();
+            const modal = document.getElementById('eventCreator');
+            const form = document.getElementById('eventForm');
+            form.reset();
+            updateEventKindFields();
+            document.getElementById('eventFormStatus').textContent = `Posicao: ${spawnCursorX.toFixed(1)}%, ${spawnCursorY.toFixed(1)}%`;
+            modal.hidden = false;
+            setTimeout(() => document.getElementById('eventTitle').focus(), 0);
+        }
+
+        function updateEventKindFields() {
+            const isDoor = document.getElementById('eventKind').value === 'door';
+            document.getElementById('eventVisualField').hidden = isDoor;
+            document.getElementById('eventAudioField').hidden = isDoor;
+            document.getElementById('eventAudioDurationField').hidden = isDoor;
+            const title = document.getElementById('eventTitle');
+            if (isDoor && !title.value.trim()) title.value = 'Porta';
+            title.placeholder = isDoor ? 'Ex.: Porta do corredor' : 'Ex.: Aparicao no corredor';
+            document.getElementById('eventFormStatus').textContent = isDoor
+                ? 'Ao acionar este marcador, o teste da porta sera aberto na aba Limiar.'
+                : `Posicao: ${spawnCursorX.toFixed(1)}%, ${spawnCursorY.toFixed(1)}%`;
+        }
+
+        document.getElementById('eventKind').addEventListener('change', updateEventKindFields);
+
+        function closeEventCreator() {
+            document.getElementById('eventCreator').hidden = true;
+            document.getElementById('eventFormStatus').textContent = '';
+        }
+
+        function openScenarioCreator() {
+            closeCtxMenu();
+            const modal = document.getElementById('scenarioCreator');
+            const form = document.getElementById('scenarioForm');
+            form.reset();
+            populateScenarioTargets();
+            updateScenarioCreationMode();
+            document.getElementById('scenarioFormStatus').textContent = `Posicao: ${spawnCursorX.toFixed(1)}%, ${spawnCursorY.toFixed(1)}%`;
+            modal.hidden = false;
+            setTimeout(() => document.getElementById('scenarioTitle').focus(), 0);
+        }
+
+        function populateScenarioTargets() {
+            const select = document.getElementById('scenarioTarget');
+            select.replaceChildren();
+            Object.values(hierarchy)
+                .filter(scenario => scenario.id !== currentId)
+                .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
+                .forEach(scenario => {
+                    const option = document.createElement('option');
+                    option.value = scenario.id;
+                    option.textContent = scenario.name;
+                    select.appendChild(option);
+                });
+        }
+
+        function updateScenarioCreationMode() {
+            const isConnection = document.getElementById('scenarioMode').value === 'connect';
+            const fileField = document.getElementById('scenarioFileField');
+            const nightFileField = document.getElementById('scenarioNightFileField');
+            const targetField = document.getElementById('scenarioTargetField');
+            const fileInput = document.getElementById('scenarioFile');
+            const targetSelect = document.getElementById('scenarioTarget');
+            fileField.hidden = isConnection;
+            nightFileField.hidden = isConnection;
+            targetField.hidden = !isConnection;
+            fileInput.required = !isConnection;
+            targetSelect.required = isConnection;
+        }
+
+        document.getElementById('scenarioMode').addEventListener('change', updateScenarioCreationMode);
+
+        function closeScenarioCreator() {
+            document.getElementById('scenarioCreator').hidden = true;
+            document.getElementById('scenarioFormStatus').textContent = '';
+        }
+
+        function openScenarioViewer(scenarioLink, sourceId) {
+            closeCtxMenu();
+            activeScenarioLink = scenarioLink;
+            activeScenarioSourceId = sourceId;
+            document.getElementById('scenarioViewerTitle').textContent = scenarioLink.title || 'Cenario';
+            const isConnection = scenarioLink.connectionOnly === true;
+            document.getElementById('scenarioViewerDescription').textContent = isConnection
+                ? `Conexao com ${hierarchy[scenarioLink.id]?.name || 'outro cenario'}.`
+                : 'Gerencie o cenario adicionado ao mapa.';
+            document.getElementById('deleteScenarioButton').textContent = isConnection ? 'Remover conexao' : 'Remover cenario';
+            document.getElementById('scenarioViewer').hidden = false;
+        }
+
+        function closeScenarioViewer() {
+            document.getElementById('scenarioViewer').hidden = true;
+            activeScenarioLink = null;
+            activeScenarioSourceId = null;
+        }
+
+        function spawnCustomMonster() {
+            closeCtxMenu();
+            const form = document.getElementById('monsterForm');
+            form.reset();
+            document.getElementById('monsterFormStatus').textContent = `Posicao: ${spawnCursorX.toFixed(1)}%, ${spawnCursorY.toFixed(1)}%`;
+            document.getElementById('monsterCreator').hidden = false;
+            setTimeout(() => document.getElementById('monsterTitle').focus(), 0);
+        }
+
+        function closeMonsterCreator() {
+            document.getElementById('monsterCreator').hidden = true;
+            document.getElementById('monsterFormStatus').textContent = '';
+        }
+
+        function updateEnemyProximityControls() {
+            const enableButton = document.getElementById('enableEnemyProximityButton');
+            const disableButton = document.getElementById('disableEnemyProximityButton');
+            if (!enableButton || !disableButton) return;
+            enableButton.disabled = isEnemyProximityEnabled;
+            disableButton.disabled = !isEnemyProximityEnabled;
+        }
+
+        function setEnemyProximityMode(enabled) {
+            isEnemyProximityEnabled = Boolean(enabled);
+            updateEnemyProximityControls();
+            renderMap(currentId, true);
+            saveMapState();
+            showToast(isEnemyProximityEnabled
+                ? 'Viloes agora sao revelados pela proximidade dos herois.'
+                : 'Revelacao por proximidade desativada. Todos os viloes estao visiveis.');
+        }
+
+        function closeEventViewer() {
+            const modal = document.getElementById('eventViewer');
+            modal.hidden = true;
+            stopActiveEventAudio();
+            document.getElementById('eventMedia').replaceChildren();
+            document.getElementById('triggerDoorEventButton').hidden = true;
+            activeEventRef = null;
+        }
+
+        function openLimiarDoorTest() {
+            closeEventViewer();
+            const request = { source: 'antonieta-map', event: 'open-limiar-challenge', kind: 'door' };
+            if (window.parent !== window) {
+                const targetOrigin = location.protocol === 'file:' ? '*' : location.origin;
+                window.parent.postMessage(request, targetOrigin);
+                return;
+            }
+            window.location.href = 'index.html?challenge=door#limiar';
+        }
+
+        function stopActiveEventAudio() {
+            clearTimeout(activeEventAudioTimer);
+            activeEventAudioTimer = null;
+            if (activeEventAudio) {
+                activeEventAudio.pause();
+                activeEventAudio.removeAttribute('src');
+                activeEventAudio.load();
+                activeEventAudio.remove();
+                activeEventAudio = null;
+            }
+        }
+
+        function playEventAudio(eventInfo) {
+            stopActiveEventAudio();
+            if (!eventInfo.audioContent) return;
+
+            const audio = document.createElement('audio');
+            audio.hidden = true;
+            audio.preload = 'auto';
+            audio.onended = () => {
+                if (activeEventAudio === audio) stopActiveEventAudio();
+            };
+            document.body.appendChild(audio);
+            activeEventAudio = audio;
+            const durationSeconds = Math.max(0.5, Math.min(600, Number(eventInfo.audioDuration) || 10));
+
+            const startPlayback = source => {
+                if (!source || activeEventRef !== eventInfo || activeEventAudio !== audio) return;
+                audio.src = source;
+                audio.play().then(() => {
+                    if (activeEventAudio !== audio) return;
+                    activeEventAudioTimer = setTimeout(() => {
+                        if (activeEventAudio === audio) stopActiveEventAudio();
+                    }, durationSeconds * 1000);
+                }).catch(() => {
+                    if (activeEventAudio === audio) {
+                        stopActiveEventAudio();
+                        showToast('O navegador bloqueou o audio automatico. Acione o evento novamente.');
+                    }
+                });
+            };
+
+            const cachedSource = eventInfo.audioContent.startsWith('idb-asset:')
+                ? mapAssetUrlCache.get(eventInfo.audioContent)
+                : eventInfo.audioContent;
+            if (cachedSource) startPlayback(cachedSource);
+            else loadMapAssetUrl(eventInfo.audioContent).then(startPlayback);
+        }
+
+        function openEventViewer(eventInfo) {
+            activeEventRef = eventInfo;
+            const modal = document.getElementById('eventViewer');
+            const mediaHost = document.getElementById('eventMedia');
+            const isDoor = eventInfo.eventKind === 'door';
+            document.getElementById('eventViewerTitle').textContent = eventInfo.title || 'Evento';
+            document.getElementById('eventViewerDescription').textContent = isDoor
+                ? 'Este marcador abre o teste da porta na aba Limiar.'
+                : 'Evento acionado pelo mestre.';
+            document.getElementById('triggerDoorEventButton').hidden = !isDoor;
+            mediaHost.textContent = isDoor
+                ? 'Use o botao abaixo para acionar o teste ou clique normalmente no marcador do mapa.'
+                : (eventInfo.content ? 'Carregando evento...' : 'Evento de audio acionado.');
+            modal.hidden = false;
+            if (isDoor) return;
+            playEventAudio(eventInfo);
+
+            if (!eventInfo.content) return;
+            loadMapAssetUrl(eventInfo.content).then(source => {
+                if (activeEventRef !== eventInfo || modal.hidden) return;
+                mediaHost.replaceChildren();
+                if (!source) {
+                    mediaHost.textContent = 'Nao foi possivel carregar a midia deste evento.';
+                    return;
+                }
+                const isVideo = /^video\//i.test(eventInfo.mediaType || '');
+                const media = document.createElement(isVideo ? 'video' : 'img');
+                media.src = source;
+                if (isVideo) {
+                    media.controls = true;
+                    media.autoplay = true;
+                    media.playsInline = true;
+                } else {
+                    media.alt = eventInfo.title || 'Midia do evento';
+                }
+                mediaHost.appendChild(media);
+                if (isVideo) media.play().catch(() => {});
+            });
+        }
+
+        document.getElementById('eventForm').addEventListener('submit', event => {
+            event.preventDefault();
+            const title = document.getElementById('eventTitle').value.trim();
+            const eventKind = document.getElementById('eventKind').value;
+            const visibility = document.getElementById('eventVisibility').value;
+            const file = document.getElementById('eventFile').files[0];
+            const audioFile = document.getElementById('eventAudioFile').files[0];
+            const audioDuration = Number(document.getElementById('eventAudioDuration').value);
+            const status = document.getElementById('eventFormStatus');
+            const saveButton = document.getElementById('saveEventButton');
+            if (!title || (eventKind !== 'door' && !file && !audioFile)) {
+                status.textContent = 'Adicione uma midia visual, um audio ou ambos.';
+                return;
+            }
+            if (eventKind === 'door') {
+                hierarchy[currentId].hotspots.push({
+                    id: `event_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                    type: 'event', eventKind: 'door', title: title.slice(0, 60), visibility,
+                    position: { top: `${spawnCursorY.toFixed(3)}%`, left: `${spawnCursorX.toFixed(3)}%` }
+                });
+                closeEventCreator();
+                renderMap(currentId, true);
+                saveMapState();
+                showToast('Porta adicionada. Clique no marcador para abrir o teste no Limiar.');
+                return;
+            }
+            if (file) {
+                const supported = /^(image\/(png|jpeg|webp|gif)|video\/(mp4|webm))$/i.test(file.type);
+                const maxSize = /^(image\/gif|video\/)/i.test(file.type) ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
+                if (!supported || file.size > maxSize) {
+                    status.textContent = supported ? 'A midia visual ultrapassa o limite permitido.' : 'Escolha um token, GIF, MP4 ou WebM valido.';
+                    return;
+                }
+            }
+            if (audioFile) {
+                const supportedAudio = /^(audio\/(mpeg|mp3|wav|wave|x-wav|vnd\.wave|ogg|mp4|m4a|x-m4a|aac))$/i.test(audioFile.type)
+                    || /\.(mp3|wav|ogg|m4a|aac)$/i.test(audioFile.name);
+                if (!supportedAudio || audioFile.size > 20 * 1024 * 1024) {
+                    status.textContent = supportedAudio ? 'O audio ultrapassa o limite de 20 MB.' : 'Escolha um audio MP3, WAV, OGG, M4A ou AAC valido.';
+                    return;
+                }
+                if (!Number.isFinite(audioDuration) || audioDuration < 0.5 || audioDuration > 600) {
+                    status.textContent = 'Defina um tempo de audio entre 0,5 e 600 segundos.';
+                    return;
+                }
+            }
+            saveButton.disabled = true;
+            status.textContent = 'Salvando evento...';
+            Promise.all([
+                file ? readFileAsDataUrl(file).then(saveMapAsset) : Promise.resolve(''),
+                audioFile ? readFileAsDataUrl(audioFile).then(saveMapAsset) : Promise.resolve('')
+            ]).then(([content, audioContent]) => {
+                hierarchy[currentId].hotspots.push({
+                    id: `event_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                    type: 'event', title: title.slice(0, 60), visibility,
+                    content, mediaType: file?.type || '',
+                    audioContent, audioType: audioFile?.type || '',
+                    audioDuration: audioFile ? audioDuration : 0,
+                    position: { top: `${spawnCursorY.toFixed(3)}%`, left: `${spawnCursorX.toFixed(3)}%` }
+                });
+                closeEventCreator();
+                renderMap(currentId, true);
+                saveMapState();
+                showToast('Evento adicionado. Use o botao direito no marcador para acionar.');
+            }).catch(error => {
+                console.warn('Nao foi possivel salvar o evento:', error);
+                status.textContent = 'Nao foi possivel salvar um dos arquivos.';
+            }).finally(() => {
+                saveButton.disabled = false;
+            });
+        });
+
+        document.getElementById('scenarioForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            const title = document.getElementById('scenarioTitle').value.trim();
+            const mode = document.getElementById('scenarioMode').value;
+            const visibility = document.getElementById('scenarioVisibility').value;
+            const file = document.getElementById('scenarioFile').files[0];
+            const nightFile = document.getElementById('scenarioNightFile').files[0];
+            const targetId = document.getElementById('scenarioTarget').value;
+            const status = document.getElementById('scenarioFormStatus');
+            const saveButton = document.getElementById('saveScenarioButton');
+            const sourceMapId = currentId;
+            const sourcePosition = { top: `${spawnCursorY.toFixed(3)}%`, left: `${spawnCursorX.toFixed(3)}%` };
+            if (!title) return;
+
+            if (mode === 'connect') {
+                if (!targetId || !hierarchy[targetId] || targetId === sourceMapId) {
+                    status.textContent = 'Escolha um cenario de destino valido.';
+                    return;
+                }
+                hierarchy[sourceMapId].hotspots.push({
+                    id: targetId,
+                    linkId: `connection_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                    type: 'scenario',
+                    connectionOnly: true,
+                    title: title.slice(0, 60),
+                    visibility,
+                    position: sourcePosition
+                });
+                closeScenarioCreator();
+                renderMap(sourceMapId, true);
+                saveMapState();
+                showToast('Conexao criada. Selecione o marcador para abrir o cenario escolhido.');
+                return;
+            }
+
+            if (!file) {
+                status.textContent = 'Escolha uma imagem para o novo mapa.';
+                return;
+            }
+            const validateScenarioImage = (candidate, label) => {
+                if (!candidate) return '';
+                const supported = /^image\/(png|jpeg|webp|gif)$/i.test(candidate.type);
+                const maxSize = /^image\/gif$/i.test(candidate.type) ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
+                if (!supported) return `${label} deve ser PNG, JPEG, WebP ou GIF.`;
+                if (candidate.size > maxSize) return `${label} ultrapassa o limite permitido.`;
+                return '';
+            };
+            const validationError = validateScenarioImage(file, 'A imagem principal')
+                || validateScenarioImage(nightFile, 'A imagem noturna');
+            if (validationError) {
+                status.textContent = validationError;
+                return;
+            }
+            saveButton.disabled = true;
+            status.textContent = 'Salvando cenario...';
+            const savedReferences = [];
+            try {
+                const imageReference = await readFileAsDataUrl(file).then(saveMapAsset);
+                savedReferences.push(imageReference);
+                const nightImageReference = nightFile
+                    ? await readFileAsDataUrl(nightFile).then(saveMapAsset)
+                    : '';
+                if (nightImageReference) savedReferences.push(nightImageReference);
+                const scenarioId = `scenario_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+                hierarchy[scenarioId] = {
+                    id: scenarioId,
+                    name: title.slice(0, 60),
+                    imgBaseName: imageReference,
+                    imgNightName: nightImageReference,
+                    imgBlackoutName: '',
+                    customScenario: true,
+                    hotspots: []
+                };
+                hierarchy[sourceMapId].hotspots.push({
+                    id: scenarioId,
+                    type: 'scenario',
+                    title: title.slice(0, 60),
+                    visibility,
+                    position: sourcePosition
+                });
+                closeScenarioCreator();
+                renderMap(sourceMapId, true);
+                saveMapState();
+                showToast(nightImageReference
+                    ? 'Cenario com versao noturna adicionado ao mapa.'
+                    : 'Cenario adicionado. Selecione o marcador para abrir o mapa.');
+            } catch (error) {
+                console.warn('Nao foi possivel salvar o cenario:', error);
+                await Promise.allSettled(savedReferences.map(deleteMapAsset));
+                status.textContent = 'Nao foi possivel salvar uma das imagens.';
+            } finally {
+                saveButton.disabled = false;
+            }
+        });
+
+        function collectCustomScenarioTree(scenarioId, collected = new Set()) {
+            const scenario = hierarchy[scenarioId];
+            if (!scenario?.customScenario || collected.has(scenarioId)) return collected;
+            collected.add(scenarioId);
+            scenario.hotspots.forEach(hotspot => {
+                if (hotspot.type === 'scenario' && hotspot.connectionOnly !== true) collectCustomScenarioTree(hotspot.id, collected);
+            });
+            return collected;
+        }
+
+        function collectScenarioAssetReferences(scenarioIds) {
+            const references = new Set();
+            const addReference = reference => {
+                if (typeof reference === 'string' && reference.startsWith('idb-asset:')) references.add(reference);
+            };
+            scenarioIds.forEach(id => {
+                const scenario = hierarchy[id];
+                if (!scenario) return;
+                addReference(scenario.imgBaseName);
+                addReference(scenario.imgNightName);
+                addReference(scenario.imgBlackoutName);
+                scenario.hotspots.forEach(hotspot => {
+                    addReference(hotspot.content);
+                    addReference(hotspot.assetContent);
+                    addReference(hotspot.audioContent);
+                });
+                (charsData[id] || []).forEach(character => addReference(character.gif));
+            });
+            return references;
+        }
+
+        document.getElementById('openScenarioButton').addEventListener('click', () => {
+            const targetId = activeScenarioLink?.id;
+            if (!targetId || !hierarchy[targetId]) return closeScenarioViewer();
+            closeScenarioViewer();
+            renderMap(targetId);
+        });
+
+        document.getElementById('deleteScenarioButton').addEventListener('click', async () => {
+            const scenarioLink = activeScenarioLink;
+            const sourceId = activeScenarioSourceId;
+            if (!scenarioLink || !sourceId || !hierarchy[sourceId]) return;
+            if (scenarioLink.connectionOnly === true) {
+                if (!confirm(`Remover a conexao "${scenarioLink.title}"? O cenario de destino sera mantido.`)) return;
+                const linkIndex = hierarchy[sourceId].hotspots.indexOf(scenarioLink);
+                if (linkIndex !== -1) hierarchy[sourceId].hotspots.splice(linkIndex, 1);
+                closeScenarioViewer();
+                renderMap(sourceId, true);
+                saveMapState();
+                showToast('Conexao entre cenarios removida.');
+                return;
+            }
+            if (!hierarchy[scenarioLink.id]?.customScenario) return;
+            const scenarioIds = collectCustomScenarioTree(scenarioLink.id);
+            const nestedCount = Math.max(0, scenarioIds.size - 1);
+            const nestedWarning = nestedCount ? ` e ${nestedCount} cenario(s) criado(s) dentro dele` : '';
+            if (!confirm(`Remover o cenario "${scenarioLink.title}"${nestedWarning}? Todo o conteudo desses cenarios sera removido.`)) return;
+
+            const assetReferences = collectScenarioAssetReferences(scenarioIds);
+            if (vanState?.active && scenarioIds.has(vanState.mapId)) {
+                const fallbackX = parseFloat(scenarioLink.position?.left) || 50;
+                const fallbackY = parseFloat(scenarioLink.position?.top) || 50;
+                if (!charsData[sourceId]) charsData[sourceId] = [];
+                (vanState.heroes || []).forEach(hero => charsData[sourceId].push({ ...hero, rx: fallbackX, ry: fallbackY }));
+                vanState = null;
+                clearVanMovementTimer();
+                stopVanAudio();
+            }
+
+            Object.values(hierarchy).forEach(sector => {
+                sector.hotspots = sector.hotspots.filter(hotspot => !(hotspot.type === 'scenario' && scenarioIds.has(hotspot.id)));
+            });
+            scenarioIds.forEach(id => {
+                delete hierarchy[id];
+                delete charsData[id];
+            });
+            navHistory = navHistory.filter(id => !scenarioIds.has(id));
+            closeScenarioViewer();
+            renderMap(sourceId, true);
+            saveMapState();
+            await Promise.allSettled([...assetReferences].map(deleteMapAsset));
+            showToast('Cenario removido do mapa.');
+        });
+
+        document.getElementById('deleteEventButton').addEventListener('click', () => {
+            if (!activeEventRef || !confirm(`Remover o evento "${activeEventRef.title}"?`)) return;
+            const events = hierarchy[currentId].hotspots;
+            const index = events.indexOf(activeEventRef);
+            if (index !== -1) events.splice(index, 1);
+            closeEventViewer();
+            renderMap(currentId, true);
+            saveMapState();
+            showToast('Evento removido do mapa.');
+        });
+
+        document.getElementById('triggerDoorEventButton').addEventListener('click', openLimiarDoorTest);
+
+        ['eventCreator', 'eventViewer', 'scenarioCreator', 'scenarioViewer', 'heroCreator', 'monsterCreator'].forEach(id => {
+            document.getElementById(id).addEventListener('mousedown', event => {
+                if (event.target !== event.currentTarget) return;
+                if (id === 'eventCreator') closeEventCreator();
+                else if (id === 'eventViewer') closeEventViewer();
+                else if (id === 'scenarioCreator') closeScenarioCreator();
+                else if (id === 'scenarioViewer') closeScenarioViewer();
+                else if (id === 'heroCreator') closeHeroCreator();
+                else closeMonsterCreator();
+            });
+        });
+
+        function openMapAssetDb() {
+            if (mapAssetDbPromise) return mapAssetDbPromise;
+            mapAssetDbPromise = new Promise((resolve, reject) => {
+                if (!('indexedDB' in window)) return reject(new Error('IndexedDB indisponível'));
+                const request = indexedDB.open(MAP_ASSET_DB_NAME, 1);
+                request.onupgradeneeded = () => {
+                    if (!request.result.objectStoreNames.contains('assets')) request.result.createObjectStore('assets');
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error || new Error('Falha ao abrir o armazenamento de arquivos'));
+            });
+            return mapAssetDbPromise;
+        }
+
+        async function saveMapAsset(dataUrl) {
+            const response = await fetch(dataUrl);
+            const blob = await response.blob();
+            const db = await openMapAssetDb();
+            const key = `asset_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+            await new Promise((resolve, reject) => {
+                const transaction = db.transaction('assets', 'readwrite');
+                transaction.objectStore('assets').put(blob, key);
+                transaction.oncomplete = resolve;
+                transaction.onerror = () => reject(transaction.error || new Error('Falha ao salvar o arquivo'));
+                transaction.onabort = () => reject(transaction.error || new Error('O salvamento do arquivo foi cancelado'));
+            });
+            const reference = `idb-asset:${key}`;
+            mapAssetUrlCache.set(reference, URL.createObjectURL(blob));
+            return reference;
+        }
+
+        async function deleteMapAsset(reference) {
+            if (!reference?.startsWith('idb-asset:')) return;
+            const cachedUrl = mapAssetUrlCache.get(reference);
+            if (cachedUrl) URL.revokeObjectURL(cachedUrl);
+            mapAssetUrlCache.delete(reference);
+            mapAssetLoads.delete(reference);
+            const db = await openMapAssetDb();
+            const key = reference.slice('idb-asset:'.length);
+            await new Promise((resolve, reject) => {
+                const transaction = db.transaction('assets', 'readwrite');
+                transaction.objectStore('assets').delete(key);
+                transaction.oncomplete = resolve;
+                transaction.onerror = () => reject(transaction.error || new Error('Falha ao remover o arquivo'));
+                transaction.onabort = () => reject(transaction.error || new Error('A remocao do arquivo foi cancelada'));
+            });
+        }
+
+        function loadMapAssetUrl(reference) {
+            if (!reference || !reference.startsWith('idb-asset:')) return Promise.resolve(reference);
+            if (mapAssetUrlCache.has(reference)) return Promise.resolve(mapAssetUrlCache.get(reference));
+            if (mapAssetLoads.has(reference)) return mapAssetLoads.get(reference);
+            const key = reference.slice('idb-asset:'.length);
+            const loading = openMapAssetDb().then(db => new Promise((resolve, reject) => {
+                const request = db.transaction('assets', 'readonly').objectStore('assets').get(key);
+                request.onsuccess = () => {
+                    if (!request.result) return resolve(null);
+                    const url = URL.createObjectURL(request.result);
+                    mapAssetUrlCache.set(reference, url);
+                    resolve(url);
+                };
+                request.onerror = () => reject(request.error || new Error('Falha ao carregar o arquivo'));
+            })).catch(error => {
+                console.warn('Não foi possível carregar um arquivo do mapa:', error);
+                return null;
+            }).finally(() => mapAssetLoads.delete(reference));
+            mapAssetLoads.set(reference, loading);
+            return loading;
+        }
+
+        function saveMapState() {
+            try {
+                const enemies = {};
+                const events = {};
+                const scenarioLinks = {};
+                const scenarios = {};
+                Object.entries(hierarchy).forEach(([id, sector]) => {
+                    if (sector.customScenario) {
+                        scenarios[id] = {
+                            id: sector.id,
+                            name: sector.name,
+                            imgBaseName: sector.imgBaseName,
+                            imgNightName: sector.imgNightName || '',
+                            imgBlackoutName: sector.imgBlackoutName || '',
+                            customScenario: true
+                        };
+                    }
+                    const changed = sector.hotspots.filter(h => h.type === 'enemy');
+                    if (changed.length) enemies[id] = changed;
+                    const addedEvents = sector.hotspots.filter(h => h.type === 'event');
+                    if (addedEvents.length) events[id] = addedEvents;
+                    const addedScenarioLinks = sector.hotspots.filter(h => h.type === 'scenario');
+                    if (addedScenarioLinks.length) scenarioLinks[id] = addedScenarioLinks;
+                });
+                localStorage.setItem(MAP_STATE_KEY, JSON.stringify({
+                    version: 1, currentId, isDay, isBlackout, isCctv, isFog,
+                    isGridActive, isEnemyProximityEnabled, charsData, charID, enemies, events, scenarios, scenarioLinks,
+                    vanState, navHistory: navHistory.slice(-50)
+                }));
+            } catch (error) {
+                console.warn('Não foi possível salvar o estado do mapa:', error);
+            }
+        }
+
+        function loadMapState() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(MAP_STATE_KEY));
+                if (!saved || saved.version !== 1) return;
+                Object.entries(saved.scenarios || {}).forEach(([id, scenario]) => {
+                    if (!id || !scenario || typeof scenario !== 'object') return;
+                    hierarchy[id] = {
+                        id,
+                        name: String(scenario.name || 'Cenario').slice(0, 60),
+                        imgBaseName: scenario.imgBaseName || '',
+                        imgNightName: scenario.imgNightName || '',
+                        imgBlackoutName: scenario.imgBlackoutName || '',
+                        customScenario: true,
+                        hotspots: []
+                    };
+                });
+                if (saved.currentId && hierarchy[saved.currentId]) currentId = saved.currentId;
+                if (typeof saved.isDay === 'boolean') isDay = saved.isDay;
+                if (typeof saved.isBlackout === 'boolean') isBlackout = saved.isBlackout;
+                if (typeof saved.isCctv === 'boolean') isCctv = saved.isCctv;
+                if (typeof saved.isFog === 'boolean') isFog = saved.isFog;
+                if (typeof saved.isGridActive === 'boolean') isGridActive = saved.isGridActive;
+                if (typeof saved.isEnemyProximityEnabled === 'boolean') isEnemyProximityEnabled = saved.isEnemyProximityEnabled;
+                if (saved.charsData && typeof saved.charsData === 'object') charsData = saved.charsData;
+                if (Number.isInteger(saved.charID) && saved.charID >= 0) charID = saved.charID;
+                if (saved.vanState && typeof saved.vanState === 'object') vanState = saved.vanState;
+                if (Array.isArray(saved.navHistory)) navHistory = saved.navHistory.filter(id => hierarchy[id]).slice(-50);
+                Object.entries(saved.enemies || {}).forEach(([id, enemies]) => {
+                    if (hierarchy[id] && Array.isArray(enemies)) {
+                        hierarchy[id].hotspots = hierarchy[id].hotspots.filter(h => h.type !== 'enemy').concat(enemies);
+                    }
+                });
+                Object.entries(saved.events || {}).forEach(([id, events]) => {
+                    if (hierarchy[id] && Array.isArray(events)) {
+                        hierarchy[id].hotspots = hierarchy[id].hotspots.filter(h => h.type !== 'event').concat(events);
+                    }
+                });
+                Object.entries(saved.scenarioLinks || {}).forEach(([id, links]) => {
+                    if (hierarchy[id] && Array.isArray(links)) {
+                        hierarchy[id].hotspots = hierarchy[id].hotspots.filter(h => h.type !== 'scenario')
+                            .concat(links.filter(link => link && hierarchy[link.id]));
+                    }
+                });
+            } catch (error) {
+                console.warn('O estado salvo do mapa foi ignorado:', error);
+            }
+        }
+
+        // VIRTUAL TABLETOP (VTT): Seleção e Extras Avançados
+        let selectedTokens = new Set();
+        let selectedVan = false;
+        let clipBoard = [];
+        let isMarquee = false;
+        let isMeasuring = false;
+        let measureDom = null;
+        let startM = {x:0, y:0};
+
+        const anchor = document.getElementById('mapAnchor');
+        const marqueeDom = document.getElementById('marqueeBox');
+        
+        // Pings e Regras (Shift/Alt click) ou Deseleção Global
+        window.addEventListener('mousedown', (e) => {
+            if(!e.target.closest('.char-token') && !e.shiftKey && !e.altKey && !e.target.closest('.hud-bar')) { 
+                selectedTokens.clear(); updateSelectionVisuals(); 
+            }
+        });
+
+        // Laços do Painel Traseiro
+        anchor.addEventListener('mousedown', (e) => {
+            if(e.target.closest('.char-token') || e.target.closest('.hs-marker-viz') || e.target.closest('.van-event')) return;
+            e.preventDefault(); // Impede o navegador de puxar a imagem fantasma ao iniciar Marquee
+            
+            const rect = anchor.getBoundingClientRect();
+
+            if (e.button === 0 && !e.shiftKey && !e.altKey) {
+                spawnCursorX = ((e.clientX - rect.left) / rect.width) * 100;
+                spawnCursorY = ((e.clientY - rect.top) / rect.height) * 100;
+                if (spawnCursorX < 0) spawnCursorX = 0; if (spawnCursorX > 100) spawnCursorX = 100;
+                if (spawnCursorY < 0) spawnCursorY = 0; if (spawnCursorY > 100) spawnCursorY = 100;
+            }
+            
+            if(e.shiftKey) { // Ping Tatico Sonar
+                const ping = document.createElement('div');
+                ping.className = 'ping-sonar';
+                ping.style.left = (e.clientX - rect.left) + 'px';
+                ping.style.top = (e.clientY - rect.top) + 'px';
+                anchor.appendChild(ping);
+                setTimeout(() => ping.remove(), 1000);
+                return;
+            }
+
+            if(e.altKey) { // Régua de Medição Geométrica
+                isMeasuring = true;
+                startM = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+                if(!measureDom) {
+                    measureDom = document.createElement('div');
+                    measureDom.id = 'measureRuler';
+                    measureDom.innerHTML = `<svg style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:100; overflow:visible;"><line id="measureLine" x1="0" y1="0" x2="0" y2="0" stroke="#f22" stroke-width="3" stroke-dasharray="5,5"/><text id="measureText" x="0" y="0" fill="#fff" font-size="16" font-weight="bold" font-family="sans-serif" stroke="#000" stroke-width="3" paint-order="stroke"></text></svg>`;
+                    anchor.appendChild(measureDom);
+                }
+                measureDom.style.display = 'block';
+                return;
+            }
+
+            isMarquee = true;
+            startM = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+            marqueeDom.style.left = startM.x + 'px';
+            marqueeDom.style.top = startM.y + 'px';
+            marqueeDom.style.width = '0px'; marqueeDom.style.height = '0px';
+            marqueeDom.style.display = 'block';
+        });
+        
+        window.addEventListener('mousemove', (e) => {
+            const rect = anchor.getBoundingClientRect();
+            let currX = e.clientX - rect.left;
+            let currY = e.clientY - rect.top;
+            
+            currX = Math.max(0, Math.min(currX, rect.width));
+            currY = Math.max(0, Math.min(currY, rect.height));
+
+            if(isMeasuring) {
+                const line = document.getElementById('measureLine');
+                const txt = document.getElementById('measureText');
+                line.setAttribute('x1', startM.x); line.setAttribute('y1', startM.y);
+                line.setAttribute('x2', currX); line.setAttribute('y2', currY);
+                let distPx = Math.hypot(currX - startM.x, currY - startM.y);
+                // Escala de Faz-de-conta: ~50px = 1.5 metros (Padrão Grid RPG), adaptando ao grid se ativo
+                let currentCellSize = 35;
+                if (typeof isGridActive !== 'undefined' && isGridActive) {
+                    const cols = Math.round(rect.width / 35) || 1;
+                    currentCellSize = rect.width / cols;
+                }
+                let m = (distPx / currentCellSize * 1.5).toFixed(1);
+                txt.setAttribute('x', currX + 15); txt.setAttribute('y', currY + 15);
+                txt.textContent = `${m}m / ${(m * 3.28).toFixed(1)}ft`;
+                return;
+            }
+
+            if(isMarquee) {
+                let minX = Math.min(startM.x, currX); let maxX = Math.max(startM.x, currX);
+                let minY = Math.min(startM.y, currY); let maxY = Math.max(startM.y, currY);
+                marqueeDom.style.left = minX + 'px'; marqueeDom.style.top = minY + 'px';
+                marqueeDom.style.width = (maxX - minX) + 'px'; marqueeDom.style.height = (maxY - minY) + 'px';
+                const arr = charsData[currentId] || [];
+                arr.forEach(t => {
+                    let px = (t.rx / 100) * rect.width; let py = (t.ry / 100) * rect.height;
+                    if(px >= minX && px <= maxX && py >= minY && py <= maxY) {
+                        selectedTokens.add(t.id);
+                    } else if (!selectedTokens.has(t.id)) { selectedTokens.delete(t.id); }
+                });
+                updateSelectionVisuals();
+            }
+        });
+
+        window.addEventListener('mouseup', () => { 
+            if(isMeasuring) { isMeasuring = false; if(measureDom) measureDom.style.display='none'; }
+            if(isMarquee) { isMarquee = false; marqueeDom.style.display = 'none'; } 
+        });
+
+        // Comandos de Teclado
+        window.addEventListener('keydown', (e) => {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            
+            const k = e.key.toLowerCase();
+
+            // Mapeamentos Ambientais Gerados
+            if (k === "t" && !e.repeat) { e.preventDefault(); if(hasDayNight) toggleTime(); }
+            if ("" && k === "") { if(true) toggleCCTV(); }
+            if ("" && k === "") { if(true) toggleFog(); }
+            if ("" && k === "") { if(true) toggleBlackout(); }
+            if ("h" && k === "h") { toggleGrid(); }
+            if ("r" && k === "r") { if(hasDayNight) resetToDay(); }
+            if ("" && k === "") {
+                 if (selectedTokens.size > 0) {
+                     // Alterna as lanternas dos tokens marcardos e refaz render do mapa
+                     selectedTokens.forEach(id => window.toggleTokenLight(id));
+                     if(isBlackout && typeof drawFlashlight === 'function') drawFlashlight();
+                 }
+            }
+
+            // Mapeamentos de Botões Nativos Mestre
+            
+
+            // Spawns e Jumpscares via F7-F10
+            if (isF7Down) {
+                if (k === 'z') { e.preventDefault(); spawnMonster("Zumbi de Sangue", "z.webm", "200px"); f7SpecialSpawned = true; }
+                else if (k === 'v') { e.preventDefault(); spawnMonster("Vulto", "vulto.webm", "120px"); f7SpecialSpawned = true; }
+                else if (k === 'a') { e.preventDefault(); spawnMonster("Anárquico", "Anarquico.webm", "75px"); f7SpecialSpawned = true; }
+            }
+
+            if (isF8Down) {
+                if (k === 'z') { e.preventDefault(); toggleJumpscare("z.webm", "fundo monstro.png", "sndZumbi"); f8SpecialTriggered = true; }
+                else if (k === 'v') { e.preventDefault(); toggleJumpscare("vulto.webm", "fundo_dominic.png", "sndVulto"); f8SpecialTriggered = true; }
+                else if (k === 'a') { e.preventDefault(); toggleJumpscare("Anarquico.webm", "fundo_anarquico.png", "sndAnarquico"); f8SpecialTriggered = true; }
+            }
+
+            if (isF9Down) {
+                if (k === 'd') { e.preventDefault(); spawnMonster("Dominic", "dominc.webm", "250px"); f9SpecialSpawned = true; }
+                else if (k === 'p') { e.preventDefault(); spawnMonster("Pertubado de Energia", "pertubado de energia.webm", "110px"); f9SpecialSpawned = true; }
+                else if (k === 'm') { e.preventDefault(); spawnMonster("Mea Culpa", "mea_culpa.webm", "150px"); f9SpecialSpawned = true; }
+            }
+
+            if (isF10Down) {
+                if (k === 'd') { e.preventDefault(); toggleJumpscare("dominc.webm", "fundo_dominic.png", "sndDominic"); f10SpecialTriggered = true; }
+                else if (k === 'p') { e.preventDefault(); toggleJumpscare("pertubado de energia.webm", "fundo pertubado de energia.png", "sndPertubado"); f10SpecialTriggered = true; }
+                else if (k === 'm') { e.preventDefault(); toggleJumpscare("mea_culpa.webm", "fundo_mea_culpa.png", "sndMeaCulpa"); f10SpecialTriggered = true; }
+            }
+
+            if (e.key === 'F7') { e.preventDefault(); if (!e.repeat) { isF7Down = true; f7SpecialSpawned = false; } }
+            if (e.key === 'F8') { e.preventDefault(); if (!e.repeat) { isF8Down = true; f8SpecialTriggered = false; } }
+            if (e.key === 'F9') { e.preventDefault(); if (!e.repeat) { isF9Down = true; f9SpecialSpawned = false; } }
+            if (e.key === 'F10') { e.preventDefault(); if (!e.repeat) { isF10Down = true; f10SpecialTriggered = false; } }
+
+            // Delete (Matar Tokens ou Inimigos)
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (selectedVan && vanState?.active && vanState.mapId === currentId) {
+                    e.preventDefault();
+                    deleteVanOfTheHidden();
+                } else if (selectedTokens.size > 0) {
+                    charsData[currentId] = charsData[currentId].filter(x => !selectedTokens.has(x.id));
+                    selectedTokens.clear();
+                    renderMap(currentId, true);
+                    saveMapState();
+                } else if (activeEnemyRef) {
+                    const hs = hierarchy[currentId].hotspots;
+                    const idx = hs.indexOf(activeEnemyRef);
+                    if (idx !== -1) {
+                        if (!activeEnemyRef.isDead) {
+                            activeEnemyRef.isDead = true;
+                            if (activeEnemyRef.title.includes("Anárquico") || activeEnemyRef.title.includes("Mea Culpa")) {
+                                activeEnemyRef.content = "anarq_morto.png";
+                                if (activeEnemyRef.title.includes("Mea Culpa")) {
+                                    activeEnemyRef.size = "130px";
+                                }
+                            } else if (activeEnemyRef.title.includes("Vulto") || activeEnemyRef.title.includes("Pertubado")) {
+                                activeEnemyRef.content = "energia_morta.png";
+                                if (activeEnemyRef.title.includes("Vulto")) {
+                                    activeEnemyRef.size = "70px";
+                                } else if (activeEnemyRef.title.includes("Pertubado")) {
+                                    activeEnemyRef.size = "85px";
+                                }
+                            } else {
+                                activeEnemyRef.content = "z morto.png";
+                                if (activeEnemyRef.title.includes("Zumbi de Sangue")) {
+                                    activeEnemyRef.size = "50px";
+                                } else if (activeEnemyRef.title.includes("Dominic")) {
+                                    activeEnemyRef.size = "90px";
+                                }
+                            }
+                            console.log("Inimigo agora está morto!");
+                        } else {
+                            const removedEnemy = activeEnemyRef;
+                            hs.splice(idx, 1);
+                            stopCustomMonsterAudio(ensureEnemyIdentity(removedEnemy));
+                            deleteMapAsset(removedEnemy.assetContent || removedEnemy.content).catch(() => {});
+                            deleteMapAsset(removedEnemy.audioContent).catch(() => {});
+                            activeEnemyRef = null;
+                            console.log("Inimigo removido do mapa!");
+                        }
+                        renderMap(currentId, true);
+                        updateMonsterSound();
+                        saveMapState();
+                    }
+                }
+            }
+            // Espelhar token selecionado ou monstro ativo com ← ou →
+            if(e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                if (selectedTokens.size > 0) {
+                    e.preventDefault();
+                    if(!charsData[currentId]) return;
+                    charsData[currentId].forEach(t => {
+                        if(selectedTokens.has(t.id)) {
+                            t.flipped = !t.flipped;
+                            const el = document.querySelector(`.char-token[data-id="${t.id}"]`);
+                            if(el) {
+                                // Flip apenas no emoji, nao no nome
+                                const face = el.querySelector('.token-face');
+                                if(face) face.style.transform = t.flipped ? 'scaleX(-1)' : 'scaleX(1)';
+                            }
+                        }
+                    });
+                } else if (activeEnemyRef) {
+                    e.preventDefault();
+                    activeEnemyRef.flipped = !activeEnemyRef.flipped;
+                    renderMap(currentId, true);
+                }
+            }
+            // Copiar
+            if(e.ctrlKey && e.key.toLowerCase() === 'c') {
+                clipBoard = charsData[currentId].filter(t => selectedTokens.has(t.id)).map(t => ({...t}));
+            }
+            // Colar
+            if(e.ctrlKey && e.key.toLowerCase() === 'v') {
+                if(clipBoard.length === 0) return;
+                selectedTokens.clear();
+                clipBoard.forEach(t => {
+                    const clone = {...t, id: ++charID, rx: t.rx + 2, ry: t.ry + 2};
+                    if(!charsData[currentId]) charsData[currentId] = [];
+                    charsData[currentId].push(clone);
+                    selectedTokens.add(clone.id);
+                });
+                renderMap(currentId, true);
+                saveMapState();
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'F7') {
+                if (isF7Down && !f7SpecialSpawned) {
+                    spawnMonster("Anárquico", "Anarquico.webm", "70px");
+                }
+                isF7Down = false;
+                f7SpecialSpawned = false;
+            }
+            if (e.key === 'F8') {
+                if (isF8Down && !f8SpecialTriggered) {
+                    toggleJumpscare("Anarquico.webm", "fundo_anarquico.png", "sndAnarquico");
+                }
+                isF8Down = false;
+                f8SpecialTriggered = false;
+            }
+            if (e.key === 'F9') {
+                if (isF9Down && !f9SpecialSpawned) {
+                    spawnMonster("Pertubado de Energia", "pertubado de energia.webm", "110px");
+                }
+                isF9Down = false;
+                f9SpecialSpawned = false;
+            }
+            if (e.key === 'F10') {
+                if (isF10Down && !f10SpecialTriggered) {
+                    toggleJumpscare("pertubado de energia.webm", "fundo pertubado de energia.png", "sndPertubado");
+                }
+                isF10Down = false;
+                f10SpecialTriggered = false;
+            }
+        });
+
+        function updateSelectionVisuals() {
+            document.querySelectorAll('.char-token').forEach(el => {
+                if(selectedTokens.has(parseInt(el.dataset.id))) el.classList.add('selected');
+                else el.classList.remove('selected');
+            });
+        }
+
+        // BLACKOUT CANVAS LOGIC MODERNO (CONES E ROTAÇÃO)
+        let fCanvas = document.getElementById('flashlightCanvas');
+        let fCtx = fCanvas ? fCanvas.getContext('2d') : null;
+        let mouseX = 0, mouseY = 0;
+
+        if (fCanvas) {
+            function resizeCanvas() {
+                const rect = document.getElementById('mapAnchor').getBoundingClientRect();
+                fCanvas.width = rect.width; fCanvas.height = rect.height;
+                drawFlashlight();
+            }
+            window.addEventListener('resize', resizeCanvas);
+            document.getElementById('mapAnchor').addEventListener('mousemove', (e) => {
+                const rect = fCanvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left; mouseY = e.clientY - rect.top;
+                if(isBlackout) drawFlashlight();
+            });
+            
+            function drawFlashlight() {
+                if(!fCtx) return;
+                const rect = fCanvas.getBoundingClientRect();
+                
+                fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
+                fCtx.fillStyle = "rgba(0, 0, 0, 0.98)";
+                fCtx.fillRect(0, 0, fCanvas.width, fCanvas.height);
+                fCtx.globalCompositeOperation = 'destination-out';
+                
+                const arr = charsData[currentId] || [];
+                const lightSources = arr.slice();
+                if (vanState?.active && vanState.mapId === currentId && vanState.status === 'success') {
+                    lightSources.push({
+                        rx: vanState.rx,
+                        ry: vanState.ry,
+                        rot: vanState.lightRot || 0,
+                        lightOn: true,
+                        lightRadius: 140
+                    });
+                }
+                const RADIUS = 280; // Cone de Luz Menor
+                const CONE_ANGLE = Math.PI / 3; // Feixe fechado de ~60 graus
+                
+                lightSources.forEach(c => {
+                   if (c.lightOn === false) return; // Verifica se a lanterna do token tá travada desligada
+                   
+                   let cx = (c.rx / 100) * rect.width;
+                   let cy = (c.ry / 100) * rect.height;
+                   const lightRadius = Number(c.lightRadius) || RADIUS;
+                   // Compensação p/ Norte: 0 graus no Canvas é Direita(Leste). Subtrair 90 joga a luz pra "Cima"(Norte) da view.
+                   let angleRad = ((c.rot || 0) - 90) * (Math.PI / 180);
+                   
+                   fCtx.beginPath();
+                   fCtx.moveTo(cx, cy);
+                   fCtx.arc(cx, cy, lightRadius, angleRad - CONE_ANGLE/2, angleRad + CONE_ANGLE/2);
+                   fCtx.lineTo(cx, cy);
+                   fCtx.fill();
+                });
+                
+                fCtx.globalCompositeOperation = 'source-over';
+                
+                // Culling Fotométrico de Hotspots
+                const hsDoms = document.querySelectorAll('.hs-marker-viz');
+                if(!isBlackout) {
+                    hsDoms.forEach(d => { d.style.opacity = '1'; d.style.pointerEvents = 'auto'; });
+                    return;
+                }
+                
+                const data = hierarchy[currentId];
+                hsDoms.forEach((d, idx) => {
+                    if (d.dataset.vis !== 'enemy') {
+                        d.style.opacity = '1';
+                        d.style.pointerEvents = 'auto';
+                        return;
+                    }
+                    let rawPos = data.hotspots[idx].position; 
+                    let hx = (parseFloat(rawPos.left) / 100) * rect.width;
+                    let hy = (parseFloat(rawPos.top) / 100) * rect.height;
+                    
+                    let isVisible = false;
+                    for(let c of lightSources) {
+                        if (c.lightOn === false) continue;
+                        let cx = (c.rx / 100) * rect.width; let cy = (c.ry / 100) * rect.height;
+                        const lightRadius = Number(c.lightRadius) || RADIUS;
+                        if(Math.hypot(hx - cx, cy - hy) <= lightRadius) {
+                            let targetAngle = Math.atan2(hy - cy, hx - cx);
+                            // Mesma compensação do Norte (CSS) vs Leste (Math)
+                            let srcAngle = ((c.rot || 0) - 90) * (Math.PI / 180);
+                            let diff = targetAngle - srcAngle;
+                            while (diff < -Math.PI) diff += Math.PI * 2;
+                            while (diff > Math.PI) diff -= Math.PI * 2;
+                            if(Math.abs(diff) <= CONE_ANGLE/2) { isVisible = true; break; }
+                        }
+                    }
+                    d.style.opacity = isVisible ? '1' : '0';
+                    d.style.pointerEvents = isVisible ? 'auto' : 'none';
+                });
+            }
+        }
+
+        function toggleBlackout() {
+            isBlackout = !isBlackout;
+            const cv = document.getElementById('flashlightCanvas');
+            if(cv) cv.style.display = isBlackout ? 'block' : 'none';
+            renderMap(currentId, true); // Força refresh da imagem base se houver variante fisica!
+            saveMapState();
+        }
+        
+        let isGridActive = false;
+        function toggleGrid() {
+            isGridActive = !isGridActive;
+            const cv = document.getElementById('gridCanvas');
+            if(cv) {
+                cv.style.display = isGridActive ? 'block' : 'none';
+                if (isGridActive) drawGrid();
+            }
+            saveMapState();
+        }
+        function drawGrid() {
+            const canvas = document.getElementById('gridCanvas');
+            if (!canvas) return;
+            const anchor = document.getElementById('mapAnchor');
+            const rect = anchor.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return;
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const targetSize = 35;
+            const cols = Math.round(rect.width / targetSize) || 1;
+            const cellSize = rect.width / cols;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x <= rect.width; x += cellSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, rect.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y <= rect.height; y += cellSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(rect.width, y);
+                ctx.stroke();
+            }
+        }
+        function resetToDay() {
+            isDay = true;
+            isBlackout = false;
+            const cv = document.getElementById('flashlightCanvas');
+            if(cv) cv.style.display = 'none';
+            renderMap(currentId, true);
+            showToast("Ambiente resetado para o Dia!");
+            saveMapState();
+        }
+        
+        let isFog = false;
+        function toggleFog() {
+            isFog = !isFog;
+            const fLayer = document.getElementById('fogLayer');
+            if(fLayer) {
+                if(isFog) fLayer.classList.add('active');
+                else fLayer.classList.remove('active');
+            }
+            saveMapState();
+        }
+        
+        function updateCctvTicks() {
+            const d = new Date();
+            document.getElementById('cctvClock').textContent = d.getFullYear() + "/" + 
+                    String(d.getMonth() + 1).padStart(2, '0') + "/" + 
+                    String(d.getDate()).padStart(2, '0') + " " + 
+                    String(d.getHours()).padStart(2, '0') + ":" + 
+                    String(d.getMinutes()).padStart(2, '0') + ":" + 
+                    String(d.getSeconds()).padStart(2, '0');
+        }
+
+        function toggleCCTV() {
+            isCctv = !isCctv;
+            const lyr = document.getElementById('cctvLayer');
+            lyr.style.display = isCctv ? 'block' : 'none';
+            
+            if(isCctv) {
+                updateCctvTicks();
+                cctvInterval = setInterval(updateCctvTicks, 1000);
+            } else {
+                clearInterval(cctvInterval);
+            }
+            saveMapState();
+        }
+
+        function ensureEnemyIdentity(enemy) {
+            if (!enemy.enemyId) enemy.enemyId = `enemy_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+            return enemy.enemyId;
+        }
+
+        function isHeroWithinEnemyDetection(enemy) {
+            const enemyX = parseFloat(enemy.position?.left);
+            const enemyY = parseFloat(enemy.position?.top);
+            const revealDistance = Math.max(1, Math.min(100, Number(enemy.detectionDistance) || 20));
+            if (!Number.isFinite(enemyX) || !Number.isFinite(enemyY)) return false;
+            return (charsData[currentId] || []).some(hero =>
+                Math.hypot(Number(hero.rx) - enemyX, Number(hero.ry) - enemyY) <= revealDistance
+            );
+        }
+
+        function isEnemyRevealedByHeroes(enemy) {
+            return !isEnemyProximityEnabled || isHeroWithinEnemyDetection(enemy);
+        }
+
+        function updateEnemyProximityVisibility() {
+            document.querySelectorAll('.hs-enemy').forEach(enemyDom => {
+                const enemy = enemyDom._enemyRef;
+                if (!enemy) return;
+                const heroesArePresent = (charsData[currentId] || []).length > 0;
+                const isFoundNow = heroesArePresent && isHeroWithinEnemyDetection(enemy);
+                if (!enemy.hasBeenFound && isFoundNow) {
+                    enemy.hasBeenFound = true;
+                    stopCustomMonsterAudio(ensureEnemyIdentity(enemy));
+                }
+                enemyDom.classList.toggle('proximity-hidden', !isEnemyRevealedByHeroes(enemy));
+            });
+        }
+
+        function stopCustomMonsterAudio(enemyId) {
+            clearTimeout(customMonsterAudioTimers.get(enemyId));
+            customMonsterAudioTimers.delete(enemyId);
+            const audio = customMonsterAudioPlayers.get(enemyId);
+            if (!audio) return;
+            audio.pause();
+            audio.removeAttribute('src');
+            audio.load();
+            audio.remove();
+            customMonsterAudioPlayers.delete(enemyId);
+        }
+
+        function shouldPlayCustomMonsterAudio(enemy) {
+            return Boolean(
+                enemy?.audioContent && !enemy.isDead && !enemy.hasBeenFound &&
+                (charsData[currentId] || []).length > 0 &&
+                hierarchy[currentId]?.hotspots.includes(enemy)
+            );
+        }
+
+        function startCustomMonsterAudio(enemy) {
+            const enemyId = ensureEnemyIdentity(enemy);
+            if (customMonsterAudioPlayers.has(enemyId) || !shouldPlayCustomMonsterAudio(enemy)) return;
+            const audio = document.createElement('audio');
+            audio.hidden = true;
+            audio.loop = false;
+            audio.preload = 'auto';
+            document.body.appendChild(audio);
+            customMonsterAudioPlayers.set(enemyId, audio);
+            const intervalMs = Math.max(1, Math.min(600, Number(enemy.audioInterval) || 15)) * 1000;
+
+            const schedulePlayback = delay => {
+                clearTimeout(customMonsterAudioTimers.get(enemyId));
+                const timer = setTimeout(() => {
+                    customMonsterAudioTimers.delete(enemyId);
+                    if (customMonsterAudioPlayers.get(enemyId) !== audio || !shouldPlayCustomMonsterAudio(enemy)) {
+                        stopCustomMonsterAudio(enemyId);
+                        return;
+                    }
+                    audio.currentTime = 0;
+                    audio.play().catch(() => {
+                        if (customMonsterAudioPlayers.get(enemyId) === audio) stopCustomMonsterAudio(enemyId);
+                    });
+                }, delay);
+                customMonsterAudioTimers.set(enemyId, timer);
+            };
+
+            audio.addEventListener('ended', () => {
+                if (customMonsterAudioPlayers.get(enemyId) === audio && shouldPlayCustomMonsterAudio(enemy)) {
+                    schedulePlayback(intervalMs);
+                }
+            });
+
+            const startPlayback = source => {
+                if (!source || customMonsterAudioPlayers.get(enemyId) !== audio || !shouldPlayCustomMonsterAudio(enemy)) {
+                    stopCustomMonsterAudio(enemyId);
+                    return;
+                }
+                audio.src = source;
+                schedulePlayback(0);
+            };
+            const cachedSource = enemy.audioContent.startsWith('idb-asset:')
+                ? mapAssetUrlCache.get(enemy.audioContent)
+                : enemy.audioContent;
+            if (cachedSource) startPlayback(cachedSource);
+            else loadMapAssetUrl(enemy.audioContent).then(startPlayback);
+        }
+
+        function updateCustomMonsterAudio() {
+            const activeEnemyIds = new Set();
+            (hierarchy[currentId]?.hotspots || []).forEach(enemy => {
+                if (enemy.type !== 'enemy' || !shouldPlayCustomMonsterAudio(enemy)) return;
+                const enemyId = ensureEnemyIdentity(enemy);
+                activeEnemyIds.add(enemyId);
+                startCustomMonsterAudio(enemy);
+            });
+            [...customMonsterAudioPlayers.keys()].forEach(enemyId => {
+                if (!activeEnemyIds.has(enemyId)) stopCustomMonsterAudio(enemyId);
+            });
+        }
+
+        function preloadCustomMonsterAudios() {
+            Object.values(hierarchy).forEach(sector => {
+                sector.hotspots.forEach(enemy => {
+                    if (enemy.type === 'enemy' && enemy.audioContent) loadMapAssetUrl(enemy.audioContent);
+                });
+            });
+        }
+
+        document.addEventListener('pointerdown', () => updateCustomMonsterAudio());
+
+        function renderMap(id, fromBack = false) {
+            if (!hierarchy[id]) return alert("Setor Inexistente no Banco de Dados!");
+            if(!fromBack && currentId !== id) navHistory.push(currentId);
+            currentId = id;
+            anchor.classList.toggle('night-mode', hasDayNight && !isDay);
+            
+            const data = hierarchy[id];
+            
+            // Lógica Avançada de Busca da Imagem física apropriada pelas Regras!
+            const imageCandidates = [];
+            if (isBlackout && data.imgBlackoutName) imageCandidates.push(data.imgBlackoutName);
+            if (hasDayNight && !isDay && data.imgNightName) imageCandidates.push(data.imgNightName);
+            if (data.imgBaseName) imageCandidates.push(data.imgBaseName);
+            if (data.imgNightName) imageCandidates.push(data.imgNightName);
+            const uniqueCandidates = [...new Set(imageCandidates.filter(Boolean))];
+            let imageIndex = 0;
+            let targetImage = uniqueCandidates[imageIndex] || '';
+
+            const imgDom = document.getElementById('bgImage');
+            const requestedMapId = id;
+
+            const showImageCandidate = async () => {
+                targetImage = uniqueCandidates[imageIndex] || '';
+                const resolvedImage = await loadMapAssetUrl(targetImage);
+                if (currentId !== requestedMapId) return;
+                if (!resolvedImage) {
+                    imgDom.onerror();
+                    return;
+                }
+                imgDom.src = resolvedImage;
+            };
+            
+            imgDom.onerror = function() {
+                console.error("Imagem offline não encontrada:", targetImage);
+                imageIndex++;
+                if (imageIndex < uniqueCandidates.length) {
+                    showImageCandidate();
+                    return;
+                }
+                imgDom.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect fill='%231a0505' width='800' height='450'/%3E%3Ctext y='225' x='400' fill='%23ff5555' font-size='20' text-anchor='middle' font-family='sans-serif'%3EERRO: ARQUIVO '" + targetImage + "' DEVE ESTAR NA PASTA DA HTML!%3C/text%3E%3C/svg%3E";
+                imgDom.onerror = null;
+                // Ajusta canvas se precisar
+                if(isBlackout) setTimeout(resizeCanvas, 50);
+                if(isGridActive) setTimeout(drawGrid, 50);
+            };
+            
+            imgDom.onload = function() {
+                if(isGridActive) drawGrid();
+                if(isBlackout) resizeCanvas();
+            }
+            showImageCandidate();
+
+            document.getElementById('lblLocation').textContent = data.name;
+            const canGoBack = navHistory.length > 0 || currentId !== 'andar_1';
+            document.getElementById('ctxBtnBack').disabled = !canGoBack;
+            const floatingBack = document.getElementById('btnFloatingBack');
+            if (floatingBack) floatingBack.style.display = canGoBack ? 'inline-flex' : 'none';
+            
+            const hsLayer = document.getElementById('hotspotsLayer');
+            hsLayer.innerHTML = '';
+            selectedVan = false;
+            document.getElementById('charsLayer').innerHTML = '';
+            document.getElementById('vanLayer').innerHTML = '';
+
+            data.hotspots.forEach((h, hIdx) => {
+                const el = document.createElement('div');
+                el.className = 'hs-marker-viz';
+                el.setAttribute('data-vis', h.type === 'enemy' ? 'enemy' : (h.visibility || 'visible'));
+                el.style.top = h.position.top;
+                el.style.left = h.position.left;
+                el.title = h.title;
+
+                if (h.type === 'event') {
+                    el.classList.add('event-marker');
+                    el.dataset.kind = h.eventKind || 'media';
+                    if (h.audioContent) loadMapAssetUrl(h.audioContent);
+                    el.setAttribute('role', 'button');
+                    el.setAttribute('tabindex', '0');
+                    const isDoorEvent = h.eventKind === 'door';
+                    el.setAttribute('aria-label', isDoorEvent
+                        ? `Porta ${h.title}. Ative para abrir o teste no Limiar.`
+                        : `Evento ${h.title}. Use o botao direito para acionar.`);
+                    el.onmousedown = e => e.stopPropagation();
+                    el.onclick = e => {
+                        e.stopPropagation();
+                        if (isDoorEvent) {
+                            openLimiarDoorTest();
+                            return;
+                        }
+                        showToast('Use o botao direito para acionar este evento.');
+                    };
+                    el.oncontextmenu = e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closeCtxMenu();
+                        openEventViewer(h);
+                    };
+                    el.onkeydown = e => {
+                        if (isDoorEvent && (e.key === 'Enter' || e.key === ' ')) {
+                            e.preventDefault();
+                            openLimiarDoorTest();
+                        } else if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
+                            e.preventDefault();
+                            openEventViewer(h);
+                        }
+                    };
+                } else if (h.type === 'enemy') {
+                    el.classList.add('hs-enemy');
+                    ensureEnemyIdentity(h);
+                    el._enemyRef = h;
+                    if (h.audioContent) loadMapAssetUrl(h.audioContent);
+                    el.classList.toggle('proximity-hidden', !isEnemyRevealedByHeroes(h));
+                    if (h.isDead) el.classList.add('dead');
+
+                    let customFilter = h.filter || 'drop-shadow(0 15px 15px rgba(0,0,0,0.8))';
+                    if (!isDay) customFilter += ' brightness(1.2) drop-shadow(0 0 8px rgba(160,195,255,.8))';
+                    const enemySize = Math.max(20, Math.min(TOKEN_MAX_SIZE_PX, parseFloat(h.size) || 144));
+                    let finalSize = `${enemySize}px`;
+                    let customSize = `width: ${finalSize}; height: auto;`;
+                    let flipStyle = h.flipped ? 'scaleX(-1) ' : '';
+                    let rotStyle = h.rot ? `rotate(${h.rot}deg)` : '';
+                    let transformStyle = (flipStyle || rotStyle) ? ` transform: ${flipStyle}${rotStyle};` : '';
+                    let contentSource = h.content;
+                    if (contentSource.startsWith('idb-asset:')) {
+                        contentSource = mapAssetUrlCache.get(contentSource) || '';
+                        if (!contentSource) {
+                            loadMapAssetUrl(h.content).then(url => { if (url && currentId === id) renderMap(id, true); });
+                            return;
+                        }
+                    }
+
+                    if ((h.mediaType && h.mediaType.startsWith('image/')) || /^data:image\//i.test(contentSource) || /\.(png|jpe?g|gif|webp)(?:[?#].*)?$/i.test(contentSource)) {
+                        el.innerHTML = `<img src="${contentSource}" style="${customSize} filter: ${customFilter}; cursor: grab;${transformStyle}" draggable="false" ondragstart="return false;">`;
+                    } else {
+                        el.innerHTML = `
+                                <div class="video-container" style="position: relative; ${customSize}" draggable="false" ondragstart="return false;">
+                                    <video src="${contentSource}" autoplay loop muted playsinline disablePictureInPicture oncontextmenu="return false;" controlsList="nodownload nofullscreen noremoteplayback" style="width: 100%; height: auto; filter: ${customFilter}; pointer-events: none; ${transformStyle}; opacity: 0; transition: opacity 0.2s;" onplaying="this.style.opacity=1" draggable="false" ondragstart="return false;"></video>
+                                    <div class="video-shield" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto; cursor: grab;" draggable="false" ondragstart="return false;"></div>
+                                </div>`;
+                    }
+
+                    el.onwheel = (e) => {
+                        e.preventDefault();
+                        if (e.ctrlKey) {
+                            const currentSize = parseFloat(h.size) || 90;
+                            h.size = `${Math.max(20, Math.min(TOKEN_MAX_SIZE_PX, currentSize + (e.deltaY < 0 ? 10 : -10)))}px`;
+                            const image = el.querySelector('img');
+                            const videoContainer = el.querySelector('.video-container');
+                            if (image) image.style.width = h.size;
+                            if (videoContainer) videoContainer.style.width = h.size;
+                            saveMapState();
+                            return;
+                        }
+                        const delta = e.deltaY > 0 ? 15 : -15;
+                        h.rot = ((h.rot || 0) + delta) % 360;
+                        const videoEl = el.querySelector('video') || el.querySelector('img');
+                        if (videoEl) {
+                            let fStyle = h.flipped ? 'scaleX(-1) ' : '';
+                            let rStyle = h.rot ? `rotate(${h.rot}deg)` : '';
+                            videoEl.style.transform = `${fStyle}${rStyle}`;
+                        }
+                        saveMapState();
+                    };
+
+                    el.onmousedown = (e) => {
+                        e.stopPropagation();
+                        selectedTokens.clear();
+                        updateSelectionVisuals();
+                        activeEnemyRef = h;
+
+                        let dragOriginX = e.clientX;
+                        let dragOriginY = e.clientY;
+                        let initialLeft = parseFloat(h.position.left);
+                        let initialTop = parseFloat(h.position.top);
+
+                        const onMove = (ev) => {
+                            const rect = anchor.getBoundingClientRect();
+                            let deltaX = ((ev.clientX - dragOriginX) / rect.width) * 100;
+                            let deltaY = ((ev.clientY - dragOriginY) / rect.height) * 100;
+                            h.position.left = Math.max(0, Math.min(100, initialLeft + deltaX)).toFixed(3) + '%';
+                            h.position.top = Math.max(0, Math.min(100, initialTop + deltaY)).toFixed(3) + '%';
+                            el.style.left = h.position.left;
+                            el.style.top = h.position.top;
+                            updateEnemyProximityVisibility();
+                        };
+
+                        const onUp = () => {
+                            document.removeEventListener('mousemove', onMove);
+                            document.removeEventListener('mouseup', onUp);
+                            saveMapState();
+                        };
+
+                        document.addEventListener('mousemove', onMove);
+                        document.addEventListener('mouseup', onUp);
+                    };
+                } else {
+                    if (h.type === 'scenario') {
+                        el.classList.add('scenario-marker');
+                        el.oncontextmenu = e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openScenarioViewer(h, id);
+                        };
+                    }
+                    el.setAttribute('role', 'button');
+                    el.setAttribute('tabindex', '0');
+                    el.setAttribute('aria-label', `Ir para ${h.title}`);
+                    el.onmousedown = e => e.stopPropagation();
+                    el.onclick = e => { e.stopPropagation(); renderMap(h.id); };
+                    el.onkeydown = e => {
+                        if (h.type === 'scenario' && (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10'))) {
+                            e.preventDefault();
+                            openScenarioViewer(h, id);
+                        } else if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            renderMap(h.id);
+                        }
+                    };
+                }
+                hsLayer.appendChild(el);
+            });
+            
+            renderSavedChars();
+            renderVanOfTheHidden();
+            updateEnemyProximityVisibility();
+            updateMonsterSound();
+            saveMapState();
+            
+            // Garantir que todos os vídeos de inimigos com autoplay realmente comecem a rodar
+            hsLayer.querySelectorAll('video').forEach(v => {
+                v.play().catch(e => console.log("Autoplay de inimigo bloqueado ou aguardando interação:", e));
+            });
+        }
+
+        function playSoundEffect(id) {
+            const s = document.getElementById(id);
+            if (s) { s.currentTime = 0; s.play().catch(e => console.log('Audio error:', e)); }
+        }
+
+        function spawnMonster(title, content, size, filter = "drop-shadow(0 15px 15px rgba(0,0,0,0.8))", mediaType = '', audioContent = '', audioType = '', detectionDistance = 20, audioInterval = 15) {
+            const newEnemy = {
+                "enemyId": `enemy_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                "type": "enemy",
+                "title": title,
+                "content": content,
+                "assetContent": content.startsWith('idb-asset:') ? content : '',
+                "size": size,
+                "filter": filter,
+                "mediaType": mediaType,
+                "audioContent": audioContent,
+                "audioType": audioType,
+                "audioInterval": Math.max(1, Math.min(600, Number(audioInterval) || 15)),
+                "hasBeenFound": false,
+                "detectionDistance": Math.max(1, Math.min(100, Number(detectionDistance) || 20)),
+                "position": { "top": spawnCursorY.toFixed(3) + "%", "left": spawnCursorX.toFixed(3) + "%" }
+            };
+            hierarchy[currentId].hotspots.push(newEnemy);
+            renderMap(currentId, true);
+            updateMonsterSound();
+            saveMapState();
+            console.log(title + " invocado no mapa!");
+        }
+
+        document.getElementById('monsterForm').addEventListener('submit', event => {
+            event.preventDefault();
+            const title = document.getElementById('monsterTitle').value.trim();
+            const file = document.getElementById('monsterFile').files[0];
+            const audioFile = document.getElementById('monsterAudioFile').files[0];
+            const audioInterval = Number(document.getElementById('monsterAudioInterval').value);
+            const detectionDistance = Number(document.getElementById('monsterDetectionDistance').value);
+            const status = document.getElementById('monsterFormStatus');
+            const saveButton = document.getElementById('saveMonsterButton');
+            if (!title || !file) return;
+
+            const supported = /^image\/(png|jpeg|webp|gif)$/i.test(file.type) || /^video\/(mp4|webm)$/i.test(file.type);
+            const maxSize = file.type === 'image/gif' ? 8 * 1024 * 1024 : 3 * 1024 * 1024;
+            if (!supported || file.size > maxSize) {
+                status.textContent = file.type === 'image/gif'
+                    ? 'O GIF pode ter ate 8 MB; outros arquivos, ate 3 MB.'
+                    : 'Escolha uma imagem, GIF ou video de ate 3 MB.';
+                return;
+            }
+            if (!Number.isFinite(detectionDistance) || detectionDistance < 1 || detectionDistance > 100) {
+                status.textContent = 'Defina uma distancia entre 1% e 100%.';
+                return;
+            }
+            if (!Number.isFinite(audioInterval) || audioInterval < 1 || audioInterval > 600) {
+                status.textContent = 'Defina um intervalo de audio entre 1 e 600 segundos.';
+                return;
+            }
+            if (audioFile) {
+                const supportedAudio = /^(audio\/(mpeg|mp3|wav|wave|x-wav|vnd\.wave|ogg|mp4|m4a|x-m4a|aac))$/i.test(audioFile.type)
+                    || /\.(mp3|wav|ogg|m4a|aac)$/i.test(audioFile.name);
+                if (!supportedAudio || audioFile.size > 20 * 1024 * 1024) {
+                    status.textContent = supportedAudio ? 'O audio ultrapassa 20 MB.' : 'Escolha um audio MP3, WAV, OGG, M4A ou AAC valido.';
+                    return;
+                }
+            }
+
+            saveButton.disabled = true;
+            status.textContent = 'Salvando vilao...';
+            Promise.all([
+                readFileAsDataUrl(file).then(saveMapAsset),
+                audioFile ? readFileAsDataUrl(audioFile).then(saveMapAsset) : Promise.resolve('')
+            ]).then(([content, audioContent]) => {
+                spawnMonster(title.slice(0, 60), content, '90px', undefined, file.type, audioContent, audioFile?.type || '', detectionDistance, audioInterval);
+                closeMonsterCreator();
+                showToast('Vilao/monstro adicionado ao mapa.');
+            }).catch(error => {
+                console.warn('Nao foi possivel salvar o vilao/monstro:', error);
+                status.textContent = 'Nao foi possivel salvar um dos arquivos.';
+            }).finally(() => {
+                saveButton.disabled = false;
+            });
+        });
+
+        function toggleJumpscare(videoSrc, bgImage, soundId) {
+            const jsOverlay = document.getElementById('jumpscareOverlay');
+            const jsVid = document.getElementById('jumpscareVideo');
+            if (!jsOverlay || !jsVid) return;
+
+            if (jsOverlay.style.display === 'none' || jsOverlay.style.display === '') {
+                jsVid.src = videoSrc;
+                jsVid.disablePictureInPicture = true;
+                jsVid.controlsList = "nodownload nofullscreen noremoteplayback";
+                jsVid.muted = true;
+
+                if (videoSrc.includes("Anarquico")) {
+                    jsVid.style.width = "40vw";
+                    jsVid.style.maxHeight = "60vh";
+                    jsVid.style.marginTop = "25vh";
+                } else if (videoSrc.includes("pertubado")) {
+                    jsVid.style.width = "30vw";
+                    jsVid.style.maxHeight = "85vh";
+                    jsVid.style.marginTop = "25vh";
+                } else if (videoSrc.includes("z.webm")) {
+                    jsVid.style.width = "60vw";
+                    jsVid.style.maxHeight = "60vh";
+                    jsVid.style.marginTop = "35vh";
+                } else if (videoSrc.includes("dominc")) {
+                    jsVid.style.width = "80vw";
+                    jsVid.style.maxHeight = "80vh";
+                    jsVid.style.marginTop = "15vh";
+                } else if (videoSrc.includes("vulto")) {
+                    jsVid.style.width = "80vw";
+                    jsVid.style.maxHeight = "80vh";
+                    jsVid.style.marginTop = "15vh";
+                } else if (videoSrc.includes("mea_culpa")) {
+                    jsVid.style.width = "100vw";
+                    jsVid.style.maxHeight = "100vh";
+                    jsVid.style.marginTop = "0vh";
+                } else {
+                    jsVid.style.width = "35vw";
+                    jsVid.style.maxHeight = "50vh";
+                    jsVid.style.marginTop = "25vh";
+                }
+
+                jsOverlay.style.backgroundImage = `url('${bgImage}')`;
+                jsOverlay.style.display = 'flex';
+                jsVid.play();
+                updateMonsterSound();
+            } else {
+                jsOverlay.style.display = 'none';
+                jsVid.pause();
+                updateMonsterSound();
+            }
+        }
+
+        function updateMonsterSound() {
+            updateCustomMonsterAudio();
+            const sAnarquico = document.getElementById('sndAnarquico');
+            const sZumbi = document.getElementById('sndZumbi');
+            const sDom = document.getElementById('sndDominic');
+            const sPertub = document.getElementById('sndPertubado');
+            const sVulto = document.getElementById('sndVulto');
+            const sMea = document.getElementById('sndMeaCulpa');
+            if (!sAnarquico || !sZumbi || !sDom || !sPertub) return;
+
+            sAnarquico.volume = 0.35;
+            sZumbi.volume = 0.15;
+            sDom.volume = 0.15;
+            sPertub.volume = 0.15;
+            if (sVulto) sVulto.volume = 0.15;
+            if (sMea) sMea.volume = 0.40;
+
+            const jsOverlay = document.getElementById('jumpscareOverlay');
+            const isJsActive = jsOverlay && jsOverlay.style.display === 'flex';
+            const jsVid = document.getElementById('jumpscareVideo');
+            const isDominicJs = isJsActive && jsVid && jsVid.src.includes('dominc.webm');
+            const isZombiJs = isJsActive && jsVid && jsVid.src.includes('z.webm');
+            const isAnarquicoJs = isJsActive && jsVid && jsVid.src.includes('Anarquico.webm');
+            const isPertubadoJs = isJsActive && jsVid && (jsVid.src.includes('pertubado%20de%20energia.webm') || jsVid.src.includes('pertubado de energia.webm'));
+            const isVultoJs = isJsActive && jsVid && jsVid.src.includes('vulto.webm');
+            const isMeaJs = isJsActive && jsVid && jsVid.src.includes('mea_culpa.webm');
+
+            if (isAnarquicoJs || charsData[currentId]?.some(h => h.type === 'enemy' && h.title === 'Anárquico' && !h.isDead)) {
+                if (sAnarquico.paused) sAnarquico.play().catch(e => console.log(e));
+            } else {
+                sAnarquico.pause();
+            }
+
+            if (isZombiJs || charsData[currentId]?.some(h => h.type === 'enemy' && h.title === 'Zumbi de Sangue' && !h.isDead)) {
+                if (sZumbi.paused) sZumbi.play().catch(e => console.log(e));
+            } else {
+                sZumbi.pause();
+            }
+
+            if (isDominicJs || charsData[currentId]?.some(h => h.type === 'enemy' && h.title === 'Dominic' && !h.isDead)) {
+                if (sDom.paused) sDom.play().catch(e => console.log(e));
+            } else {
+                sDom.pause();
+            }
+
+            if (isPertubadoJs || charsData[currentId]?.some(h => h.type === 'enemy' && h.title === 'Pertubado de Energia' && !h.isDead)) {
+                if (sPertub.paused) sPertub.play().catch(e => console.log(e));
+            } else {
+                sPertub.pause();
+            }
+
+            if (isVultoJs || charsData[currentId]?.some(h => h.type === 'enemy' && h.title === 'Vulto' && !h.isDead)) {
+                if (sVulto.paused) sVulto.play().catch(e => console.log(e));
+            } else {
+                if (sVulto) sVulto.pause();
+            }
+
+            if (isMeaJs || charsData[currentId]?.some(h => h.type === 'enemy' && h.title === 'Mea Culpa' && !h.isDead)) {
+                if (sMea.paused) sMea.play().catch(e => console.log(e));
+            } else {
+                if (sMea) sMea.pause();
+            }
+        }
+
+        function stopVanAudio() {
+            ['sndVanSuccess', 'sndVanFailure'].forEach(id => {
+                const audio = document.getElementById(id);
+                if (!audio) return;
+                audio.pause();
+                audio.currentTime = 0;
+            });
+        }
+
+        function playVanAudio(id) {
+            stopVanAudio();
+            const audio = document.getElementById(id);
+            if (audio) audio.play().catch(error => console.log('Áudio da van bloqueado:', error));
+        }
+
+        function clearVanMovementTimer() {
+            clearTimeout(vanMovementTimer);
+            vanMovementTimer = null;
+        }
+
+        function expireVanMovement() {
+            clearVanMovementTimer();
+            if (!vanState?.active || vanState.status !== 'success') return;
+            vanState.status = 'restart_required';
+            delete vanState.movementStartedAt;
+            delete vanState.movementExpiresAt;
+            selectedVan = false;
+            if (vanState.mapId === currentId) renderMap(currentId, true);
+            else saveMapState();
+            showToast('A van desligou. Faça um novo teste para ligá-la.');
+        }
+
+        function scheduleVanMovementTimeout() {
+            clearVanMovementTimer();
+            if (!vanState?.active || vanState.status !== 'success') return;
+            if (!Number.isFinite(vanState.movementExpiresAt)) {
+                vanState.movementStartedAt = Date.now();
+                vanState.movementExpiresAt = vanState.movementStartedAt + VAN_MOVEMENT_DURATION_MS;
+            }
+            const remaining = vanState.movementExpiresAt - Date.now();
+            if (remaining <= 0) {
+                expireVanMovement();
+                return;
+            }
+            vanMovementTimer = setTimeout(expireVanMovement, remaining);
+        }
+
+        function activateVanOfTheHidden() {
+            if (vanState?.active) {
+                showToast(vanState.mapId === currentId ? 'A Van dos Ocultos já está no mapa.' : 'A Van dos Ocultos já está ativa em outro mapa.');
+                return;
+            }
+            const heroes = charsData[currentId] || [];
+            if (!heroes.length) {
+                showToast('Crie ao menos um herói para chamar a van.');
+                return;
+            }
+            const chosenHero = heroes[Math.floor(Math.random() * heroes.length)];
+            clearVanMovementTimer();
+            vanState = {
+                active: true,
+                mapId: currentId,
+                rx: chosenHero.rx,
+                ry: chosenHero.ry,
+                lightRot: 0,
+                attempts: 0,
+                status: 'ready',
+                heroes: heroes.map(hero => ({...hero}))
+            };
+            charsData[currentId] = [];
+            selectedTokens.clear();
+            activeEnemyRef = null;
+            renderMap(currentId, true);
+            showToast('Os heróis entraram na Van dos Ocultos.');
+        }
+
+        function renderVanOfTheHidden() {
+            const layer = document.getElementById('vanLayer');
+            if (!layer || !vanState?.active || vanState.mapId !== currentId) return;
+            if (vanState.status === 'success') {
+                if (Number.isFinite(vanState.movementExpiresAt) && vanState.movementExpiresAt <= Date.now()) {
+                    vanState.status = 'restart_required';
+                    delete vanState.movementStartedAt;
+                    delete vanState.movementExpiresAt;
+                    clearVanMovementTimer();
+                } else {
+                    scheduleVanMovementTimeout();
+                }
+            }
+            const event = document.createElement('div');
+            const canDrag = vanState.status === 'success';
+            event.className = `van-event${canDrag ? ' running draggable' : ''}`;
+            event.style.left = `${vanState.rx}%`;
+            event.style.top = `${vanState.ry}%`;
+
+            const image = document.createElement('img');
+            image.src = 'van_em_movimento.gif';
+            image.alt = 'Van dos Ocultos em movimento';
+            if (selectedVan) event.classList.add('selected');
+            image.addEventListener('pointerdown', e => startVanDrag(e, event));
+
+            let controls = null;
+            if (vanState.status !== 'success') {
+                controls = document.createElement('div');
+                controls.className = 'van-controls';
+                const start = document.createElement('button');
+                start.type = 'button';
+                start.textContent = 'Start';
+                start.addEventListener('click', rollVanOfTheHidden);
+                controls.appendChild(start);
+            }
+
+            if (vanState.status === 'failure' && controls) {
+                const cancel = document.createElement('button');
+                cancel.type = 'button';
+                cancel.className = 'van-cancel';
+                cancel.textContent = 'Cancelar';
+                cancel.addEventListener('click', cancelVanOfTheHidden);
+                controls.appendChild(cancel);
+            }
+
+            if (vanState.status === 'failure' && controls) {
+                const status = document.createElement('div');
+                status.className = 'van-status';
+                status.setAttribute('role', 'status');
+                status.textContent = vanState.status === 'success' ? 'Deu boa! A van ligou.' : 'Não deu boa. Tente novamente.';
+                controls.appendChild(status);
+            }
+            if (vanState.status === 'restart_required' && controls) {
+                const restartStatus = document.createElement('div');
+                restartStatus.className = 'van-status';
+                restartStatus.setAttribute('role', 'status');
+                restartStatus.textContent = 'A van desligou. Faça um novo teste para ligá-la.';
+                controls.appendChild(restartStatus);
+            }
+            event.append(image);
+            if (controls) event.append(controls);
+            layer.appendChild(event);
+        }
+
+        function startVanDrag(event, vanDom) {
+            if (event.button !== 0 || !vanState?.active || vanState.mapId !== currentId) return;
+            selectedVan = true;
+            selectedTokens.clear();
+            activeEnemyRef = null;
+            updateSelectionVisuals();
+            vanDom.classList.add('selected');
+            if (vanState.status !== 'success') return;
+            event.preventDefault();
+            event.stopPropagation();
+            const origin = { x: event.clientX, y: event.clientY, rx: vanState.rx, ry: vanState.ry };
+            let previousPointer = { x: event.clientX, y: event.clientY };
+            const rect = anchor.getBoundingClientRect();
+            const move = e => {
+                if (!vanState?.active || vanState.status !== 'success' || vanState.mapId !== currentId || !rect.width || !rect.height) return;
+                const directionX = e.clientX - previousPointer.x;
+                const directionY = e.clientY - previousPointer.y;
+                if (Math.hypot(directionX, directionY) > 1) {
+                    vanState.lightRot = Math.atan2(directionY, directionX) * (180 / Math.PI) + 90;
+                }
+                previousPointer = { x: e.clientX, y: e.clientY };
+                vanState.rx = Math.max(0, Math.min(100, origin.rx + ((e.clientX - origin.x) / rect.width) * 100));
+                vanState.ry = Math.max(0, Math.min(100, origin.ry + ((e.clientY - origin.y) / rect.height) * 100));
+                vanDom.style.left = `${vanState.rx}%`;
+                vanDom.style.top = `${vanState.ry}%`;
+                if (isBlackout && typeof drawFlashlight === 'function') drawFlashlight();
+            };
+            const finish = () => {
+                document.removeEventListener('pointermove', move);
+                document.removeEventListener('pointerup', finish);
+                document.removeEventListener('pointercancel', finish);
+                saveMapState();
+            };
+            document.addEventListener('pointermove', move);
+            document.addEventListener('pointerup', finish, { once: true });
+            document.addEventListener('pointercancel', finish, { once: true });
+        }
+
+        function rollVanOfTheHidden() {
+            if (!vanState?.active || vanState.mapId !== currentId || vanState.status === 'success') return;
+            vanState.attempts += 1;
+            const success = Math.random() < 0.3;
+            vanState.status = success ? 'success' : 'failure';
+            if (success) {
+                vanState.movementStartedAt = Date.now();
+                vanState.movementExpiresAt = vanState.movementStartedAt + VAN_MOVEMENT_DURATION_MS;
+                scheduleVanMovementTimeout();
+            } else {
+                delete vanState.movementStartedAt;
+                delete vanState.movementExpiresAt;
+                clearVanMovementTimer();
+            }
+            playVanAudio(success ? 'sndVanSuccess' : 'sndVanFailure');
+            renderMap(currentId, true);
+            showToast(success ? 'Deu boa! A van ligou.' : 'Não deu boa. Aperte Start novamente ou cancele.');
+        }
+
+        function cancelVanOfTheHidden() {
+            if (!vanState?.active || vanState.mapId !== currentId || vanState.status !== 'failure') return;
+            const restoredHeroes = Array.isArray(vanState.heroes) ? vanState.heroes : [];
+            charsData[currentId] = restoredHeroes;
+            vanState = null;
+            clearVanMovementTimer();
+            stopVanAudio();
+            renderMap(currentId, true);
+            showToast('Viagem cancelada. Os heróis voltaram ao mapa.');
+        }
+
+        function deleteVanOfTheHidden() {
+            if (!vanState?.active || vanState.mapId !== currentId) return;
+            charsData[currentId] = restoreVanHeroesAtVanPosition();
+            vanState = null;
+            clearVanMovementTimer();
+            selectedVan = false;
+            stopVanAudio();
+            renderMap(currentId, true);
+            showToast('Van removida. Os heróis voltaram ao mapa.');
+        }
+
+        function restoreVanHeroesAtVanPosition() {
+            if (!Array.isArray(vanState?.heroes)) return [];
+            return vanState.heroes.map(hero => ({ ...hero, rx: vanState.rx, ry: vanState.ry }));
+        }
+
+        function goBack() {
+            if (navHistory.length > 0) {
+                renderMap(navHistory.pop(), true);
+            } else if (currentId !== 'andar_cidade_arredores' && currentId !== 'andar_1' && currentId !== 'andar_nova_capital') {
+                renderMap('andar_cidade_arredores', true);
+            } else if (currentId !== 'andar_1') {
+                renderMap('andar_1', true);
+            }
+        }
+        function toggleTime() { isDay = !isDay; renderMap(currentId, true); saveMapState(); }
+
+        function addHero(cInfo) {
+            if (vanState?.active && vanState.mapId === currentId && vanState.status === 'success') {
+                charsData[currentId] = restoreVanHeroesAtVanPosition();
+                vanState = null;
+                clearVanMovementTimer();
+                stopVanAudio();
+                document.getElementById('vanLayer').innerHTML = '';
+                renderSavedChars();
+                showToast('Heróis de volta ao mapa. A van foi removida.');
+            } else if (vanState?.active && vanState.mapId === currentId) {
+                showToast('Aguarde o resultado ou cancele a Van dos Ocultos.');
+                return;
+            }
+            if(!charsData[currentId]) charsData[currentId] = [];
+            charsData[currentId].push(cInfo);
+            selectedTokens.clear();
+            selectedTokens.add(cInfo.id);
+            drawChar(cInfo);
+            updateSelectionVisuals();
+            updateEnemyProximityVisibility();
+            updateCustomMonsterAudio();
+            if(isBlackout && typeof drawFlashlight === 'function') drawFlashlight();
+            saveMapState();
+        }
+
+        function refreshHeroCreateRows() {
+            const rows = [...document.querySelectorAll('#heroCreateList .hero-create-row')];
+            rows.forEach((row, index) => {
+                row.querySelector('h3').textContent = `Herói ${index + 1}`;
+                row.querySelector('.remove-hero-row').disabled = rows.length === 1;
+            });
+            const saveButton = document.getElementById('saveHeroesButton');
+            saveButton.textContent = rows.length === 1 ? 'Adicionar herói ao mapa' : `Adicionar ${rows.length} heróis ao mapa`;
+        }
+
+        function addHeroCreatorRow(focusName = true) {
+            const list = document.getElementById('heroCreateList');
+            if (list.children.length >= 20) {
+                document.getElementById('heroFormStatus').textContent = 'Você pode adicionar até 20 heróis por vez.';
+                return;
+            }
+            const row = document.createElement('section');
+            row.className = 'hero-create-row';
+            row.innerHTML = `
+                <h3>Herói</h3>
+                <button class="remove-hero-row" type="button" title="Remover este herói" aria-label="Remover este herói">×</button>
+                <label class="event-field">Nome
+                    <input class="hero-create-name" type="text" maxlength="60" required placeholder="Ex.: Investigador">
+                </label>
+                <label class="event-field">Símbolo
+                    <input class="hero-create-emoji" type="text" maxlength="12" value="👤" aria-label="Símbolo ou emoji do herói">
+                </label>
+                <label class="event-field hero-gif-field">GIF do herói (opcional)
+                    <input class="hero-create-gif" type="file" accept="image/gif,.gif">
+                    <small>GIF de até 8 MB. Se nenhum for escolhido, o símbolo será usado no token.</small>
+                </label>`;
+            row.querySelector('.remove-hero-row').addEventListener('click', () => {
+                if (list.children.length === 1) return;
+                row.remove();
+                document.getElementById('heroFormStatus').textContent = '';
+                refreshHeroCreateRows();
+            });
+            list.appendChild(row);
+            refreshHeroCreateRows();
+            if (focusName) row.querySelector('.hero-create-name').focus();
+        }
+
+        function spawnHero() {
+            closeCtxMenu();
+            if (vanState?.active && vanState.mapId === currentId && vanState.status !== 'success') {
+                showToast('Aguarde o resultado ou cancele a Van dos Ocultos.');
+                return;
+            }
+            document.getElementById('heroForm').reset();
+            document.getElementById('heroCreateList').innerHTML = '';
+            document.getElementById('heroFormStatus').textContent = `Posição: ${spawnCursorX.toFixed(1)}%, ${spawnCursorY.toFixed(1)}%`;
+            document.getElementById('heroCreator').hidden = false;
+            addHeroCreatorRow(false);
+            setTimeout(() => document.querySelector('.hero-create-name')?.focus(), 0);
+        }
+
+        function closeHeroCreator() {
+            document.getElementById('heroCreator').hidden = true;
+            document.getElementById('heroFormStatus').textContent = '';
+        }
+
+        document.getElementById('addHeroRowButton').addEventListener('click', () => {
+            document.getElementById('heroFormStatus').textContent = '';
+            addHeroCreatorRow();
+        });
+
+        document.getElementById('heroForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            const status = document.getElementById('heroFormStatus');
+            const saveButton = document.getElementById('saveHeroesButton');
+            const rows = [...document.querySelectorAll('#heroCreateList .hero-create-row')];
+            const entries = rows.map(row => ({
+                name: row.querySelector('.hero-create-name').value.trim(),
+                emoji: row.querySelector('.hero-create-emoji').value.trim() || '👤',
+                file: row.querySelector('.hero-create-gif').files[0]
+            }));
+            if (!entries.length || entries.some(entry => !entry.name)) {
+                status.textContent = 'Preencha o nome de todos os heróis.';
+                return;
+            }
+            const invalidFile = entries.find(entry => entry.file && (
+                !(entry.file.type === 'image/gif' || /\.gif$/i.test(entry.file.name))
+                || entry.file.size > 8 * 1024 * 1024
+            ));
+            if (invalidFile) {
+                status.textContent = `O arquivo de "${invalidFile.name}" deve ser um GIF de até 8 MB.`;
+                return;
+            }
+            if (vanState?.active && vanState.mapId === currentId && vanState.status !== 'success') {
+                status.textContent = 'Aguarde o resultado ou cancele a Van dos Ocultos.';
+                return;
+            }
+
+            const savedAssetRefs = [];
+            saveButton.disabled = true;
+            status.textContent = entries.length === 1 ? 'Salvando herói...' : `Salvando ${entries.length} heróis...`;
+            try {
+                await Promise.all(entries.map(async entry => {
+                    if (!entry.file) return;
+                    const source = await readFileAsDataUrl(entry.file);
+                    if (!/^data:image\/gif;base64,/i.test(source)) throw new Error('GIF inválido');
+                    entry.gif = await saveMapAsset(source);
+                    savedAssetRefs.push(entry.gif);
+                }));
+
+                if (vanState?.active && vanState.mapId === currentId && vanState.status === 'success') {
+                    charsData[currentId] = restoreVanHeroesAtVanPosition();
+                    vanState = null;
+                    clearVanMovementTimer();
+                    stopVanAudio();
+                }
+                if (!charsData[currentId]) charsData[currentId] = [];
+                const columns = Math.ceil(Math.sqrt(entries.length));
+                const rowsCount = Math.ceil(entries.length / columns);
+                const createdHeroes = entries.map((entry, index) => ({
+                    id: ++charID,
+                    name: entry.name.slice(0, 60),
+                    emoji: entry.emoji,
+                    gif: entry.gif || undefined,
+                    rx: Math.max(2, Math.min(98, spawnCursorX + ((index % columns) - (columns - 1) / 2) * 4)),
+                    ry: Math.max(2, Math.min(98, spawnCursorY + (Math.floor(index / columns) - (rowsCount - 1) / 2) * 4)),
+                    rot: 0,
+                    lightOn: true
+                }));
+                charsData[currentId].push(...createdHeroes);
+                selectedTokens.clear();
+                createdHeroes.forEach(hero => selectedTokens.add(hero.id));
+                closeHeroCreator();
+                renderMap(currentId, true);
+                saveMapState();
+                showToast(createdHeroes.length === 1 ? 'Herói adicionado ao mapa.' : `${createdHeroes.length} heróis adicionados ao mapa.`);
+            } catch (error) {
+                console.warn('Não foi possível salvar os heróis:', error);
+                await Promise.allSettled(savedAssetRefs.map(deleteMapAsset));
+                status.textContent = 'Não foi possível salvar um dos GIFs.';
+            } finally {
+                saveButton.disabled = false;
+            }
+        });
+
+        function renderSavedChars() {
+            const arr = charsData[currentId] || [];
+            arr.forEach(c => drawChar(c));
+            updateSelectionVisuals();
+            if(isBlackout && typeof drawFlashlight === 'function') drawFlashlight();
+        }
+
+        function drawChar(cObj) {
+            const anchor = document.getElementById('mapAnchor');
+            const layer = document.getElementById('charsLayer');
+
+            const dom = document.createElement('div');
+            dom.className = 'char-token';
+            dom.dataset.id = cObj.id;
+            dom.style.left = cObj.rx + '%';
+            dom.style.top = cObj.ry + '%';
+            dom.style.transform = `translate(-50%, -50%) rotate(${cObj.rot || 0}deg)`;
+            const tokenScale = Math.max(HERO_MIN_SCALE, Math.min(HERO_MAX_SCALE, Number(cObj.scale) || 1));
+            cObj.scale = tokenScale;
+            dom.style.width = `${HERO_BASE_SIZE_PX * tokenScale}px`;
+            dom.style.height = `${HERO_BASE_SIZE_PX * tokenScale}px`;
+            dom.style.fontSize = `${1.2 * tokenScale}em`;
+            const face = document.createElement('span');
+            face.className = 'token-face';
+            if (cObj.gif && (/^data:image\/gif;base64,/i.test(cObj.gif) || cObj.gif.startsWith('idb-asset:'))) {
+                dom.classList.add('has-gif');
+                const image = document.createElement('img');
+                if (cObj.gif.startsWith('idb-asset:')) {
+                    loadMapAssetUrl(cObj.gif).then(url => { if (url && image.isConnected) image.src = url; });
+                } else {
+                    image.src = cObj.gif;
+                }
+                image.alt = '';
+                face.appendChild(image);
+            } else {
+                face.textContent = cObj.emoji;
+            }
+            const name = document.createElement('div');
+            name.className = 'char-name';
+            name.textContent = cObj.name;
+            dom.append(face, name);
+            // Aplicar flip apenas no emoji (nao no container para nao espelhar o nome)
+            if(cObj.flipped) dom.querySelector('.token-face').style.transform = 'scaleX(-1)';
+
+            // Ctrl + scroll ajusta tamanho; scroll normal continua girando o token.
+            dom.onwheel = (e) => {
+                e.preventDefault();
+                if (e.ctrlKey) {
+                    cObj.scale = Math.max(HERO_MIN_SCALE, Math.min(HERO_MAX_SCALE, (Number(cObj.scale) || 1) + (e.deltaY < 0 ? 0.25 : -0.25)));
+                    dom.style.width = `${HERO_BASE_SIZE_PX * cObj.scale}px`;
+                    dom.style.height = `${HERO_BASE_SIZE_PX * cObj.scale}px`;
+                    dom.style.fontSize = `${1.2 * cObj.scale}em`;
+                    saveMapState();
+                    return;
+                }
+                cObj.rot = (cObj.rot || 0) + (e.deltaY > 0 ? 15 : -15);
+                cObj.rot = cObj.rot % 360;
+                // Rotação só no container, flip só no token-face
+                dom.style.transform = `translate(-50%, -50%) rotate(${cObj.rot}deg)`;
+                if (isBlackout && typeof drawFlashlight === 'function') drawFlashlight();
+                saveMapState();
+            };
+
+            dom.ondblclick = (e) => {
+                e.stopPropagation();
+                const n = prompt("Renomear:", cObj.name);
+                if(n && n.trim()) { cObj.name = n.trim().slice(0, 60); dom.querySelector('.char-name').textContent = cObj.name; saveMapState(); }
+            };
+
+            dom.onmousedown = (e) => { 
+                e.stopPropagation(); 
+                e.preventDefault(); 
+                if(!selectedTokens.has(cObj.id)) {
+                    if(!e.shiftKey) selectedTokens.clear();
+                    selectedTokens.add(cObj.id);
+                    updateSelectionVisuals();
+                }
+                const initialTokensPos = {};
+                charsData[currentId].forEach(t => {
+                    if(selectedTokens.has(t.id)) { initialTokensPos[t.id] = { rx: t.rx, ry: t.ry }; }
+                });
+                tokenDrag = {
+                    mapId: currentId,
+                    dragOrigin: { x: e.clientX, y: e.clientY },
+                    initialTokensPos
+                };
+            };
+
+            layer.appendChild(dom);
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            if (!tokenDrag || tokenDrag.mapId !== currentId) return;
+            const rect = anchor.getBoundingClientRect();
+            const deltaX = ((e.clientX - tokenDrag.dragOrigin.x) / rect.width) * 100;
+            const deltaY = ((e.clientY - tokenDrag.dragOrigin.y) / rect.height) * 100;
+            (charsData[currentId] || []).forEach(t => {
+                const initial = tokenDrag.initialTokensPos[t.id];
+                if (!initial) return;
+                t.rx = Math.max(0, Math.min(100, initial.rx + deltaX));
+                t.ry = Math.max(0, Math.min(100, initial.ry + deltaY));
+                const tDom = document.querySelector(`.char-token[data-id="${t.id}"]`);
+                if (tDom) { tDom.style.left = t.rx + '%'; tDom.style.top = t.ry + '%'; }
+            });
+            updateEnemyProximityVisibility();
+            if (isBlackout && typeof drawFlashlight === 'function') drawFlashlight();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (tokenDrag) saveMapState();
+            tokenDrag = null;
+        });
+
+        window.toggleTokenLight = function(id) {
+             const t = charsData[currentId].find(x => x.id === id);
+             if(t) {
+                 t.lightOn = !(t.lightOn !== false);
+                 const tDom = document.querySelector(`.char-token[data-id="${id}"]`);
+                  if(tDom) {
+                     tDom.style.filter = t.lightOn !== false ? 'none' : 'grayscale(80%) opacity(0.6)';
+                  }
+                 saveMapState();
+                 // O drawFlashlight() será chamado no disparador global do atalho
+             }
+        }
+
+        window.addEventListener('resize', () => {
+            if (typeof resizeCanvas === 'function') resizeCanvas();
+            if (typeof isGridActive !== 'undefined' && isGridActive) drawGrid();
+        });
+        window.onload = () => {
+            loadMapState();
+            preloadCustomMonsterAudios();
+            updateEnemyProximityControls();
+            document.getElementById('flashlightCanvas').style.display = isBlackout ? 'block' : 'none';
+            document.getElementById('gridCanvas').style.display = isGridActive ? 'block' : 'none';
+            document.getElementById('fogLayer').classList.toggle('active', isFog);
+            document.getElementById('cctvLayer').style.display = isCctv ? 'block' : 'none';
+            if (isCctv) { updateCctvTicks(); cctvInterval = setInterval(updateCctvTicks, 1000); }
+            renderMap(currentId);
+        };
+    </script>
+</body>
+</html>
