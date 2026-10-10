@@ -1,6 +1,16 @@
 # Conteúdo do mapa da Antonieta
 
-Este inventário descreve o estado inicial publicado do mapa. As posições são porcentagens da imagem: **esquerda × topo**.
+Este inventário descreve o estado inicial incluído nesta pasta. As posições são porcentagens da imagem: **esquerda × topo**.
+
+## Como levar para outro PC
+
+1. Copie **esta pasta local** `projeto-antonieta` inteira, incluindo `map-state.js`, `map-assets/`, `audio/` e `limiar/`. A pasta `.git` é opcional para jogar; ela só serve para o histórico do repositório.
+2. No outro PC, abra um terminal dentro da pasta copiada. Com Python instalado, execute `python -m http.server 8000` (no Windows, `py -m http.server 8000` também pode funcionar).
+3. Abra `http://localhost:8000/` no navegador. Use `index.html` para acessar as abas do mapa e da Arena. Servir por HTTP também permite que os áudios do Limiar funcionem.
+
+O mapa abre com os dados de `map-state.js` em um navegador novo. Copiar só o HTML ou só os pontos não leva as 34 mídias novas; os caminhos abaixo precisam continuar relativos à pasta do projeto. Sete GIFs já existiam na raiz e foram reaproveitados.
+
+**Arena do Vazio:** o grupo de personagens da Arena fica no armazenamento do navegador e não é transferido ao copiar a pasta. Se houver personagens personalizados, clique em **Exportar grupo** na Arena do PC antigo, copie o arquivo `arena-personagens.json` e use **Importar grupo** no PC novo.
 
 ## Onde cada dado fica
 
