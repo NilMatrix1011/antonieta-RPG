@@ -22,7 +22,19 @@ O mapa abre com os dados de `map-state.js` em um navegador novo. Copiar só o HT
 | GIFs de personagens já existentes no projeto | `Idle_rotations_8dir (2).gif`, `(3).gif`, `(4).gif` e `(5).gif` na raiz |
 | Página com as abas do mapa e da Arena | `index.html` |
 
-Em `map-state.js`, `scenarios` guarda os cenários criados, `scenarioLinks` guarda os pontos que levam a outros cenários, `events` guarda os pontos de eventos, e `charsData` guarda os personagens. `enemies` está vazio neste estado. As mídias são referenciadas pelo caminho relativo ao HTML. O navegador pode manter alterações particulares em `localStorage` (`antonieta-map-state-v1`); quando existe um estado local válido, ele é carregado no lugar deste estado inicial.
+Em `map-state.js`, `scenarios` guarda os cenários criados, `scenarioLinks` guarda os pontos que levam a outros cenários, `events` guarda os pontos de eventos, e `charsData` guarda os personagens. `enemies` está vazio neste estado. As mídias são referenciadas pelo caminho relativo ao HTML. O navegador pode manter alterações particulares em `localStorage` (`antonieta-map-state-v1`); quando existe um estado local válido, ele é carregado no lugar deste estado inicial. Estados locais anteriores à troca do mapa da cidade perdem os pontos antigos desse mapa ao serem carregados.
+
+O **Mapa da Cidade** usa `Mapa de antonieta dia.png` de dia e `Mapa de antonieta noite.png` à noite. Seus pontos de interesse antigos foram removidos; apenas o retorno ao Mapa Mundi continua disponível. Os cenários de destino permanecem no projeto para reutilização.
+
+Em **Controles do Mestre → Primeiro contato**, o mapa entra em blackout e revela círculos em torno dos heróis e da van. O ajuste de distância no painel vai de 3% a 45% do menor lado do mapa e é salvo com o estado local. O botão **Desativar** volta à visualização normal.
+
+Em **Ativar proximidade**, a Van dos Ocultos ativa conta como um herói na detecção dos vilões, inclusive quando não há personagens fora dela.
+
+O menu **Controles do Mestre** dispõe as opções em linhas horizontais. **Desativar monstros** oculta e silencia os monstros do mapa atual, preservando os dados para **Ativar monstros** depois. Essa escolha é salva por mapa no estado local.
+
+Para adicionar ou trocar a imagem noturna de um cenário criado, abra o cenário e escolha **Adicionar mapa noite deste cenário** ou **Substituir mapa noite deste cenário** no menu do mestre. Também é possível clicar com o botão direito no marcador de acesso ao cenário e escolher **Adicionar mapa noite** ou **Substituir mapa noite**. A imagem é salva no navegador e aparece automaticamente no modo noite.
+
+Para espelhar o mapa entre aparelhos, abra a versão publicada por HTTPS e escolha **Compartilhar mapa ao vivo** no menu do mestre. Informe a chave de criação da mesa, fornecida ao mestre na configuração do serviço. O sistema cria um link de mestre e um link para os jogadores. As alterações do mestre e as mídias enviadas são guardadas no serviço de sincronização em `shared-map-backend/`; os jogadores recebem a versão atualizada automaticamente. Guarde a chave e o link do mestre em privado. A sincronização do mapa não altera as abas independentes Arena e Limiar. O serviço precisa estar acessível aos jogadores para que os links funcionem fora da conta do proprietário.
 
 Os pontos sozinhos preservam títulos, destinos e posições. As mídias de `map-assets/` precisam acompanhar `map-state.js` para que imagens e vídeos apareçam em outros navegadores. Os quatro eventos de porta não usam mídia própria.
 
@@ -48,8 +60,6 @@ Os pontos sozinhos preservam títulos, destinos e posições. As mídias de `map
 
 | Origem | Ponto | Destino | Esquerda × topo |
 | --- | --- | --- | --- |
-| Cidade de Antonieta e Arredores | Antiga prefeitura | Antiga prefeitura | 41.376% × 72.337% |
-| Cidade de Antonieta e Arredores | Rua do padre | Rua do padre | 20.443% × 17.583% |
 | Centro de Nova Capital | Beco | Beco | 46.788% × 40.329% |
 | Centro de Nova Capital | Olhos atentos | Olhos atentos | 64.671% × 35.016% |
 | Centro de Nova Capital | Delegacia | Delegacia | 77.664% × 50.148% |
@@ -72,7 +82,6 @@ Os pontos sozinhos preservam títulos, destinos e posições. As mídias de `map
 | Mapa Mundi | A chegada tão esperada | `map-assets/asset_1790954522302_6zfh8bl6dyi.png` | 11.942% × 49.575% |
 | Mapa Mundi | Uma ajudinha sempre é bem vinda | `map-assets/asset_1790955324594_a22gazvzei.png` | 47.342% × 58.644% |
 | Mapa Mundi | Pra onde eles foram? | `map-assets/asset_1790955354417_hoehq2tlbp5.png` | 45.189% × 56.625% |
-| Cidade de Antonieta e Arredores | Boa resposta | `map-assets/asset_1790967535111_7rhr36c1u0f.mp4` | 50.126% × 81.748% |
 | Centro de Nova Capital | Olha ele ai | `map-assets/asset_1790885867670_uf0bhx51hvj.png` | 54.620% × 67.402% |
 | Escola Estadual Antônio Macrado | Quem é ela ? | `map-assets/asset_1790957617259_u3xs2qkeezi.png` | 77.366% × 23.043% |
 | Labirinto da Mansão | Uma estranha alavanca | `map-assets/asset_1791406180255_9xrpfj676ps.mp4` | 58.063% × 47.871% |

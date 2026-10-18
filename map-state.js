@@ -3,10 +3,13 @@ window.ANTONIETA_DEFAULT_MAP_STATE = {
   "currentId": "andar_nova_capital",
   "isDay": true,
   "isBlackout": false,
+  "isFirstContact": false,
+  "firstContactRadius": 15,
   "isCctv": false,
   "isFog": false,
   "isGridActive": false,
   "isEnemyProximityEnabled": false,
+  "monstersDisabledByMap": {},
   "charsData": {
     "andar_1": [],
     "andar_7": [],
@@ -125,23 +128,6 @@ window.ANTONIETA_DEFAULT_MAP_STATE = {
         "position": {
           "top": "56.625%",
           "left": "45.189%"
-        }
-      }
-    ],
-    "andar_cidade_arredores": [
-      {
-        "id": "event_1790967535117_tdsctm",
-        "type": "event",
-        "title": "Boa resposta",
-        "visibility": "invisible",
-        "content": "map-assets/asset_1790967535111_7rhr36c1u0f.mp4",
-        "mediaType": "video/mp4",
-        "audioContent": "",
-        "audioType": "",
-        "audioDuration": 0,
-        "position": {
-          "top": "81.748%",
-          "left": "50.126%"
         }
       }
     ],
@@ -478,28 +464,6 @@ window.ANTONIETA_DEFAULT_MAP_STATE = {
     }
   },
   "scenarioLinks": {
-    "andar_cidade_arredores": [
-      {
-        "id": "scenario_1791406050478_72nlwx",
-        "type": "scenario",
-        "title": "Antiga prefeitura",
-        "visibility": "semi",
-        "position": {
-          "top": "72.337%",
-          "left": "41.376%"
-        }
-      },
-      {
-        "id": "scenario_1791406721210_grz30h",
-        "type": "scenario",
-        "title": "Rua do padre",
-        "visibility": "semi",
-        "position": {
-          "top": "17.583%",
-          "left": "20.443%"
-        }
-      }
-    ],
     "andar_nova_capital": [
       {
         "id": "scenario_1791237320458_gsbc14",
