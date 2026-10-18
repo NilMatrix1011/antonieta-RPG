@@ -17,12 +17,16 @@
         .location-hint { font-size: 0.65em; color: rgba(255,255,255,0.35); letter-spacing: 1px; margin-top: 3px; }
 
         /* MENU DE CONTEXTO (Botão Direito) */
-        .ctx-menu { position: fixed; z-index: 9999; background: rgba(12,12,16,0.97); border: 1px solid var(--main-color); border-radius: 10px; padding: 6px; display: none; flex-direction: column; gap: 3px; min-width: 180px; max-width: 210px; box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 20px var(--ambient-glow); backdrop-filter: blur(12px); animation: ctxFadeIn 0.15s ease; }
+        .ctx-menu { position: fixed; z-index: 9999; background: rgba(12,12,16,0.97); border: 1px solid var(--main-color); border-radius: 10px; padding: 10px; display: none; flex-direction: row; flex-wrap: wrap; align-content: flex-start; gap: 6px; width: min(960px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 20px var(--ambient-glow); backdrop-filter: blur(12px); animation: ctxFadeIn 0.15s ease; }
         .ctx-menu.open { display: flex; }
         @keyframes ctxFadeIn { from { opacity:0; transform: scale(0.92); } to { opacity:1; transform: scale(1); } }
-        .ctx-sep { height: 1px; background: rgba(255,255,255,0.1); margin: 4px 0; }
-        .ctx-title { font-size: 0.62em; text-transform: uppercase; letter-spacing: 1.5px; color: var(--main-color); padding: 3px 8px; opacity: 0.7; }
+        .ctx-sep { flex: 0 0 100%; height: 1px; background: rgba(255,255,255,0.1); margin: 4px 0; }
+        .ctx-title { flex: 0 0 100%; font-size: 0.62em; text-transform: uppercase; letter-spacing: 1.5px; color: var(--main-color); padding: 3px 8px; opacity: 0.7; }
         .btn-ui { display: block; width: 100%; padding: 8px 11px; background: transparent; border: none; border-radius: 7px; color: #fff; text-align: left; cursor: pointer; transition: 0.2s; font-size: 0.78em; font-family: inherit; }
+        .ctx-menu .btn-ui { flex: 1 1 160px; width: auto; min-width: 145px; text-align: center; }
+        .ctx-menu .btn-ui[hidden] { display: none; }
+        .ctx-menu .btn-ui:hover { padding-left: 11px; }
+        .ctx-menu .ctx-tip { flex: 1 1 170px; }
         .btn-ui:hover { background: rgba(255,255,255,0.08); color: var(--main-color); padding-left: 15px; }
         .btn-ui:disabled { opacity: 0.35; cursor: not-allowed; }
         .btn-ui:disabled:hover { background: transparent; color: rgba(255,255,255,0.6); padding-left: 11px; }
@@ -71,37 +75,55 @@
         .event-field[hidden] { display: none; }
         .event-field input, .event-field select { width: 100%; padding: 10px 11px; border: 1px solid rgba(255,255,255,.24); border-radius: 7px; background: #050507; color: #fff; font: inherit; }
         .event-field small { color: rgba(255,255,255,.42); line-height: 1.45; }
-        .event-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+        .event-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 20px; }
         .event-actions button { padding: 9px 13px; border: 1px solid rgba(255,255,255,.35); border-radius: 7px; background: transparent; color: #fff; cursor: pointer; }
         .event-actions .primary { background: #fff; color: #070709; }
         .event-actions .danger { margin-right: auto; border-color: #a94f4f; color: #ff9292; }
         .event-form-status { min-height: 20px; color: #e2c87c; font-size: .75rem; }
+        .sync-status { position: fixed; top: 12px; right: 12px; z-index: 10000; max-width: min(360px, 80vw); padding: 7px 11px; border: 1px solid rgba(255,255,255,.28); border-radius: 7px; background: rgba(8,8,12,.9); color: #ddd; font-size: .72rem; }
+        .sync-status:empty { display: none; }
+        .share-link-input { width: 100%; min-width: 0; padding: 10px; color: #fff; background: #050507; border: 1px solid rgba(255,255,255,.3); border-radius: 7px; }
+        body.shared-viewer .ctx-menu,
+        body.shared-viewer #eventCreator,
+        body.shared-viewer #scenarioCreator,
+        body.shared-viewer #scenarioNightEditor,
+        body.shared-viewer #shareMapModal,
+        body.shared-viewer #heroCreator,
+        body.shared-viewer #monsterCreator,
+        body.shared-viewer #firstContactSettings,
+        body.shared-viewer #deleteEventButton,
+        body.shared-viewer #deleteScenarioButton,
+        body.shared-viewer #editScenarioNightButton { display: none !important; }
         .event-view-card { width: min(900px, 96vw); }
         .event-media { display: grid; place-items: center; min-height: 160px; max-height: 70vh; overflow: auto; border-radius: 8px; background: #000; }
         .event-media img, .event-media video { display: block; max-width: 100%; max-height: 68vh; object-fit: contain; }
+        .first-contact-range { padding: 0 !important; accent-color: #9fd7a1; cursor: pointer; }
+        .first-contact-value { color: #9fd7a1; font-weight: 700; }
+        .van-interior-card { width: min(1100px, 96vw); }
+        .van-interior-card .event-media img { width: 100%; }
         .hero-create-list { display: grid; gap: 12px; margin-top: 16px; }
         .hero-create-row { position: relative; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(90px, .6fr); gap: 10px; padding: 14px; border: 1px solid rgba(255,255,255,.16); border-radius: 9px; background: rgba(255,255,255,.035); }
         .hero-create-row h3 { grid-column: 1 / -1; margin: 0; padding-right: 32px; color: #79d998; font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
         .hero-create-row .event-field { margin: 0; }
-        .hero-create-row .hero-gif-field { grid-column: 1 / -1; }
+        .hero-create-row .hero-image-field { grid-column: 1 / -1; }
         .remove-hero-row { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border: 0; border-radius: 6px; background: transparent; color: #ff9292; font-size: 1.05rem; cursor: pointer; }
         .remove-hero-row:disabled { opacity: .25; cursor: default; }
         .add-hero-row { width: 100%; margin-top: 12px; padding: 10px; border: 1px dashed rgba(121,217,152,.6); border-radius: 8px; background: rgba(121,217,152,.06); color: #8ee9ab; cursor: pointer; }
-        @media (max-width: 520px) { .hero-create-row { grid-template-columns: 1fr; } .hero-create-row h3, .hero-create-row .hero-gif-field { grid-column: 1; } }
+        @media (max-width: 520px) { .hero-create-row { grid-template-columns: 1fr; } .hero-create-row h3, .hero-create-row .hero-image-field { grid-column: 1; } }
 
         /* PERSONAGENS E MULTI-SELECT (VTT) */
         .char-token { position: absolute; width: 45px; height: 45px; border-radius: 50%; background: #111; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 1.2em; cursor: grab; z-index: 110; transform: translate(-50%, -50%) rotate(0deg); box-shadow: 0 10px 20px rgba(0,0,0,0.8); user-select: none; overflow: visible; transition: box-shadow 0.2s, border-color 0.2s; }
         .token-face { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: hidden; }
         .token-face img { width: 100%; height: 100%; display: block; object-fit: cover; pointer-events: none; }
-        .char-token.has-gif { background: transparent; border-color: transparent; border-radius: 0; box-shadow: none; }
-        .char-token.has-gif .token-face { border-radius: 0; overflow: visible; }
-        .char-token.has-gif .token-face img { object-fit: contain; }
-        .char-token.has-gif:active { box-shadow: none; }
+        .char-token.has-image { background: transparent; border-color: transparent; border-radius: 0; box-shadow: none; }
+        .char-token.has-image .token-face { border-radius: 0; overflow: visible; }
+        .char-token.has-image .token-face img { object-fit: contain; }
+        .char-token.has-image:active { box-shadow: none; }
         .char-token.selected { border-color: #ffd700; box-shadow: 0 0 20px rgba(255,215,0,0.8); z-index: 115; }
         .char-token:active { cursor: grabbing; box-shadow: 0 15px 30px rgba(0,0,0,0.9); }
         .map-anchor.night-mode .char-token { border-color: #dce9ff; box-shadow: 0 0 13px rgba(150,190,255,.75), 0 0 24px rgba(120,160,255,.35); }
         .map-anchor.night-mode .char-token.selected { border-color: #ffd700; box-shadow: 0 0 20px rgba(255,215,0,.8), 0 0 28px rgba(120,160,255,.6); }
-        .map-anchor.night-mode .char-token.has-gif .token-face { filter: brightness(1.18) drop-shadow(0 0 7px rgba(160,195,255,.9)); }
+        .map-anchor.night-mode .char-token.has-image .token-face { filter: brightness(1.18) drop-shadow(0 0 7px rgba(160,195,255,.9)); }
         .char-name { position: absolute; top: 110%; background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 6px; font-size: 0.7em; white-space: nowrap; pointer-events:none; z-index:115; opacity: 0; visibility: hidden; transition: opacity .15s, visibility .15s; }
         .char-token:hover .char-name, .char-token:focus-within .char-name { opacity: 1; visibility: visible; }
         .marquee-box { position: absolute; border: 1px dashed #ffd700; background: rgba(255,215,0,0.15); pointer-events: none; z-index: 120; display: none; }
@@ -124,16 +146,16 @@
         
         .fog-layer { position: absolute; inset: 0; pointer-events: none; z-index: 15; display: none; opacity: 0; transition: opacity 1s ease-in-out; overflow: hidden; mix-blend-mode: screen; }
         .fog-layer.active { display: block; opacity: 1; }
-        .fog-overlay { position: absolute; inset: -100px; background: radial-gradient(ellipse 600px 400px at 20% 30%, rgba(200, 200, 220, 0.35), transparent 50%), radial-gradient(ellipse 500px 350px at 50% 50%, rgba(210, 210, 230, 0.3), transparent 50%), radial-gradient(ellipse 550px 380px at 80% 70%, rgba(205, 205, 225, 0.33), transparent 50%); animation: fogDriftRight 30s linear infinite; filter: blur(40px); }
+        .fog-overlay { position: absolute; inset: -100px; background: radial-gradient(ellipse 600px 400px at 20% 30%, rgba(45, 185, 80, 0.35), transparent 50%), radial-gradient(ellipse 500px 350px at 50% 50%, rgba(60, 205, 95, 0.3), transparent 50%), radial-gradient(ellipse 550px 380px at 80% 70%, rgba(55, 195, 85, 0.33), transparent 50%); animation: fogDriftRight 30s linear infinite; filter: blur(40px); }
         @keyframes fogDriftRight { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-        .fog-veil { position: absolute; inset: -100px; background: radial-gradient(ellipse 550px 370px at 30% 40%, rgba(190, 190, 210, 0.3), transparent 50%), radial-gradient(ellipse 480px 340px at 60% 60%, rgba(185, 185, 205, 0.28), transparent 50%), radial-gradient(ellipse 520px 360px at 90% 20%, rgba(195, 195, 215, 0.32), transparent 50%); animation: fogDriftRight 45s linear infinite; filter: blur(50px); animation-delay: -15s; }
-        .fog-dense-layer { position: absolute; inset: -100px; background: radial-gradient(ellipse 580px 390px at 40% 25%, rgba(180, 180, 200, 0.28), transparent 50%), radial-gradient(ellipse 490px 330px at 70% 75%, rgba(175, 175, 195, 0.25), transparent 50%); animation: fogDriftLeft 40s linear infinite; filter: blur(45px); animation-delay: -10s; }
+        .fog-veil { position: absolute; inset: -100px; background: radial-gradient(ellipse 550px 370px at 30% 40%, rgba(35, 175, 70, 0.3), transparent 50%), radial-gradient(ellipse 480px 340px at 60% 60%, rgba(30, 165, 65, 0.28), transparent 50%), radial-gradient(ellipse 520px 360px at 90% 20%, rgba(40, 180, 75, 0.32), transparent 50%); animation: fogDriftRight 45s linear infinite; filter: blur(50px); animation-delay: -15s; }
+        .fog-dense-layer { position: absolute; inset: -100px; background: radial-gradient(ellipse 580px 390px at 40% 25%, rgba(25, 160, 60, 0.28), transparent 50%), radial-gradient(ellipse 490px 330px at 70% 75%, rgba(20, 150, 55, 0.25), transparent 50%); animation: fogDriftLeft 40s linear infinite; filter: blur(45px); animation-delay: -10s; }
         @keyframes fogDriftLeft { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        .fog-float-layer { position: absolute; inset: 0; background: radial-gradient(ellipse 650px 420px at 15% 20%, rgba(220, 220, 240, 0.4), transparent 50%), radial-gradient(ellipse 580px 390px at 85% 80%, rgba(210, 210, 230, 0.42), transparent 50%), radial-gradient(ellipse 620px 400px at 45% 55%, rgba(215, 215, 235, 0.38), transparent 50%); animation: fogFloatInPlace1 20s ease-in-out infinite; filter: blur(55px); }
+        .fog-float-layer { position: absolute; inset: 0; background: radial-gradient(ellipse 650px 420px at 15% 20%, rgba(70, 220, 110, 0.4), transparent 50%), radial-gradient(ellipse 580px 390px at 85% 80%, rgba(60, 205, 95, 0.42), transparent 50%), radial-gradient(ellipse 620px 400px at 45% 55%, rgba(65, 215, 105, 0.38), transparent 50%); animation: fogFloatInPlace1 20s ease-in-out infinite; filter: blur(55px); }
         @keyframes fogFloatInPlace1 { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 1; } 33% { transform: translate(40px, -30px) scale(1.08); opacity: 0.85; } 66% { transform: translate(-35px, 35px) scale(0.92); opacity: 0.9; } }
-        .fog-ambient-layer { position: absolute; inset: 0; background: radial-gradient(ellipse 700px 450px at 50% 30%, rgba(200, 200, 220, 0.38), transparent 50%), radial-gradient(ellipse 600px 380px at 25% 70%, rgba(190, 190, 210, 0.4), transparent 50%), radial-gradient(ellipse 550px 360px at 75% 45%, rgba(195, 195, 215, 0.36), transparent 50%); animation: fogFloatInPlace2 28s ease-in-out infinite; filter: blur(60px); animation-delay: -7s; }
+        .fog-ambient-layer { position: absolute; inset: 0; background: radial-gradient(ellipse 700px 450px at 50% 30%, rgba(45, 185, 80, 0.38), transparent 50%), radial-gradient(ellipse 600px 380px at 25% 70%, rgba(35, 175, 70, 0.4), transparent 50%), radial-gradient(ellipse 550px 360px at 75% 45%, rgba(40, 180, 75, 0.36), transparent 50%); animation: fogFloatInPlace2 28s ease-in-out infinite; filter: blur(60px); animation-delay: -7s; }
         @keyframes fogFloatInPlace2 { 0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 1; } 50% { transform: translate(-45px, 40px) rotate(5deg); opacity: 0.8; } }
-        .fog-pulse-layer { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 0%, transparent 20%, rgba(180, 180, 200, 0.2) 50%, rgba(160, 160, 180, 0.3) 100%); animation: fogPulse 12s ease-in-out infinite; filter: blur(35px); }
+        .fog-pulse-layer { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 0%, transparent 20%, rgba(25, 160, 60, 0.2) 50%, rgba(15, 140, 50, 0.3) 100%); animation: fogPulse 12s ease-in-out infinite; filter: blur(35px); }
         @keyframes fogPulse { 0%, 100% { opacity: 0.9; transform: scale(1); } 50% { opacity: 1; transform: scale(1.12); } }
         .fog-particles { position: absolute; inset: 0; background-image: radial-gradient(circle 2px at 15% 25%, rgba(170, 255, 190, 0.5), transparent), radial-gradient(circle 1px at 45% 35%, rgba(170, 255, 190, 0.3), transparent), radial-gradient(circle 2px at 75% 15%, rgba(170, 255, 190, 0.4), transparent), radial-gradient(circle 1px at 25% 65%, rgba(170, 255, 190, 0.35), transparent), radial-gradient(circle 2px at 85% 55%, rgba(170, 255, 190, 0.4), transparent), radial-gradient(circle 1px at 55% 75%, rgba(170, 255, 190, 0.3), transparent), radial-gradient(circle 2px at 10% 85%, rgba(170, 255, 190, 0.5), transparent), radial-gradient(circle 1px at 90% 85%, rgba(170, 255, 190, 0.3), transparent), radial-gradient(circle 2px at 40% 50%, rgba(170, 255, 190, 0.4), transparent), radial-gradient(circle 1px at 70% 30%, rgba(170, 255, 190, 0.35), transparent); background-size: 200% 200%; animation: fogParticlesDrift 25s linear infinite; opacity: 0.6; }
         @keyframes fogParticlesDrift { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
@@ -144,6 +166,7 @@
         .hs-marker-viz.hs-enemy:hover { transform: translate(-50%, -50%) !important; background: transparent !important; border: none !important; box-shadow: none !important; }
         .hs-enemy video, .hs-enemy img { pointer-events: none; max-width: 800px; max-height: 800px; display: block; user-select: none !important; -webkit-user-drag: none !important; background: transparent !important; outline: none !important; border: none !important; }
         .hs-enemy.proximity-hidden { display: none !important; }
+        .hs-enemy.monsters-disabled { display: none !important; }
         .video-container { background: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; }
         video::-webkit-media-controls, video::-webkit-media-controls-start-playback-button, video::-webkit-media-controls-overlay-play-button, video::-webkit-media-controls-panel, video::-webkit-media-controls-play-button, *::-webkit-media-controls-start-playback-button, *::-webkit-media-controls-overlay-play-button, video::-webkit-media-controls-picture-in-picture-button, video::-webkit-media-controls-enclosure, video::-internal-media-controls-download-button, video::-internal-media-controls-overlay-cast-button { display: none !important; -webkit-appearance: none !important; }
     
@@ -191,6 +214,7 @@
         <button class="btn-ui" onclick="toggleFog(); closeCtxMenu();">☁️ Névoa</button>
         <button class="btn-ui" onclick="toggleCCTV(); closeCtxMenu();">🎥 CCTV</button>
         <button class="btn-ui" onclick="toggleBlackout(); closeCtxMenu();">🔌 Blackout</button>
+        <button class="btn-ui" id="firstContactButton" type="button" aria-pressed="false" onclick="openFirstContactSettings();">👁️ Primeiro contato</button>
         <button class="btn-ui" onclick="toggleGrid(); closeCtxMenu();">🏁 Mostrar/Ocultar Grid</button>
         <button class="btn-ui" onclick="resetToDay(); closeCtxMenu();">☀️ Forçar Dia (Todos)</button>
         <div class="ctx-sep"></div>
@@ -201,6 +225,7 @@
         <div class="ctx-title">VISIBILIDADE DOS VIL&Otilde;ES</div>
         <button class="btn-ui" id="enableEnemyProximityButton" onclick="setEnemyProximityMode(true); closeCtxMenu();">Ativar proximidade</button>
         <button class="btn-ui" id="disableEnemyProximityButton" onclick="setEnemyProximityMode(false); closeCtxMenu();">Desativar proximidade</button>
+        <button class="btn-ui" id="toggleMonstersButton" type="button" onclick="toggleMonstersEnabled(); closeCtxMenu();">Desativar monstros</button>
         <div class="ctx-sep"></div>
         <div class="ctx-title" style="opacity:0.4; font-size:0.6em;">📖 DICAS DO SISTEMA</div>
         <div class="ctx-tip">🗑️ <b>Delete</b> — Remove jogador selecionado</div>
@@ -216,6 +241,40 @@
         <div class="ctx-sep"></div>
         <div class="ctx-title">CEN&Aacute;RIOS</div>
         <button class="btn-ui" onclick="openScenarioCreator();" style="color:#8fc9e8;">&#10010; Adicionar cen&aacute;rio</button>
+        <button class="btn-ui" id="editCurrentScenarioNightButton" type="button" onclick="openScenarioNightEditor(currentId);" hidden>🌙 Adicionar mapa noite deste cenário</button>
+        <div class="ctx-sep"></div>
+        <button class="btn-ui" type="button" onclick="openShareMap();">🔗 Compartilhar mapa ao vivo</button>
+        <button class="btn-ui" type="button" onclick="exportMapBackup(); closeCtxMenu();">⬇ Baixar backup JSON</button>
+        <button class="btn-ui" type="button" onclick="document.getElementById('importMapBackupFile').click(); closeCtxMenu();">⬆ Restaurar backup JSON</button>
+    </div>
+    <input id="importMapBackupFile" type="file" accept=".json,application/json" hidden>
+
+    <div class="sync-status" id="syncStatus" role="status" aria-live="polite"></div>
+    <div class="event-modal" id="shareMapModal" hidden>
+        <section class="event-card" role="dialog" aria-modal="true" aria-labelledby="shareMapTitle">
+            <h2 id="shareMapTitle">Compartilhar mapa ao vivo</h2>
+            <p>As mudanças feitas pelo mestre aparecem automaticamente no link dos jogadores.</p>
+            <label class="event-field" id="shareCreateKeyField">Chave de criação da mesa
+                <input id="shareCreateKey" type="password" autocomplete="off" placeholder="Cole a chave fornecida ao mestre">
+            </label>
+            <div id="shareMapLinks" hidden>
+                <label class="event-field">Link dos jogadores
+                    <input class="share-link-input" id="viewerShareLink" type="text" readonly>
+                </label>
+                <label class="event-field">Link do mestre — mantenha privado
+                    <input class="share-link-input" id="masterShareLink" type="text" readonly>
+                </label>
+                <div class="event-actions">
+                    <button type="button" onclick="copyShareLink('viewerShareLink')">Copiar link dos jogadores</button>
+                    <button type="button" onclick="copyShareLink('masterShareLink')">Copiar link do mestre</button>
+                </div>
+            </div>
+            <div class="event-form-status" id="shareMapStatus" role="status" aria-live="polite"></div>
+            <div class="event-actions">
+                <button id="createSharedRoomButton" class="primary" type="button">Criar mesa compartilhada</button>
+                <button type="button" onclick="closeShareMap()">Fechar</button>
+            </div>
+        </section>
     </div>
 
     <div class="event-modal" id="eventCreator" hidden>
@@ -317,8 +376,48 @@
             <p id="scenarioViewerDescription">Gerencie o cen&aacute;rio adicionado ao mapa.</p>
             <div class="event-actions">
                 <button class="danger" id="deleteScenarioButton" type="button">Remover cen&aacute;rio</button>
+                <button id="editScenarioNightButton" type="button" hidden>Editar mapa noite</button>
                 <button class="primary" id="openScenarioButton" type="button">Abrir cen&aacute;rio</button>
                 <button type="button" onclick="closeScenarioViewer()">Fechar</button>
+            </div>
+        </section>
+    </div>
+
+    <div class="event-modal" id="scenarioNightEditor" hidden>
+        <form class="event-card" id="scenarioNightForm">
+            <h2 id="scenarioNightEditorTitle">Mapa noite do cenário</h2>
+            <p id="scenarioNightCurrent"></p>
+            <label class="event-field">Imagem do mapa noite
+                <input id="scenarioNightEditFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required>
+                <small>PNG, JPEG ou WebP até 8 MB; GIF até 20 MB. A imagem será usada automaticamente no modo noite.</small>
+            </label>
+            <div class="event-form-status" id="scenarioNightEditStatus" role="status" aria-live="polite"></div>
+            <div class="event-actions">
+                <button type="button" onclick="closeScenarioNightEditor()">Cancelar</button>
+                <button class="primary" id="saveScenarioNightButton" type="submit">Salvar mapa noite</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="event-modal" id="vanInterior" hidden>
+        <section class="event-card van-interior-card" role="dialog" aria-modal="true" aria-labelledby="vanInteriorTitle">
+            <h2 id="vanInteriorTitle">Interior da Van dos Ocultos</h2>
+            <div class="event-media"><img id="vanInteriorImage" alt="Interior da Van dos Ocultos"></div>
+            <div class="event-actions"><button type="button" onclick="closeVanInterior()">Fechar</button></div>
+        </section>
+    </div>
+
+    <div class="event-modal" id="firstContactSettings" hidden>
+        <section class="event-card" role="dialog" aria-modal="true" aria-labelledby="firstContactTitle">
+            <h2 id="firstContactTitle">Primeiro contato</h2>
+            <p>O mapa fica escuro e revela apenas a área em volta dos heróis e da van.</p>
+            <label class="event-field" for="firstContactRadius">Distância visível: <output class="first-contact-value" id="firstContactRadiusValue" for="firstContactRadius">15%</output>
+                <input class="first-contact-range" id="firstContactRadius" type="range" min="3" max="45" step="1" value="15">
+                <small>Porcentagem do menor lado do mapa.</small>
+            </label>
+            <div class="event-actions">
+                <button class="danger" type="button" onclick="setFirstContactMode(false); closeFirstContactSettings();">Desativar</button>
+                <button type="button" onclick="closeFirstContactSettings()">Fechar</button>
             </div>
         </section>
     </div>
@@ -421,12 +520,15 @@
     <audio id="sndVanFailure" src="deu ruim.mp3" preload="auto"></audio>
 
     <script src="map-state.js"></script>
+    <script src="map-state-live.js"></script>
+    <script src="map-sync.js"></script>
+    <script src="map-backup.js"></script>
     <script>
         // RPG_FORGE_METADATA_START
-        // const rpgForgeProjectData = {"name":"Mansão dos Macrados","theme":"custom","customThemeName":"Mansão assombrada","customColor":"#040411","showLocationName":true,"locationNamePos":"bottom-left","hasDayNight":true,"keyDayNight":"","hasBlackout":true,"keyBlackout":"","keyTokenLight":"","hasCctv":true,"keyCctv":"","hasFog":true,"keyFog":"","keyGrid":"h","keyResetDay":"r","masterButtons":[],"sectors":[{"id":"andar_1","name":"Mapa Mundi","imgBaseName":"Mapa_Mundi.png","imgNightName":"Mapa_Mundi_noite.png","imgBlackoutName":"","blobBase":null,"blobNight":null,"blobBlackout":null,"hotspots":[{"id":"andar_cidade_arredores","title":"Mapa de Exploração: Cidade e Arredores","visibility":"semi","position":{"top":"33.000%","left":"9.500%"}},{"id":"andar_nova_capital","title":"Centro de Nova Capital","visibility":"semi","position":{"top":"51.810%","left":"90.020%"}}]},{"id":"andar_cidade_arredores","name":"Cidade de Antonieta e Arredores","imgBaseName":"Mapa de Exploração_ Cidade e Arredores(1).png","imgNightName":"ChatGPT Image 30 de set. de 2026, 14_24_42.png","imgBlackoutName":"Cidade de Antonieta_blackout.png","blobBase":"blob:https://cassiano-behemonth.github.io/c4c1c0d3-299d-47b6-b3cf-cf8472446ad7","blobNight":"blob:https://cassiano-behemonth.github.io/13da636a-70b3-424e-a0cb-ed6fa2c61303","blobBlackout":null,"hotspots":[{"id":"andar_2","title":"Farmácia Drogas e Cia","visibility":"semi","position":{"top":"31.290%","left":"13.179%"}},{"id":"andar_3","title":"Loja de armas","visibility":"semi","position":{"top":"32.980%","left":"35.734%"}},{"id":"andar_4","title":"Escola","visibility":"semi","position":{"top":"54.708%","left":"25.951%"}},{"id":"andar_5","title":"Igreja","visibility":"semi","position":{"top":"87.541%","left":"23.505%"}},{"id":"andar_6","title":"Bosque da Vila","visibility":"semi","position":{"top":"44.810%","left":"67.527%"}},{"id":"andar_7","title":"Labirinto","visibility":"semi","position":{"top":"35.877%","left":"81.386%"}},{"id":"andar_8","title":"Mansão Dos Macrados","visibility":"semi","position":{"top":"30.807%","left":"76.359%"}},{"id":"andar_14","title":"Conversar","visibility":"semi","position":{"top":"72.693%","left":"42.391%"}},{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"6.500%","left":"6.500%"}}]},{"id":"andar_nova_capital","name":"Centro de Nova Capital","imgBaseName":"Centro_de_Nova_Capital.png","imgNightName":"Centro_de_Nova_Capital.png","imgBlackoutName":"","blobBase":null,"blobNight":null,"blobBlackout":null,"hotspots":[{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"48.500%","left":"21.500%"}}]},{"id":"andar_2","name":"Farmácia Drogas e CIA","imgBaseName":"ChatGPT Image 30 de set. de 2026, 14_31_56.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/21f7f7b2-aa21-4225-9290-075af4b8e83d","blobNight":null,"blobBlackout":null,"hotspots":[{"id":"andar_15","title":"Conversar","visibility":"semi","position":{"top":"44.085%","left":"68.342%"}}]},{"id":"andar_3","name":"Armaria do Seu Armani","imgBaseName":"c2152cb1-bd5a-4863-b156-233d9d905efd.png","imgNightName":"Balcão de armas e vendedor grisalho.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/fde7d989-0988-4238-b340-5b6b3bba0bca","blobNight":"blob:https://cassiano-behemonth.github.io/dcf1d340-abeb-44d2-bf31-275a0be6df58","blobBlackout":null,"hotspots":[{"id":"andar_13","title":"Conversar","visibility":"semi","position":{"top":"41.912%","left":"67.663%"}}]},{"id":"andar_4","name":"Escola Estadual Antônio Macrado","imgBaseName":"62f4b069-7980-4229-95c0-9c5beb2f4607.png","imgNightName":"Saguão Escolar Sob a Chuva Noturna.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/ad800690-adf6-485b-92c4-145607df63dd","blobNight":"blob:https://cassiano-behemonth.github.io/5c1108f8-fda5-437d-a473-6215f7aa7b64","blobBlackout":null,"hotspots":[{"id":"andar_12","title":"Conversar","visibility":"semi","position":{"top":"56.880%","left":"59.375%"}},{"id":"andar_11","title":"Conversar","visibility":"semi","position":{"top":"53.138%","left":"30.163%"}}]},{"id":"andar_5","name":"Igreja Novos Dias","imgBaseName":"9259071d-78d2-4c0b-bee4-ffc9426ea242.png","imgNightName":"c1c72732-0c15-418e-a77f-67498a97e3b2.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/9877768e-42bc-4b8d-9a80-ea254852d92e","blobNight":"blob:https://cassiano-behemonth.github.io/e7434cfe-2b3f-49bd-8d81-a1a70dc9f9e1","blobBlackout":null,"hotspots":[{"id":"andar_10","title":"*","visibility":"invisible","position":{"top":"55.152%","left":"50.543%"}}]},{"id":"andar_6","name":"Bosque da vila","imgBaseName":"Mapa Gótico do Bosque Noturno.png","imgNightName":"Mapa Noturno do Bosque Assombrado.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/4a25c16f-4a41-4f47-aa7d-a00872cb664c","blobNight":"blob:https://cassiano-behemonth.github.io/d2200299-4d1c-4911-a35c-18df5cb0f326","blobBlackout":null,"hotspots":[]},{"id":"andar_7","name":"Labirinto da Mansão","imgBaseName":"70a6c983-4357-45ec-80cd-5db03c7283ec.png","imgNightName":"82e61193-1d50-4fab-9b95-0c6b6d055ecd.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/75700fc8-fdf9-4216-b37c-c8f5ab1ca2c1","blobNight":"blob:https://cassiano-behemonth.github.io/70130d59-a95b-4930-a415-fdce9896ed15","blobBlackout":null,"hotspots":[]},{"id":"andar_8","name":"Mansão Dos Macrados 1 andar","imgBaseName":"994e6fe9-677a-4fe7-a1fc-0e5e014819d7.png","imgNightName":"e9d56ac7-e985-47f8-a917-ba1f7925fd5d.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/ac5d8454-5b5d-440f-bdcb-21ae63657a4b","blobNight":"blob:https://cassiano-behemonth.github.io/ab3beb3f-6500-436c-853d-a1cb30fb76d4","blobBlackout":null,"hotspots":[{"id":"andar_9","title":"Entrar","visibility":"semi","position":{"top":"7.148%","left":"13.451%"}}]},{"id":"andar_9","name":"Mansão Dos Macrados 2 andar","imgBaseName":"b4236906-0edf-4916-adec-3fc5b2cd3be5.png","imgNightName":"ad4457d4-7bdf-461d-a6e4-c22cafcba0ea.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/89d56fae-d3ba-486b-a27f-0cb7abf93505","blobNight":"blob:https://cassiano-behemonth.github.io/b0159261-60df-484a-9d10-70c696b2dda2","blobBlackout":null,"hotspots":[]},{"id":"andar_10","name":"Subsolo da igreja","imgBaseName":"ChatGPT Image 30 de set. de 2026, 17_32_42.png","imgNightName":"ChatGPT Image 30 de set. de 2026, 17_32_40.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/9c468cfb-9e5f-4ec9-a656-aebb86cd913d","blobNight":"blob:https://cassiano-behemonth.github.io/3cc7ea2f-4143-4966-b294-a4d078660b58","blobBlackout":null,"hotspots":[]},{"id":"andar_11","name":"Conversa com o zelador","imgBaseName":"","imgNightName":"Zelador diante do saguão antigo.png","imgBlackoutName":"","blobBase":null,"blobNight":"blob:https://cassiano-behemonth.github.io/fe1e63ff-bac5-4521-b65c-1b293864c076","blobBlackout":null,"hotspots":[]},{"id":"andar_12","name":"Conversa com a Dona Cecilia","imgBaseName":"Freira na recepção da escola antiga.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/98911459-7375-44c2-b7bb-351742ea7056","blobNight":null,"blobBlackout":null,"hotspots":[]},{"id":"andar_13","name":"Conversa com Seu armani","imgBaseName":"Balcão de armas e vendedor grisalho.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/fd49a6ca-28be-40fb-b56b-d4f8fc37e2e4","blobNight":null,"blobBlackout":null,"hotspots":[]},{"id":"andar_14","name":"Vereador na prefeitura antiga","imgBaseName":"imagem_2026-09-30_202325269.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/1266587a-bf06-4bc6-a652-c753185366fd","blobNight":null,"blobBlackout":null,"hotspots":[]},{"id":"andar_15","name":"Conversa com a senhora Lindasol","imgBaseName":"Farmácia Assombrada do Balcão (1).png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/fe42fc1f-86f1-4702-bef4-c7ce3311d550","blobNight":null,"blobBlackout":null,"hotspots":[]}]};
+        // const rpgForgeProjectData = {"name":"Mansão dos Macrados","theme":"custom","customThemeName":"Mansão assombrada","customColor":"#040411","showLocationName":true,"locationNamePos":"bottom-left","hasDayNight":true,"keyDayNight":"","hasBlackout":true,"keyBlackout":"","keyTokenLight":"","hasCctv":true,"keyCctv":"","hasFog":true,"keyFog":"","keyGrid":"h","keyResetDay":"r","masterButtons":[],"sectors":[{"id":"andar_1","name":"Mapa Mundi","imgBaseName":"Mapa_Mundi.png","imgNightName":"Mapa_Mundi_noite.png","imgBlackoutName":"","blobBase":null,"blobNight":null,"blobBlackout":null,"hotspots":[{"id":"andar_cidade_arredores","title":"Mapa da Cidade","visibility":"semi","position":{"top":"33.000%","left":"9.500%"}},{"id":"andar_nova_capital","title":"Centro de Nova Capital","visibility":"semi","position":{"top":"51.810%","left":"90.020%"}}]},{"id":"andar_cidade_arredores","name":"Mapa da Cidade","imgBaseName":"Mapa de antonieta dia.png","imgNightName":"Mapa de antonieta noite.png","imgBlackoutName":"","blobBase":null,"blobNight":null,"blobBlackout":null,"hotspots":[{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"6.500%","left":"6.500%"}}]},{"id":"andar_nova_capital","name":"Centro de Nova Capital","imgBaseName":"Centro_de_Nova_Capital.png","imgNightName":"Centro_de_Nova_Capital.png","imgBlackoutName":"","blobBase":null,"blobNight":null,"blobBlackout":null,"hotspots":[{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"48.500%","left":"21.500%"}}]},{"id":"andar_2","name":"Farmácia Drogas e CIA","imgBaseName":"ChatGPT Image 30 de set. de 2026, 14_31_56.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/21f7f7b2-aa21-4225-9290-075af4b8e83d","blobNight":null,"blobBlackout":null,"hotspots":[{"id":"andar_15","title":"Conversar","visibility":"semi","position":{"top":"44.085%","left":"68.342%"}}]},{"id":"andar_3","name":"Armaria do Seu Armani","imgBaseName":"c2152cb1-bd5a-4863-b156-233d9d905efd.png","imgNightName":"Balcão de armas e vendedor grisalho.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/fde7d989-0988-4238-b340-5b6b3bba0bca","blobNight":"blob:https://cassiano-behemonth.github.io/dcf1d340-abeb-44d2-bf31-275a0be6df58","blobBlackout":null,"hotspots":[{"id":"andar_13","title":"Conversar","visibility":"semi","position":{"top":"41.912%","left":"67.663%"}}]},{"id":"andar_4","name":"Escola Estadual Antônio Macrado","imgBaseName":"62f4b069-7980-4229-95c0-9c5beb2f4607.png","imgNightName":"Saguão Escolar Sob a Chuva Noturna.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/ad800690-adf6-485b-92c4-145607df63dd","blobNight":"blob:https://cassiano-behemonth.github.io/5c1108f8-fda5-437d-a473-6215f7aa7b64","blobBlackout":null,"hotspots":[{"id":"andar_12","title":"Conversar","visibility":"semi","position":{"top":"56.880%","left":"59.375%"}},{"id":"andar_11","title":"Conversar","visibility":"semi","position":{"top":"53.138%","left":"30.163%"}}]},{"id":"andar_5","name":"Igreja Novos Dias","imgBaseName":"9259071d-78d2-4c0b-bee4-ffc9426ea242.png","imgNightName":"c1c72732-0c15-418e-a77f-67498a97e3b2.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/9877768e-42bc-4b8d-9a80-ea254852d92e","blobNight":"blob:https://cassiano-behemonth.github.io/e7434cfe-2b3f-49bd-8d81-a1a70dc9f9e1","blobBlackout":null,"hotspots":[{"id":"andar_10","title":"*","visibility":"invisible","position":{"top":"55.152%","left":"50.543%"}}]},{"id":"andar_6","name":"Bosque da vila","imgBaseName":"Mapa Gótico do Bosque Noturno.png","imgNightName":"Mapa Noturno do Bosque Assombrado.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/4a25c16f-4a41-4f47-aa7d-a00872cb664c","blobNight":"blob:https://cassiano-behemonth.github.io/d2200299-4d1c-4911-a35c-18df5cb0f326","blobBlackout":null,"hotspots":[]},{"id":"andar_7","name":"Labirinto da Mansão","imgBaseName":"70a6c983-4357-45ec-80cd-5db03c7283ec.png","imgNightName":"82e61193-1d50-4fab-9b95-0c6b6d055ecd.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/75700fc8-fdf9-4216-b37c-c8f5ab1ca2c1","blobNight":"blob:https://cassiano-behemonth.github.io/70130d59-a95b-4930-a415-fdce9896ed15","blobBlackout":null,"hotspots":[]},{"id":"andar_8","name":"Mansão Dos Macrados 1 andar","imgBaseName":"994e6fe9-677a-4fe7-a1fc-0e5e014819d7.png","imgNightName":"e9d56ac7-e985-47f8-a917-ba1f7925fd5d.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/ac5d8454-5b5d-440f-bdcb-21ae63657a4b","blobNight":"blob:https://cassiano-behemonth.github.io/ab3beb3f-6500-436c-853d-a1cb30fb76d4","blobBlackout":null,"hotspots":[{"id":"andar_9","title":"Entrar","visibility":"semi","position":{"top":"7.148%","left":"13.451%"}}]},{"id":"andar_9","name":"Mansão Dos Macrados 2 andar","imgBaseName":"b4236906-0edf-4916-adec-3fc5b2cd3be5.png","imgNightName":"ad4457d4-7bdf-461d-a6e4-c22cafcba0ea.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/89d56fae-d3ba-486b-a27f-0cb7abf93505","blobNight":"blob:https://cassiano-behemonth.github.io/b0159261-60df-484a-9d10-70c696b2dda2","blobBlackout":null,"hotspots":[]},{"id":"andar_10","name":"Subsolo da igreja","imgBaseName":"ChatGPT Image 30 de set. de 2026, 17_32_42.png","imgNightName":"ChatGPT Image 30 de set. de 2026, 17_32_40.png","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/9c468cfb-9e5f-4ec9-a656-aebb86cd913d","blobNight":"blob:https://cassiano-behemonth.github.io/3cc7ea2f-4143-4966-b294-a4d078660b58","blobBlackout":null,"hotspots":[]},{"id":"andar_11","name":"Conversa com o zelador","imgBaseName":"","imgNightName":"Zelador diante do saguão antigo.png","imgBlackoutName":"","blobBase":null,"blobNight":"blob:https://cassiano-behemonth.github.io/fe1e63ff-bac5-4521-b65c-1b293864c076","blobBlackout":null,"hotspots":[]},{"id":"andar_12","name":"Conversa com a Dona Cecilia","imgBaseName":"Freira na recepção da escola antiga.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/98911459-7375-44c2-b7bb-351742ea7056","blobNight":null,"blobBlackout":null,"hotspots":[]},{"id":"andar_13","name":"Conversa com Seu armani","imgBaseName":"Balcão de armas e vendedor grisalho.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/fd49a6ca-28be-40fb-b56b-d4f8fc37e2e4","blobNight":null,"blobBlackout":null,"hotspots":[]},{"id":"andar_14","name":"Vereador na prefeitura antiga","imgBaseName":"imagem_2026-09-30_202325269.png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/1266587a-bf06-4bc6-a652-c753185366fd","blobNight":null,"blobBlackout":null,"hotspots":[]},{"id":"andar_15","name":"Conversa com a senhora Lindasol","imgBaseName":"Farmácia Assombrada do Balcão (1).png","imgNightName":"","imgBlackoutName":"","blobBase":"blob:https://cassiano-behemonth.github.io/fe42fc1f-86f1-4702-bef4-c7ce3311d550","blobNight":null,"blobBlackout":null,"hotspots":[]}]};
         // RPG_FORGE_METADATA_END
         const THEME_LORE = "Mansão assombrada";
-        const hierarchy = {"andar_1":{"id":"andar_1","name":"Mapa Mundi","imgBaseName":"Mapa_Mundi.png","imgNightName":"Mapa_Mundi.png","imgBlackoutName":"","hotspots":[{"id":"andar_cidade_arredores","title":"Mapa de Exploração: Cidade e Arredores","visibility":"semi","position":{"top":"33.000%","left":"9.500%"}},{"id":"andar_nova_capital","title":"Centro de Nova Capital","visibility":"semi","position":{"top":"51.810%","left":"90.020%"}}]},"andar_cidade_arredores":{"id":"andar_cidade_arredores","name":"Cidade de Antonieta e Arredores","imgBaseName":"Mapa de Exploração_ Cidade e Arredores(1).png","imgNightName":"ChatGPT Image 30 de set. de 2026, 14_24_42.png","imgBlackoutName":"Cidade de Antonieta_blackout.png","hotspots":[{"id":"andar_2","title":"Farmácia Drogas e Cia","visibility":"semi","position":{"top":"31.290%","left":"13.179%"}},{"id":"andar_3","title":"Loja de armas","visibility":"semi","position":{"top":"32.980%","left":"35.734%"}},{"id":"andar_4","title":"Escola","visibility":"semi","position":{"top":"54.708%","left":"25.951%"}},{"id":"andar_5","title":"Igreja","visibility":"semi","position":{"top":"87.541%","left":"23.505%"}},{"id":"andar_6","title":"Bosque da Vila","visibility":"semi","position":{"top":"44.810%","left":"67.527%"}},{"id":"andar_7","title":"Labirinto","visibility":"semi","position":{"top":"35.877%","left":"81.386%"}},{"id":"andar_8","title":"Mansão Dos Macrados","visibility":"semi","position":{"top":"30.807%","left":"76.359%"}},{"id":"andar_14","title":"Conversar","visibility":"semi","position":{"top":"72.693%","left":"42.391%"}},{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"6.500%","left":"6.500%"}}]},"andar_nova_capital":{"id":"andar_nova_capital","name":"Centro de Nova Capital","imgBaseName":"Centro_de_Nova_Capital.png","imgNightName":"Centro_de_Nova_Capital.png","imgBlackoutName":"","hotspots":[{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"48.500%","left":"21.500%"}}]},"andar_2":{"id":"andar_2","name":"Farmácia Drogas e CIA","imgBaseName":"ChatGPT Image 30 de set. de 2026, 14_31_56.png","imgNightName":"Farmácia Drogas e CIA_noite.png","imgBlackoutName":"Farmácia Drogas e CIA_blackout.png","hotspots":[{"id":"andar_15","title":"Conversar","visibility":"semi","position":{"top":"44.085%","left":"68.342%"}}]},"andar_3":{"id":"andar_3","name":"Armaria do Seu Armani","imgBaseName":"c2152cb1-bd5a-4863-b156-233d9d905efd.png","imgNightName":"Balcão de armas e vendedor grisalho.png","imgBlackoutName":"Armaria do Seu Armani_blackout.png","hotspots":[{"id":"andar_13","title":"Conversar","visibility":"semi","position":{"top":"41.912%","left":"67.663%"}}]},"andar_4":{"id":"andar_4","name":"Escola Estadual Antônio Macrado","imgBaseName":"62f4b069-7980-4229-95c0-9c5beb2f4607.png","imgNightName":"Saguão Escolar Sob a Chuva Noturna.png","imgBlackoutName":"Escola Estadual Antônio Macrado_blackout.png","hotspots":[{"id":"andar_12","title":"Conversar","visibility":"semi","position":{"top":"56.880%","left":"59.375%"}},{"id":"andar_11","title":"Conversar","visibility":"semi","position":{"top":"53.138%","left":"30.163%"}}]},"andar_5":{"id":"andar_5","name":"Igreja Novos Dias","imgBaseName":"9259071d-78d2-4c0b-bee4-ffc9426ea242.png","imgNightName":"c1c72732-0c15-418e-a77f-67498a97e3b2.png","imgBlackoutName":"Igreja Novos Dias_blackout.png","hotspots":[{"id":"andar_10","title":"*","visibility":"invisible","position":{"top":"55.152%","left":"50.543%"}}]},"andar_6":{"id":"andar_6","name":"Bosque da vila","imgBaseName":"Mapa Gótico do Bosque Noturno.png","imgNightName":"Mapa Noturno do Bosque Assombrado.png","imgBlackoutName":"Bosque da vila_blackout.png","hotspots":[]},"andar_7":{"id":"andar_7","name":"Labirinto da Mansão","imgBaseName":"70a6c983-4357-45ec-80cd-5db03c7283ec.png","imgNightName":"82e61193-1d50-4fab-9b95-0c6b6d055ecd.png","imgBlackoutName":"Labirinto da Mansão_blackout.png","hotspots":[]},"andar_8":{"id":"andar_8","name":"Mansão Dos Macrados 1 andar","imgBaseName":"994e6fe9-677a-4fe7-a1fc-0e5e014819d7.png","imgNightName":"e9d56ac7-e985-47f8-a917-ba1f7925fd5d.png","imgBlackoutName":"Mansão Dos Macrados 1 andar_blackout.png","hotspots":[{"id":"andar_9","title":"Entrar","visibility":"semi","position":{"top":"7.148%","left":"13.451%"}}]},"andar_9":{"id":"andar_9","name":"Mansão Dos Macrados 2 andar","imgBaseName":"b4236906-0edf-4916-adec-3fc5b2cd3be5.png","imgNightName":"ad4457d4-7bdf-461d-a6e4-c22cafcba0ea.png","imgBlackoutName":"Mansão Dos Macrados 2 andar_blackout.png","hotspots":[]},"andar_10":{"id":"andar_10","name":"Subsolo da igreja","imgBaseName":"ChatGPT Image 30 de set. de 2026, 17_32_42.png","imgNightName":"ChatGPT Image 30 de set. de 2026, 17_32_40.png","imgBlackoutName":"Subsolo da igreja_blackout.png","hotspots":[]},"andar_11":{"id":"andar_11","name":"Conversa com o zelador","imgBaseName":"Conversa com o zelador.png","imgNightName":"Zelador diante do saguão antigo.png","imgBlackoutName":"Conversa com o zelador_blackout.png","hotspots":[]},"andar_12":{"id":"andar_12","name":"Conversa com a Dona Cecilia","imgBaseName":"Freira na recepção da escola antiga.png","imgNightName":"Conversa com a Dona Cecilia_noite.png","imgBlackoutName":"Conversa com a Dona Cecilia_blackout.png","hotspots":[]},"andar_13":{"id":"andar_13","name":"Conversa com Seu armani","imgBaseName":"Balcão de armas e vendedor grisalho.png","imgNightName":"Conversa com Seu armani_noite.png","imgBlackoutName":"Conversa com Seu armani_blackout.png","hotspots":[]},"andar_14":{"id":"andar_14","name":"Vereador na prefeitura antiga","imgBaseName":"imagem_2026-09-30_202325269.png","imgNightName":"Vereador na prefeitura antiga_noite.png","imgBlackoutName":"Vereador na prefeitura antiga_blackout.png","hotspots":[]},"andar_15":{"id":"andar_15","name":"Conversa com a senhora Lindasol","imgBaseName":"Farmácia Assombrada do Balcão (1).png","imgNightName":"Conversa com a senhora Lindasol_noite.png","imgBlackoutName":"Conversa com a senhora Lindasol_blackout.png","hotspots":[]}};
+        const hierarchy = {"andar_1":{"id":"andar_1","name":"Mapa Mundi","imgBaseName":"Mapa_Mundi.png","imgNightName":"Mapa_Mundi.png","imgBlackoutName":"","hotspots":[{"id":"andar_cidade_arredores","title":"Mapa da Cidade","visibility":"semi","position":{"top":"33.000%","left":"9.500%"}},{"id":"andar_nova_capital","title":"Centro de Nova Capital","visibility":"semi","position":{"top":"51.810%","left":"90.020%"}}]},"andar_cidade_arredores":{"id":"andar_cidade_arredores","name":"Mapa da Cidade","imgBaseName":"Mapa de antonieta dia.png","imgNightName":"Mapa de antonieta noite.png","imgBlackoutName":"","hotspots":[{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"6.500%","left":"6.500%"}}]},"andar_nova_capital":{"id":"andar_nova_capital","name":"Centro de Nova Capital","imgBaseName":"Centro_de_Nova_Capital.png","imgNightName":"Centro_de_Nova_Capital.png","imgBlackoutName":"","hotspots":[{"id":"andar_1","title":"← Retornar ao Mapa Mundi","visibility":"semi","position":{"top":"48.500%","left":"21.500%"}}]},"andar_2":{"id":"andar_2","name":"Farmácia Drogas e CIA","imgBaseName":"ChatGPT Image 30 de set. de 2026, 14_31_56.png","imgNightName":"Farmácia Drogas e CIA_noite.png","imgBlackoutName":"Farmácia Drogas e CIA_blackout.png","hotspots":[{"id":"andar_15","title":"Conversar","visibility":"semi","position":{"top":"44.085%","left":"68.342%"}}]},"andar_3":{"id":"andar_3","name":"Armaria do Seu Armani","imgBaseName":"c2152cb1-bd5a-4863-b156-233d9d905efd.png","imgNightName":"Balcão de armas e vendedor grisalho.png","imgBlackoutName":"Armaria do Seu Armani_blackout.png","hotspots":[{"id":"andar_13","title":"Conversar","visibility":"semi","position":{"top":"41.912%","left":"67.663%"}}]},"andar_4":{"id":"andar_4","name":"Escola Estadual Antônio Macrado","imgBaseName":"62f4b069-7980-4229-95c0-9c5beb2f4607.png","imgNightName":"Saguão Escolar Sob a Chuva Noturna.png","imgBlackoutName":"Escola Estadual Antônio Macrado_blackout.png","hotspots":[{"id":"andar_12","title":"Conversar","visibility":"semi","position":{"top":"56.880%","left":"59.375%"}},{"id":"andar_11","title":"Conversar","visibility":"semi","position":{"top":"53.138%","left":"30.163%"}}]},"andar_5":{"id":"andar_5","name":"Igreja Novos Dias","imgBaseName":"9259071d-78d2-4c0b-bee4-ffc9426ea242.png","imgNightName":"c1c72732-0c15-418e-a77f-67498a97e3b2.png","imgBlackoutName":"Igreja Novos Dias_blackout.png","hotspots":[{"id":"andar_10","title":"*","visibility":"invisible","position":{"top":"55.152%","left":"50.543%"}}]},"andar_6":{"id":"andar_6","name":"Bosque da vila","imgBaseName":"Mapa Gótico do Bosque Noturno.png","imgNightName":"Mapa Noturno do Bosque Assombrado.png","imgBlackoutName":"Bosque da vila_blackout.png","hotspots":[]},"andar_7":{"id":"andar_7","name":"Labirinto da Mansão","imgBaseName":"70a6c983-4357-45ec-80cd-5db03c7283ec.png","imgNightName":"82e61193-1d50-4fab-9b95-0c6b6d055ecd.png","imgBlackoutName":"Labirinto da Mansão_blackout.png","hotspots":[]},"andar_8":{"id":"andar_8","name":"Mansão Dos Macrados 1 andar","imgBaseName":"994e6fe9-677a-4fe7-a1fc-0e5e014819d7.png","imgNightName":"e9d56ac7-e985-47f8-a917-ba1f7925fd5d.png","imgBlackoutName":"Mansão Dos Macrados 1 andar_blackout.png","hotspots":[{"id":"andar_9","title":"Entrar","visibility":"semi","position":{"top":"7.148%","left":"13.451%"}}]},"andar_9":{"id":"andar_9","name":"Mansão Dos Macrados 2 andar","imgBaseName":"b4236906-0edf-4916-adec-3fc5b2cd3be5.png","imgNightName":"ad4457d4-7bdf-461d-a6e4-c22cafcba0ea.png","imgBlackoutName":"Mansão Dos Macrados 2 andar_blackout.png","hotspots":[]},"andar_10":{"id":"andar_10","name":"Subsolo da igreja","imgBaseName":"ChatGPT Image 30 de set. de 2026, 17_32_42.png","imgNightName":"ChatGPT Image 30 de set. de 2026, 17_32_40.png","imgBlackoutName":"Subsolo da igreja_blackout.png","hotspots":[]},"andar_11":{"id":"andar_11","name":"Conversa com o zelador","imgBaseName":"Conversa com o zelador.png","imgNightName":"Zelador diante do saguão antigo.png","imgBlackoutName":"Conversa com o zelador_blackout.png","hotspots":[]},"andar_12":{"id":"andar_12","name":"Conversa com a Dona Cecilia","imgBaseName":"Freira na recepção da escola antiga.png","imgNightName":"Conversa com a Dona Cecilia_noite.png","imgBlackoutName":"Conversa com a Dona Cecilia_blackout.png","hotspots":[]},"andar_13":{"id":"andar_13","name":"Conversa com Seu armani","imgBaseName":"Balcão de armas e vendedor grisalho.png","imgNightName":"Conversa com Seu armani_noite.png","imgBlackoutName":"Conversa com Seu armani_blackout.png","hotspots":[]},"andar_14":{"id":"andar_14","name":"Vereador na prefeitura antiga","imgBaseName":"imagem_2026-09-30_202325269.png","imgNightName":"Vereador na prefeitura antiga_noite.png","imgBlackoutName":"Vereador na prefeitura antiga_blackout.png","hotspots":[]},"andar_15":{"id":"andar_15","name":"Conversa com a senhora Lindasol","imgBaseName":"Farmácia Assombrada do Balcão (1).png","imgNightName":"Conversa com a senhora Lindasol_noite.png","imgBlackoutName":"Conversa com a senhora Lindasol_blackout.png","hotspots":[]}};
         hierarchy.andar_1.imgNightName = "Mapa mundi noite.png";
         hierarchy.andar_14.imgBaseName = "Vereador sorridente diante da prefeitura abandonada.png";
         const hasDayNight = true;
@@ -435,6 +537,8 @@
         let currentId = 'andar_1';
         let isDay = true;
         let isBlackout = false;
+        let isFirstContact = false;
+        let firstContactRadius = 15;
         let isCctv = false;
         let cctvInterval = null;
         let navHistory = [];
@@ -442,6 +546,7 @@
         let activeEventRef = null;
         let activeScenarioLink = null;
         let activeScenarioSourceId = null;
+        let activeNightScenarioId = null;
         let activeEventAudio = null;
         let activeEventAudioTimer = null;
         let isF7Down = false, f7SpecialSpawned = false;
@@ -459,22 +564,135 @@
 
         function openCtxMenu(x, y) {
             updateEnemyProximityControls();
+            updateMonstersToggleButton();
+            const nightButton = document.getElementById('editCurrentScenarioNightButton');
+            nightButton.hidden = !hierarchy[currentId]?.customScenario;
+            nightButton.textContent = hierarchy[currentId]?.imgNightName
+                ? '🌙 Substituir mapa noite deste cenário'
+                : '🌙 Adicionar mapa noite deste cenário';
             ctxMenu.style.left = x + 'px';
             ctxMenu.style.top  = y + 'px';
             ctxMenu.classList.add('open');
             // Ajuste para não sair da tela
             requestAnimationFrame(() => {
-                const r = ctxMenu.getBoundingClientRect();
-                if (r.right  > window.innerWidth)  ctxMenu.style.left = (x - r.width)  + 'px';
-                if (r.bottom > window.innerHeight) ctxMenu.style.top  = (y - r.height) + 'px';
+                ctxMenu.style.left = Math.max(12, Math.min(x, window.innerWidth - ctxMenu.offsetWidth - 12)) + 'px';
+                ctxMenu.style.top = Math.max(12, Math.min(y, window.innerHeight - ctxMenu.offsetHeight - 12)) + 'px';
             });
         }
 
         function closeCtxMenu() { ctxMenu.classList.remove('open'); }
 
+        function showShareLinks(links) {
+            document.getElementById('shareMapLinks').hidden = !links;
+            document.getElementById('createSharedRoomButton').hidden = Boolean(links);
+            document.getElementById('shareCreateKeyField').hidden = Boolean(links);
+            if (!links) return;
+            document.getElementById('viewerShareLink').value = links.viewer;
+            document.getElementById('masterShareLink').value = links.master;
+        }
+
+        function openShareMap() {
+            closeCtxMenu();
+            const sync = window.AntonietaMapSync;
+            showShareLinks(sync.links());
+            document.getElementById('shareMapStatus').textContent = '';
+            document.getElementById('shareMapModal').hidden = false;
+        }
+
+        function closeShareMap() {
+            if (document.getElementById('createSharedRoomButton').disabled) return;
+            document.getElementById('shareMapModal').hidden = true;
+        }
+
+        async function copyShareLink(inputId) {
+            const input = document.getElementById(inputId);
+            try {
+                await navigator.clipboard.writeText(input.value);
+                document.getElementById('shareMapStatus').textContent = 'Link copiado.';
+            } catch (error) {
+                input.select();
+                document.getElementById('shareMapStatus').textContent = 'Selecione e copie o link exibido.';
+            }
+        }
+
+        function blobToDataUrl(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(reader.error || new Error('Falha ao ler uma mídia do mapa.'));
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function exportMapBackup() {
+            try {
+                const state = saveMapState();
+                if (!state) throw new Error('Não foi possível salvar o mapa.');
+                showToast('Preparando backup com imagens e áudios...');
+                const backup = await window.AntonietaMapBackup.create(state, async reference => {
+                    const source = await loadMapAssetUrl(reference);
+                    if (!source) throw new Error(`Mídia ausente: ${reference}`);
+                    const response = await fetch(source);
+                    if (!response.ok) throw new Error(`Falha ao baixar: ${reference}`);
+                    return blobToDataUrl(await response.blob());
+                });
+                const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }));
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `antonieta-mapa-${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 60000);
+                showToast('Backup JSON salvo. Guarde o arquivo para o outro computador.');
+            } catch (error) {
+                showToast(`Falha no backup: ${error.message}`);
+            }
+        }
+
+        document.getElementById('importMapBackupFile').addEventListener('change', async event => {
+            const input = event.currentTarget;
+            const file = input.files?.[0];
+            if (!file) return;
+            try {
+                if (window.AntonietaMapSync?.isViewer) throw new Error('Abra o link do mestre para restaurar o mapa.');
+                const backup = JSON.parse(await file.text());
+                if (!confirm('Restaurar este backup? O estado atual da mesa será substituído.')) return;
+                showToast('Restaurando imagens, áudios e cenários...');
+                const state = await window.AntonietaMapBackup.restore(backup, saveMapAsset);
+                if (window.AntonietaMapSync?.isMaster) await window.AntonietaMapSync.replace(state);
+                else localStorage.setItem(MAP_STATE_KEY, JSON.stringify(state));
+                location.reload();
+            } catch (error) {
+                showToast(`Falha ao restaurar: ${error.message}`);
+            } finally {
+                input.value = '';
+            }
+        });
+
+        document.getElementById('createSharedRoomButton').addEventListener('click', async () => {
+            const button = document.getElementById('createSharedRoomButton');
+            const status = document.getElementById('shareMapStatus');
+            button.disabled = true;
+            status.textContent = 'Enviando estado e imagens do mapa...';
+            try {
+                const state = saveMapState();
+                await window.AntonietaMapSync.create(state, async reference => {
+                    const url = await loadMapAssetUrl(reference);
+                    if (!url) return null;
+                    const response = await fetch(url);
+                    return response.blob();
+                }, document.getElementById('shareCreateKey').value.trim());
+            } catch (error) {
+                status.textContent = `Não foi possível criar a mesa: ${error.message}`;
+                button.disabled = false;
+            }
+        });
+
         document.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             if (e.target.closest('.event-modal')) return;
+            if (window.AntonietaMapSync?.isViewer) return;
             openCtxMenu(e.clientX, e.clientY);
             
             const anc = document.getElementById('mapAnchor');
@@ -496,12 +714,17 @@
                 closeEventViewer();
                 closeScenarioCreator();
                 closeScenarioViewer();
+                closeScenarioNightEditor();
+                closeShareMap();
                 closeHeroCreator();
                 closeMonsterCreator();
+                closeVanInterior();
+                closeFirstContactSettings();
             }
         });
         
         const MAP_STATE_KEY = 'antonieta-map-state-v1';
+        const CITY_MAP_REVISION = 2;
         let charsData = {}; 
         let charID = 0;
         let tokenDrag = null;
@@ -510,6 +733,7 @@
         let vanMovementTimer = null;
         const VAN_MOVEMENT_DURATION_MS = 2 * 60 * 1000;
         let isEnemyProximityEnabled = false;
+        let monstersDisabledByMap = {};
         const customMonsterAudioPlayers = new Map();
         const customMonsterAudioTimers = new Map();
         const MAP_ASSET_DB_NAME = 'antonieta-map-assets-v1';
@@ -621,8 +845,13 @@
             const isConnection = scenarioLink.connectionOnly === true;
             document.getElementById('scenarioViewerDescription').textContent = isConnection
                 ? `Conexao com ${hierarchy[scenarioLink.id]?.name || 'outro cenario'}.`
-                : 'Gerencie o cenario adicionado ao mapa.';
+                : (window.AntonietaMapSync?.isViewer ? 'Abra este cenario para explorar.' : 'Gerencie o cenario adicionado ao mapa.');
             document.getElementById('deleteScenarioButton').textContent = isConnection ? 'Remover conexao' : 'Remover cenario';
+            const nightButton = document.getElementById('editScenarioNightButton');
+            nightButton.hidden = !hierarchy[scenarioLink.id]?.customScenario;
+            nightButton.textContent = hierarchy[scenarioLink.id]?.imgNightName
+                ? 'Substituir mapa noite'
+                : 'Adicionar mapa noite';
             document.getElementById('scenarioViewer').hidden = false;
         }
 
@@ -630,6 +859,28 @@
             document.getElementById('scenarioViewer').hidden = true;
             activeScenarioLink = null;
             activeScenarioSourceId = null;
+        }
+
+        function openScenarioNightEditor(scenarioId) {
+            const scenario = hierarchy[scenarioId];
+            if (!scenario?.customScenario) return;
+            closeCtxMenu();
+            closeScenarioViewer();
+            activeNightScenarioId = scenarioId;
+            document.getElementById('scenarioNightForm').reset();
+            document.getElementById('scenarioNightEditorTitle').textContent = `Mapa noite: ${scenario.name}`;
+            document.getElementById('scenarioNightCurrent').textContent = scenario.imgNightName
+                ? 'Este cenário já tem um mapa noite. Salvar outra imagem substituirá a versão atual.'
+                : 'Este cenário ainda não tem um mapa noite.';
+            document.getElementById('scenarioNightEditStatus').textContent = '';
+            document.getElementById('scenarioNightEditor').hidden = false;
+            setTimeout(() => document.getElementById('scenarioNightEditFile').focus(), 0);
+        }
+
+        function closeScenarioNightEditor() {
+            if (document.getElementById('saveScenarioNightButton').disabled) return;
+            document.getElementById('scenarioNightEditor').hidden = true;
+            activeNightScenarioId = null;
         }
 
         function spawnCustomMonster() {
@@ -660,8 +911,33 @@
             renderMap(currentId, true);
             saveMapState();
             showToast(isEnemyProximityEnabled
-                ? 'Viloes agora sao revelados pela proximidade dos herois.'
+                ? 'Vilões agora são revelados pela proximidade dos heróis e da van.'
                 : 'Revelacao por proximidade desativada. Todos os viloes estao visiveis.');
+        }
+
+        function areMonstersEnabled(mapId = currentId) {
+            return monstersDisabledByMap[mapId] !== true;
+        }
+
+        function updateMonstersToggleButton() {
+            const button = document.getElementById('toggleMonstersButton');
+            if (!button) return;
+            button.textContent = areMonstersEnabled() ? 'Desativar monstros' : 'Ativar monstros';
+            button.setAttribute('aria-pressed', String(!areMonstersEnabled()));
+        }
+
+        function toggleMonstersEnabled() {
+            const disabling = areMonstersEnabled();
+            monstersDisabledByMap[currentId] = disabling;
+            if (disabling) {
+                activeEnemyRef = null;
+                const jumpscare = document.getElementById('jumpscareOverlay');
+                if (jumpscare) jumpscare.style.display = 'none';
+                document.getElementById('jumpscareVideo')?.pause();
+            }
+            updateMonstersToggleButton();
+            renderMap(currentId, true);
+            showToast(disabling ? 'Monstros deste mapa ocultos e silenciados.' : 'Monstros deste mapa ativados.');
         }
 
         function closeEventViewer() {
@@ -741,7 +1017,7 @@
             document.getElementById('eventViewerTitle').textContent = eventInfo.title || 'Evento';
             document.getElementById('eventViewerDescription').textContent = isDoor
                 ? 'Este marcador abre o teste da porta na aba Limiar.'
-                : 'Evento acionado pelo mestre.';
+                : (window.AntonietaMapSync?.isViewer ? 'Evento encontrado no mapa.' : 'Evento acionado pelo mestre.');
             document.getElementById('triggerDoorEventButton').hidden = !isDoor;
             mediaHost.textContent = isDoor
                 ? 'Use o botao abaixo para acionar o teste ou clique normalmente no marcador do mapa.'
@@ -845,6 +1121,15 @@
             });
         });
 
+        function validateScenarioImage(candidate, label) {
+            if (!candidate) return '';
+            const supported = /^image\/(png|jpeg|webp|gif)$/i.test(candidate.type);
+            const maxSize = /^image\/gif$/i.test(candidate.type) ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
+            if (!supported) return `${label} deve ser PNG, JPEG, WebP ou GIF.`;
+            if (candidate.size > maxSize) return `${label} ultrapassa o limite permitido.`;
+            return '';
+        }
+
         document.getElementById('scenarioForm').addEventListener('submit', async event => {
             event.preventDefault();
             const title = document.getElementById('scenarioTitle').value.trim();
@@ -884,14 +1169,6 @@
                 status.textContent = 'Escolha uma imagem para o novo mapa.';
                 return;
             }
-            const validateScenarioImage = (candidate, label) => {
-                if (!candidate) return '';
-                const supported = /^image\/(png|jpeg|webp|gif)$/i.test(candidate.type);
-                const maxSize = /^image\/gif$/i.test(candidate.type) ? 20 * 1024 * 1024 : 8 * 1024 * 1024;
-                if (!supported) return `${label} deve ser PNG, JPEG, WebP ou GIF.`;
-                if (candidate.size > maxSize) return `${label} ultrapassa o limite permitido.`;
-                return '';
-            };
             const validationError = validateScenarioImage(file, 'A imagem principal')
                 || validateScenarioImage(nightFile, 'A imagem noturna');
             if (validationError) {
@@ -940,6 +1217,49 @@
             }
         });
 
+        document.getElementById('editScenarioNightButton').addEventListener('click', () => {
+            if (activeScenarioLink?.id) openScenarioNightEditor(activeScenarioLink.id);
+        });
+
+        document.getElementById('scenarioNightForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            const scenarioId = activeNightScenarioId;
+            const scenario = hierarchy[scenarioId];
+            const file = document.getElementById('scenarioNightEditFile').files[0];
+            const status = document.getElementById('scenarioNightEditStatus');
+            const saveButton = document.getElementById('saveScenarioNightButton');
+            if (!scenario?.customScenario || !file) return;
+            const validationError = validateScenarioImage(file, 'A imagem noturna');
+            if (validationError) {
+                status.textContent = validationError;
+                return;
+            }
+            saveButton.disabled = true;
+            status.textContent = 'Salvando mapa noite...';
+            let newReference = '';
+            try {
+                newReference = await readFileAsDataUrl(file).then(saveMapAsset);
+                const previousReference = scenario.imgNightName;
+                scenario.imgNightName = newReference;
+                saveMapState();
+                if (currentId === scenarioId && !isDay) renderMap(scenarioId, true);
+                saveButton.disabled = false;
+                closeScenarioNightEditor();
+                showToast('Mapa noite salvo para este cenário.');
+                if (previousReference?.startsWith('idb-asset:') &&
+                    !Object.values(hierarchy).some(map =>
+                        [map.imgBaseName, map.imgNightName, map.imgBlackoutName].includes(previousReference))) {
+                    deleteMapAsset(previousReference).catch(error => console.warn('Não foi possível remover a imagem noturna anterior:', error));
+                }
+            } catch (error) {
+                console.warn('Não foi possível salvar o mapa noite:', error);
+                if (newReference) await deleteMapAsset(newReference).catch(() => {});
+                status.textContent = 'Não foi possível salvar a imagem noturna.';
+            } finally {
+                saveButton.disabled = false;
+            }
+        });
+
         function collectCustomScenarioTree(scenarioId, collected = new Set()) {
             const scenario = hierarchy[scenarioId];
             if (!scenario?.customScenario || collected.has(scenarioId)) return collected;
@@ -966,7 +1286,10 @@
                     addReference(hotspot.assetContent);
                     addReference(hotspot.audioContent);
                 });
-                (charsData[id] || []).forEach(character => addReference(character.gif));
+                (charsData[id] || []).forEach(character => {
+                    addReference(character.image);
+                    addReference(character.gif);
+                });
             });
             return references;
         }
@@ -979,6 +1302,7 @@
         });
 
         document.getElementById('deleteScenarioButton').addEventListener('click', async () => {
+            if (window.AntonietaMapSync?.isViewer) return;
             const scenarioLink = activeScenarioLink;
             const sourceId = activeScenarioSourceId;
             if (!scenarioLink || !sourceId || !hierarchy[sourceId]) return;
@@ -1025,6 +1349,7 @@
         });
 
         document.getElementById('deleteEventButton').addEventListener('click', () => {
+            if (window.AntonietaMapSync?.isViewer) return;
             if (!activeEventRef || !confirm(`Remover o evento "${activeEventRef.title}"?`)) return;
             const events = hierarchy[currentId].hotspots;
             const index = events.indexOf(activeEventRef);
@@ -1037,14 +1362,18 @@
 
         document.getElementById('triggerDoorEventButton').addEventListener('click', openLimiarDoorTest);
 
-        ['eventCreator', 'eventViewer', 'scenarioCreator', 'scenarioViewer', 'heroCreator', 'monsterCreator'].forEach(id => {
+        ['eventCreator', 'eventViewer', 'scenarioCreator', 'scenarioViewer', 'scenarioNightEditor', 'shareMapModal', 'heroCreator', 'monsterCreator', 'vanInterior', 'firstContactSettings'].forEach(id => {
             document.getElementById(id).addEventListener('mousedown', event => {
                 if (event.target !== event.currentTarget) return;
                 if (id === 'eventCreator') closeEventCreator();
                 else if (id === 'eventViewer') closeEventViewer();
                 else if (id === 'scenarioCreator') closeScenarioCreator();
                 else if (id === 'scenarioViewer') closeScenarioViewer();
+                else if (id === 'scenarioNightEditor') closeScenarioNightEditor();
+                else if (id === 'shareMapModal') closeShareMap();
                 else if (id === 'heroCreator') closeHeroCreator();
+                else if (id === 'vanInterior') closeVanInterior();
+                else if (id === 'firstContactSettings') closeFirstContactSettings();
                 else closeMonsterCreator();
             });
         });
@@ -1066,6 +1395,7 @@
         async function saveMapAsset(dataUrl) {
             const response = await fetch(dataUrl);
             const blob = await response.blob();
+            if (window.AntonietaMapSync?.isMaster) return window.AntonietaMapSync.upload(blob);
             const db = await openMapAssetDb();
             const key = `asset_${Date.now()}_${Math.random().toString(36).slice(2)}`;
             await new Promise((resolve, reject) => {
@@ -1143,11 +1473,14 @@
                     const addedScenarioLinks = sector.hotspots.filter(h => h.type === 'scenario');
                     if (addedScenarioLinks.length) scenarioLinks[id] = addedScenarioLinks;
                 });
-                localStorage.setItem(MAP_STATE_KEY, JSON.stringify({
-                    version: 1, currentId, isDay, isBlackout, isCctv, isFog,
-                    isGridActive, isEnemyProximityEnabled, charsData, charID, enemies, events, scenarios, scenarioLinks,
+                const state = {
+                    version: 1, cityMapRevision: CITY_MAP_REVISION, currentId, isDay, isBlackout, isFirstContact, firstContactRadius, isCctv, isFog,
+                    isGridActive, isEnemyProximityEnabled, monstersDisabledByMap, charsData, charID, enemies, events, scenarios, scenarioLinks,
                     vanState, navHistory: navHistory.slice(-50)
-                }));
+                };
+                localStorage.setItem(MAP_STATE_KEY, JSON.stringify(state));
+                window.AntonietaMapSync?.save(state);
+                return state;
             } catch (error) {
                 console.warn('Não foi possível salvar o estado do mapa:', error);
             }
@@ -1163,6 +1496,7 @@
                     console.warn('O estado local do mapa foi ignorado:', error);
                 }
                 if (!saved || saved.version !== 1) return;
+                const hasCurrentCityMap = saved.cityMapRevision === CITY_MAP_REVISION;
                 Object.entries(saved.scenarios || {}).forEach(([id, scenario]) => {
                     if (!id || !scenario || typeof scenario !== 'object') return;
                     hierarchy[id] = {
@@ -1178,25 +1512,34 @@
                 if (saved.currentId && hierarchy[saved.currentId]) currentId = saved.currentId;
                 if (typeof saved.isDay === 'boolean') isDay = saved.isDay;
                 if (typeof saved.isBlackout === 'boolean') isBlackout = saved.isBlackout;
+                if (typeof saved.isFirstContact === 'boolean') isFirstContact = saved.isFirstContact;
+                if (Number.isFinite(saved.firstContactRadius)) firstContactRadius = Math.max(3, Math.min(45, saved.firstContactRadius));
+                if (isFirstContact) isBlackout = true;
                 if (typeof saved.isCctv === 'boolean') isCctv = saved.isCctv;
                 if (typeof saved.isFog === 'boolean') isFog = saved.isFog;
                 if (typeof saved.isGridActive === 'boolean') isGridActive = saved.isGridActive;
                 if (typeof saved.isEnemyProximityEnabled === 'boolean') isEnemyProximityEnabled = saved.isEnemyProximityEnabled;
+                if (saved.monstersDisabledByMap && typeof saved.monstersDisabledByMap === 'object' && !Array.isArray(saved.monstersDisabledByMap)) {
+                    monstersDisabledByMap = saved.monstersDisabledByMap;
+                }
                 if (saved.charsData && typeof saved.charsData === 'object') charsData = saved.charsData;
                 if (Number.isInteger(saved.charID) && saved.charID >= 0) charID = saved.charID;
                 if (saved.vanState && typeof saved.vanState === 'object') vanState = saved.vanState;
                 if (Array.isArray(saved.navHistory)) navHistory = saved.navHistory.filter(id => hierarchy[id]).slice(-50);
                 Object.entries(saved.enemies || {}).forEach(([id, enemies]) => {
+                    if (id === 'andar_cidade_arredores' && !hasCurrentCityMap) return;
                     if (hierarchy[id] && Array.isArray(enemies)) {
                         hierarchy[id].hotspots = hierarchy[id].hotspots.filter(h => h.type !== 'enemy').concat(enemies);
                     }
                 });
                 Object.entries(saved.events || {}).forEach(([id, events]) => {
+                    if (id === 'andar_cidade_arredores' && !hasCurrentCityMap) return;
                     if (hierarchy[id] && Array.isArray(events)) {
                         hierarchy[id].hotspots = hierarchy[id].hotspots.filter(h => h.type !== 'event').concat(events);
                     }
                 });
                 Object.entries(saved.scenarioLinks || {}).forEach(([id, links]) => {
+                    if (id === 'andar_cidade_arredores' && !hasCurrentCityMap) return;
                     if (hierarchy[id] && Array.isArray(links)) {
                         hierarchy[id].hotspots = hierarchy[id].hotspots.filter(h => h.type !== 'scenario')
                             .concat(links.filter(link => link && hierarchy[link.id]));
@@ -1228,6 +1571,7 @@
 
         // Laços do Painel Traseiro
         anchor.addEventListener('mousedown', (e) => {
+            if (window.AntonietaMapSync?.isViewer) return;
             if(e.target.closest('.char-token') || e.target.closest('.hs-marker-viz') || e.target.closest('.van-event')) return;
             e.preventDefault(); // Impede o navegador de puxar a imagem fantasma ao iniciar Marquee
             
@@ -1320,6 +1664,7 @@
 
         // Comandos de Teclado
         window.addEventListener('keydown', (e) => {
+            if (window.AntonietaMapSync?.isViewer) return;
             if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             
             const k = e.key.toLowerCase();
@@ -1526,13 +1871,14 @@
                 const rect = fCanvas.getBoundingClientRect();
                 
                 fCtx.clearRect(0, 0, fCanvas.width, fCanvas.height);
-                fCtx.fillStyle = "rgba(0, 0, 0, 0.98)";
+                fCtx.fillStyle = isFirstContact ? '#000' : 'rgba(0, 0, 0, 0.98)';
                 fCtx.fillRect(0, 0, fCanvas.width, fCanvas.height);
                 fCtx.globalCompositeOperation = 'destination-out';
+                fCtx.fillStyle = '#000';
                 
                 const arr = charsData[currentId] || [];
-                const lightSources = arr.slice();
-                if (vanState?.active && vanState.mapId === currentId && vanState.status === 'success') {
+                const lightSources = arr.filter(c => c.type !== 'enemy');
+                if (vanState?.active && vanState.mapId === currentId && (isFirstContact || vanState.status === 'success')) {
                     lightSources.push({
                         rx: vanState.rx,
                         ry: vanState.ry,
@@ -1543,12 +1889,19 @@
                 }
                 const RADIUS = 280; // Cone de Luz Menor
                 const CONE_ANGLE = Math.PI / 3; // Feixe fechado de ~60 graus
+                const firstContactPixelRadius = Math.min(rect.width, rect.height) * firstContactRadius / 100;
                 
                 lightSources.forEach(c => {
-                   if (c.lightOn === false) return; // Verifica se a lanterna do token tá travada desligada
+                   if (!isFirstContact && c.lightOn === false) return; // Verifica se a lanterna do token tá travada desligada
                    
                    let cx = (c.rx / 100) * rect.width;
                    let cy = (c.ry / 100) * rect.height;
+                   if (isFirstContact) {
+                       fCtx.beginPath();
+                       fCtx.arc(cx, cy, firstContactPixelRadius, 0, Math.PI * 2);
+                       fCtx.fill();
+                       return;
+                   }
                    const lightRadius = Number(c.lightRadius) || RADIUS;
                    // Compensação p/ Norte: 0 graus no Canvas é Direita(Leste). Subtrair 90 joga a luz pra "Cima"(Norte) da view.
                    let angleRad = ((c.rot || 0) - 90) * (Math.PI / 180);
@@ -1565,15 +1918,30 @@
                 // Culling Fotométrico de Hotspots
                 const hsDoms = document.querySelectorAll('.hs-marker-viz');
                 if(!isBlackout) {
-                    hsDoms.forEach(d => { d.style.opacity = '1'; d.style.pointerEvents = 'auto'; });
+                    hsDoms.forEach(d => {
+                        d.style.opacity = '1';
+                        d.style.pointerEvents = 'auto';
+                        if (d.hasAttribute('tabindex')) d.tabIndex = 0;
+                    });
                     return;
                 }
                 
                 const data = hierarchy[currentId];
                 hsDoms.forEach((d, idx) => {
+                    if (isFirstContact) {
+                        const position = data.hotspots[idx]?.position;
+                        const hx = (parseFloat(position?.left) / 100) * rect.width;
+                        const hy = (parseFloat(position?.top) / 100) * rect.height;
+                        const visible = lightSources.some(c => Math.hypot(hx - (c.rx / 100) * rect.width, hy - (c.ry / 100) * rect.height) <= firstContactPixelRadius);
+                        d.style.opacity = visible ? '1' : '0';
+                        d.style.pointerEvents = visible ? 'auto' : 'none';
+                        if (d.hasAttribute('tabindex')) d.tabIndex = visible ? 0 : -1;
+                        return;
+                    }
                     if (d.dataset.vis !== 'enemy') {
                         d.style.opacity = '1';
                         d.style.pointerEvents = 'auto';
+                        if (d.hasAttribute('tabindex')) d.tabIndex = 0;
                         return;
                     }
                     let rawPos = data.hotspots[idx].position; 
@@ -1597,17 +1965,48 @@
                     }
                     d.style.opacity = isVisible ? '1' : '0';
                     d.style.pointerEvents = isVisible ? 'auto' : 'none';
+                    if (d.hasAttribute('tabindex')) d.tabIndex = isVisible ? 0 : -1;
                 });
             }
         }
 
         function toggleBlackout() {
             isBlackout = !isBlackout;
+            isFirstContact = false;
+            document.getElementById('firstContactButton').setAttribute('aria-pressed', 'false');
             const cv = document.getElementById('flashlightCanvas');
             if(cv) cv.style.display = isBlackout ? 'block' : 'none';
             renderMap(currentId, true); // Força refresh da imagem base se houver variante fisica!
             saveMapState();
         }
+
+        function setFirstContactMode(active) {
+            isFirstContact = active;
+            isBlackout = active;
+            document.getElementById('firstContactButton').setAttribute('aria-pressed', String(active));
+            document.getElementById('flashlightCanvas').style.display = active ? 'block' : 'none';
+            renderMap(currentId, true);
+            saveMapState();
+        }
+
+        function openFirstContactSettings() {
+            closeCtxMenu();
+            if (!isFirstContact) setFirstContactMode(true);
+            document.getElementById('firstContactRadius').value = String(firstContactRadius);
+            document.getElementById('firstContactRadiusValue').textContent = `${firstContactRadius}%`;
+            document.getElementById('firstContactSettings').hidden = false;
+        }
+
+        function closeFirstContactSettings() {
+            document.getElementById('firstContactSettings').hidden = true;
+        }
+
+        document.getElementById('firstContactRadius').addEventListener('input', event => {
+            firstContactRadius = Math.max(3, Math.min(45, Number(event.target.value) || 15));
+            document.getElementById('firstContactRadiusValue').textContent = `${firstContactRadius}%`;
+            if (isFirstContact && typeof drawFlashlight === 'function') drawFlashlight();
+        });
+        document.getElementById('firstContactRadius').addEventListener('change', saveMapState);
         
         let isGridActive = false;
         function toggleGrid() {
@@ -1650,6 +2049,8 @@
         function resetToDay() {
             isDay = true;
             isBlackout = false;
+            isFirstContact = false;
+            document.getElementById('firstContactButton').setAttribute('aria-pressed', 'false');
             const cv = document.getElementById('flashlightCanvas');
             if(cv) cv.style.display = 'none';
             renderMap(currentId, true);
@@ -1697,31 +2098,37 @@
             return enemy.enemyId;
         }
 
-        function isHeroWithinEnemyDetection(enemy) {
+        function getEnemyDetectionSources() {
+            const sources = (charsData[currentId] || []).filter(c => c.type !== 'enemy');
+            if (vanState?.active && vanState.mapId === currentId) sources.push(vanState);
+            return sources;
+        }
+
+        function isHeroOrVanWithinEnemyDetection(enemy) {
             const enemyX = parseFloat(enemy.position?.left);
             const enemyY = parseFloat(enemy.position?.top);
             const revealDistance = Math.max(1, Math.min(100, Number(enemy.detectionDistance) || 20));
             if (!Number.isFinite(enemyX) || !Number.isFinite(enemyY)) return false;
-            return (charsData[currentId] || []).some(hero =>
-                Math.hypot(Number(hero.rx) - enemyX, Number(hero.ry) - enemyY) <= revealDistance
+            return getEnemyDetectionSources().some(source =>
+                Math.hypot(Number(source.rx) - enemyX, Number(source.ry) - enemyY) <= revealDistance
             );
         }
 
-        function isEnemyRevealedByHeroes(enemy) {
-            return !isEnemyProximityEnabled || isHeroWithinEnemyDetection(enemy);
+        function isEnemyRevealedByProximity(enemy) {
+            return areMonstersEnabled() && (!isEnemyProximityEnabled || isHeroOrVanWithinEnemyDetection(enemy));
         }
 
         function updateEnemyProximityVisibility() {
             document.querySelectorAll('.hs-enemy').forEach(enemyDom => {
+                if (!areMonstersEnabled()) return;
                 const enemy = enemyDom._enemyRef;
                 if (!enemy) return;
-                const heroesArePresent = (charsData[currentId] || []).length > 0;
-                const isFoundNow = heroesArePresent && isHeroWithinEnemyDetection(enemy);
+                const isFoundNow = isHeroOrVanWithinEnemyDetection(enemy);
                 if (!enemy.hasBeenFound && isFoundNow) {
                     enemy.hasBeenFound = true;
                     stopCustomMonsterAudio(ensureEnemyIdentity(enemy));
                 }
-                enemyDom.classList.toggle('proximity-hidden', !isEnemyRevealedByHeroes(enemy));
+                enemyDom.classList.toggle('proximity-hidden', !isEnemyRevealedByProximity(enemy));
             });
         }
 
@@ -1739,8 +2146,8 @@
 
         function shouldPlayCustomMonsterAudio(enemy) {
             return Boolean(
-                enemy?.audioContent && !enemy.isDead && !enemy.hasBeenFound &&
-                (charsData[currentId] || []).length > 0 &&
+                areMonstersEnabled() && enemy?.audioContent && !enemy.isDead && !enemy.hasBeenFound &&
+                getEnemyDetectionSources().length > 0 &&
                 hierarchy[currentId]?.hotspots.includes(enemy)
             );
         }
@@ -1820,6 +2227,11 @@
             if (!hierarchy[id]) return alert("Setor Inexistente no Banco de Dados!");
             if(!fromBack && currentId !== id) navHistory.push(currentId);
             currentId = id;
+            if (!areMonstersEnabled(id)) {
+                const jumpscare = document.getElementById('jumpscareOverlay');
+                if (jumpscare) jumpscare.style.display = 'none';
+                document.getElementById('jumpscareVideo')?.pause();
+            }
             anchor.classList.toggle('night-mode', hasDayNight && !isDay);
             
             const data = hierarchy[id];
@@ -1875,6 +2287,7 @@
             if (floatingBack) floatingBack.style.display = canGoBack ? 'inline-flex' : 'none';
             
             const hsLayer = document.getElementById('hotspotsLayer');
+            hsLayer.querySelectorAll('video').forEach(video => video.pause());
             hsLayer.innerHTML = '';
             selectedVan = false;
             document.getElementById('charsLayer').innerHTML = '';
@@ -1905,7 +2318,8 @@
                             openLimiarDoorTest();
                             return;
                         }
-                        showToast('Use o botao direito para acionar este evento.');
+                        if (window.AntonietaMapSync?.isViewer) openEventViewer(h);
+                        else showToast('Use o botao direito para acionar este evento.');
                     };
                     el.oncontextmenu = e => {
                         e.preventDefault();
@@ -1924,10 +2338,15 @@
                     };
                 } else if (h.type === 'enemy') {
                     el.classList.add('hs-enemy');
-                    ensureEnemyIdentity(h);
                     el._enemyRef = h;
+                    if (!areMonstersEnabled(id)) {
+                        el.classList.add('monsters-disabled');
+                        hsLayer.appendChild(el);
+                        return;
+                    }
+                    ensureEnemyIdentity(h);
                     if (h.audioContent) loadMapAssetUrl(h.audioContent);
-                    el.classList.toggle('proximity-hidden', !isEnemyRevealedByHeroes(h));
+                    el.classList.toggle('proximity-hidden', !isEnemyRevealedByProximity(h));
                     if (h.isDead) el.classList.add('dead');
 
                     let customFilter = h.filter || 'drop-shadow(0 15px 15px rgba(0,0,0,0.8))';
@@ -1958,6 +2377,7 @@
                     }
 
                     el.onwheel = (e) => {
+                        if (window.AntonietaMapSync?.isViewer) return;
                         e.preventDefault();
                         if (e.ctrlKey) {
                             const currentSize = parseFloat(h.size) || 90;
@@ -1981,6 +2401,7 @@
                     };
 
                     el.onmousedown = (e) => {
+                        if (window.AntonietaMapSync?.isViewer) return;
                         e.stopPropagation();
                         selectedTokens.clear();
                         updateSelectionVisuals();
@@ -2136,6 +2557,7 @@
             const jsOverlay = document.getElementById('jumpscareOverlay');
             const jsVid = document.getElementById('jumpscareVideo');
             if (!jsOverlay || !jsVid) return;
+            if (!areMonstersEnabled()) return;
 
             if (jsOverlay.style.display === 'none' || jsOverlay.style.display === '') {
                 jsVid.src = videoSrc;
@@ -2193,6 +2615,11 @@
             const sVulto = document.getElementById('sndVulto');
             const sMea = document.getElementById('sndMeaCulpa');
             if (!sAnarquico || !sZumbi || !sDom || !sPertub) return;
+
+            if (!areMonstersEnabled()) {
+                [sAnarquico, sZumbi, sDom, sPertub, sVulto, sMea].forEach(audio => audio?.pause());
+                return;
+            }
 
             sAnarquico.volume = 0.35;
             sZumbi.volume = 0.15;
@@ -2301,17 +2728,13 @@
                 return;
             }
             const heroes = charsData[currentId] || [];
-            if (!heroes.length) {
-                showToast('Crie ao menos um herói para chamar a van.');
-                return;
-            }
-            const chosenHero = heroes[Math.floor(Math.random() * heroes.length)];
+            const chosenHero = heroes.length ? heroes[Math.floor(Math.random() * heroes.length)] : null;
             clearVanMovementTimer();
             vanState = {
                 active: true,
                 mapId: currentId,
-                rx: chosenHero.rx,
-                ry: chosenHero.ry,
+                rx: chosenHero?.rx ?? spawnCursorX,
+                ry: chosenHero?.ry ?? spawnCursorY,
                 lightRot: 0,
                 attempts: 0,
                 status: 'ready',
@@ -2321,7 +2744,19 @@
             selectedTokens.clear();
             activeEnemyRef = null;
             renderMap(currentId, true);
-            showToast('Os heróis entraram na Van dos Ocultos.');
+            showToast(heroes.length ? 'Os heróis entraram na Van dos Ocultos.' : 'Van dos Ocultos adicionada ao mapa.');
+        }
+
+        function openVanInterior() {
+            if (!vanState?.active || vanState.mapId !== currentId) return;
+            const image = document.getElementById('vanInteriorImage');
+            image.src = isDay ? 'van dia.png' : 'van noite.png';
+            image.alt = isDay ? 'Interior da van durante o dia' : 'Interior da van durante a noite';
+            document.getElementById('vanInterior').hidden = false;
+        }
+
+        function closeVanInterior() {
+            document.getElementById('vanInterior').hidden = true;
         }
 
         function renderVanOfTheHidden() {
@@ -2347,12 +2782,11 @@
             image.src = 'van_em_movimento.gif';
             image.alt = 'Van dos Ocultos em movimento';
             if (selectedVan) event.classList.add('selected');
-            image.addEventListener('pointerdown', e => startVanDrag(e, event));
+            if (!window.AntonietaMapSync?.isViewer) image.addEventListener('pointerdown', e => startVanDrag(e, event));
 
-            let controls = null;
-            if (vanState.status !== 'success') {
-                controls = document.createElement('div');
-                controls.className = 'van-controls';
+            const controls = document.createElement('div');
+            controls.className = 'van-controls';
+            if (vanState.status !== 'success' && !window.AntonietaMapSync?.isViewer) {
                 const start = document.createElement('button');
                 start.type = 'button';
                 start.textContent = 'Start';
@@ -2360,7 +2794,13 @@
                 controls.appendChild(start);
             }
 
-            if (vanState.status === 'failure' && controls) {
+            const enter = document.createElement('button');
+            enter.type = 'button';
+            enter.textContent = 'Entrar na van';
+            enter.addEventListener('click', openVanInterior);
+            controls.appendChild(enter);
+
+            if (vanState.status === 'failure' && !window.AntonietaMapSync?.isViewer) {
                 const cancel = document.createElement('button');
                 cancel.type = 'button';
                 cancel.className = 'van-cancel';
@@ -2369,22 +2809,21 @@
                 controls.appendChild(cancel);
             }
 
-            if (vanState.status === 'failure' && controls) {
+            if (vanState.status === 'failure') {
                 const status = document.createElement('div');
                 status.className = 'van-status';
                 status.setAttribute('role', 'status');
                 status.textContent = vanState.status === 'success' ? 'Deu boa! A van ligou.' : 'Não deu boa. Tente novamente.';
                 controls.appendChild(status);
             }
-            if (vanState.status === 'restart_required' && controls) {
+            if (vanState.status === 'restart_required') {
                 const restartStatus = document.createElement('div');
                 restartStatus.className = 'van-status';
                 restartStatus.setAttribute('role', 'status');
                 restartStatus.textContent = 'A van desligou. Faça um novo teste para ligá-la.';
                 controls.appendChild(restartStatus);
             }
-            event.append(image);
-            if (controls) event.append(controls);
+            event.append(image, controls);
             layer.appendChild(event);
         }
 
@@ -2413,6 +2852,7 @@
                 vanState.ry = Math.max(0, Math.min(100, origin.ry + ((e.clientY - origin.y) / rect.height) * 100));
                 vanDom.style.left = `${vanState.rx}%`;
                 vanDom.style.top = `${vanState.ry}%`;
+                updateEnemyProximityVisibility();
                 if (isBlackout && typeof drawFlashlight === 'function') drawFlashlight();
             };
             const finish = () => {
@@ -2447,24 +2887,27 @@
 
         function cancelVanOfTheHidden() {
             if (!vanState?.active || vanState.mapId !== currentId || vanState.status !== 'failure') return;
+            closeVanInterior();
             const restoredHeroes = Array.isArray(vanState.heroes) ? vanState.heroes : [];
             charsData[currentId] = restoredHeroes;
             vanState = null;
             clearVanMovementTimer();
             stopVanAudio();
             renderMap(currentId, true);
-            showToast('Viagem cancelada. Os heróis voltaram ao mapa.');
+            showToast(restoredHeroes.length ? 'Viagem cancelada. Os heróis voltaram ao mapa.' : 'Van removida do mapa.');
         }
 
         function deleteVanOfTheHidden() {
             if (!vanState?.active || vanState.mapId !== currentId) return;
-            charsData[currentId] = restoreVanHeroesAtVanPosition();
+            closeVanInterior();
+            const restoredHeroes = restoreVanHeroesAtVanPosition();
+            charsData[currentId] = restoredHeroes;
             vanState = null;
             clearVanMovementTimer();
             selectedVan = false;
             stopVanAudio();
             renderMap(currentId, true);
-            showToast('Van removida. Os heróis voltaram ao mapa.');
+            showToast(restoredHeroes.length ? 'Van removida. Os heróis voltaram ao mapa.' : 'Van removida do mapa.');
         }
 
         function restoreVanHeroesAtVanPosition() {
@@ -2535,9 +2978,9 @@
                 <label class="event-field">Símbolo
                     <input class="hero-create-emoji" type="text" maxlength="12" value="👤" aria-label="Símbolo ou emoji do herói">
                 </label>
-                <label class="event-field hero-gif-field">GIF do herói (opcional)
-                    <input class="hero-create-gif" type="file" accept="image/gif,.gif">
-                    <small>GIF de até 8 MB. Se nenhum for escolhido, o símbolo será usado no token.</small>
+                <label class="event-field hero-image-field">Imagem ou GIF do herói (opcional)
+                    <input class="hero-create-image" type="file" accept="image/png,image/jpeg,image/webp,image/gif,.png,.jpg,.jpeg,.webp,.gif">
+                    <small>PNG, JPEG, WebP ou GIF de até 8 MB. Se nenhum for escolhido, o símbolo será usado no token.</small>
                 </label>`;
             row.querySelector('.remove-hero-row').addEventListener('click', () => {
                 if (list.children.length === 1) return;
@@ -2582,18 +3025,18 @@
             const entries = rows.map(row => ({
                 name: row.querySelector('.hero-create-name').value.trim(),
                 emoji: row.querySelector('.hero-create-emoji').value.trim() || '👤',
-                file: row.querySelector('.hero-create-gif').files[0]
+                file: row.querySelector('.hero-create-image').files[0]
             }));
             if (!entries.length || entries.some(entry => !entry.name)) {
                 status.textContent = 'Preencha o nome de todos os heróis.';
                 return;
             }
             const invalidFile = entries.find(entry => entry.file && (
-                !(entry.file.type === 'image/gif' || /\.gif$/i.test(entry.file.name))
+                !['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(entry.file.type)
                 || entry.file.size > 8 * 1024 * 1024
             ));
             if (invalidFile) {
-                status.textContent = `O arquivo de "${invalidFile.name}" deve ser um GIF de até 8 MB.`;
+                status.textContent = `O arquivo de "${invalidFile.name}" deve ser PNG, JPEG, WebP ou GIF de até 8 MB.`;
                 return;
             }
             if (vanState?.active && vanState.mapId === currentId && vanState.status !== 'success') {
@@ -2608,9 +3051,9 @@
                 await Promise.all(entries.map(async entry => {
                     if (!entry.file) return;
                     const source = await readFileAsDataUrl(entry.file);
-                    if (!/^data:image\/gif;base64,/i.test(source)) throw new Error('GIF inválido');
-                    entry.gif = await saveMapAsset(source);
-                    savedAssetRefs.push(entry.gif);
+                    if (!/^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(source)) throw new Error('Imagem inválida');
+                    entry.image = await saveMapAsset(source);
+                    savedAssetRefs.push(entry.image);
                 }));
 
                 if (vanState?.active && vanState.mapId === currentId && vanState.status === 'success') {
@@ -2626,7 +3069,7 @@
                     id: ++charID,
                     name: entry.name.slice(0, 60),
                     emoji: entry.emoji,
-                    gif: entry.gif || undefined,
+                    image: entry.image || undefined,
                     rx: Math.max(2, Math.min(98, spawnCursorX + ((index % columns) - (columns - 1) / 2) * 4)),
                     ry: Math.max(2, Math.min(98, spawnCursorY + (Math.floor(index / columns) - (rowsCount - 1) / 2) * 4)),
                     rot: 0,
@@ -2642,7 +3085,7 @@
             } catch (error) {
                 console.warn('Não foi possível salvar os heróis:', error);
                 await Promise.allSettled(savedAssetRefs.map(deleteMapAsset));
-                status.textContent = 'Não foi possível salvar um dos GIFs.';
+                status.textContent = 'Não foi possível salvar uma das imagens.';
             } finally {
                 saveButton.disabled = false;
             }
@@ -2650,7 +3093,9 @@
 
         function renderSavedChars() {
             const arr = charsData[currentId] || [];
-            arr.forEach(c => drawChar(c));
+            arr.forEach(c => {
+                if (c.type !== 'enemy' || areMonstersEnabled()) drawChar(c);
+            });
             updateSelectionVisuals();
             if(isBlackout && typeof drawFlashlight === 'function') drawFlashlight();
         }
@@ -2672,13 +3117,14 @@
             dom.style.fontSize = `${1.2 * tokenScale}em`;
             const face = document.createElement('span');
             face.className = 'token-face';
-            if (cObj.gif && (/^data:image\/gif;base64,/i.test(cObj.gif) || cObj.gif.startsWith('idb-asset:') || /\.gif(?:[?#].*)?$/i.test(cObj.gif))) {
-                dom.classList.add('has-gif');
+            const imageReference = cObj.image || cObj.gif;
+            if (typeof imageReference === 'string' && (/^data:image\/(?:png|jpeg|webp|gif);base64,/i.test(imageReference) || imageReference.startsWith('idb-asset:') || /\.(?:png|jpe?g|webp|gif)(?:[?#].*)?$/i.test(imageReference))) {
+                dom.classList.add('has-image');
                 const image = document.createElement('img');
-                if (cObj.gif.startsWith('idb-asset:')) {
-                    loadMapAssetUrl(cObj.gif).then(url => { if (url && image.isConnected) image.src = url; });
+                if (imageReference.startsWith('idb-asset:')) {
+                    loadMapAssetUrl(imageReference).then(url => { if (url && image.isConnected) image.src = url; });
                 } else {
-                    image.src = cObj.gif;
+                    image.src = imageReference;
                 }
                 image.alt = '';
                 face.appendChild(image);
@@ -2694,6 +3140,7 @@
 
             // Ctrl + scroll ajusta tamanho; scroll normal continua girando o token.
             dom.onwheel = (e) => {
+                if (window.AntonietaMapSync?.isViewer) return;
                 e.preventDefault();
                 if (e.ctrlKey) {
                     cObj.scale = Math.max(HERO_MIN_SCALE, Math.min(HERO_MAX_SCALE, (Number(cObj.scale) || 1) + (e.deltaY < 0 ? 0.25 : -0.25)));
@@ -2712,12 +3159,14 @@
             };
 
             dom.ondblclick = (e) => {
+                if (window.AntonietaMapSync?.isViewer) return;
                 e.stopPropagation();
                 const n = prompt("Renomear:", cObj.name);
                 if(n && n.trim()) { cObj.name = n.trim().slice(0, 60); dom.querySelector('.char-name').textContent = cObj.name; saveMapState(); }
             };
 
             dom.onmousedown = (e) => { 
+                if (window.AntonietaMapSync?.isViewer) return;
                 e.stopPropagation(); 
                 e.preventDefault(); 
                 if(!selectedTokens.has(cObj.id)) {
@@ -2778,8 +3227,13 @@
             if (typeof resizeCanvas === 'function') resizeCanvas();
             if (typeof isGridActive !== 'undefined' && isGridActive) drawGrid();
         });
-        window.onload = () => {
+        window.onload = async () => {
+            const remoteState = await window.AntonietaMapSync.init();
+            if (remoteState === false) return;
+            if (window.AntonietaMapSync.hasRoom && !remoteState) return;
+            if (remoteState) localStorage.setItem(MAP_STATE_KEY, JSON.stringify(remoteState));
             loadMapState();
+            document.getElementById('firstContactButton').setAttribute('aria-pressed', String(isFirstContact));
             preloadCustomMonsterAudios();
             updateEnemyProximityControls();
             document.getElementById('flashlightCanvas').style.display = isBlackout ? 'block' : 'none';
@@ -2788,6 +3242,11 @@
             document.getElementById('cctvLayer').style.display = isCctv ? 'block' : 'none';
             if (isCctv) { updateCctvTicks(); cctvInterval = setInterval(updateCctvTicks, 1000); }
             renderMap(currentId);
+            const newLinks = sessionStorage.getItem('antonieta-new-shared-room');
+            if (newLinks) {
+                sessionStorage.removeItem('antonieta-new-shared-room');
+                openShareMap();
+            }
         };
     </script>
 </body>
