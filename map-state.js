@@ -76,65 +76,9 @@ window.ANTONIETA_DEFAULT_MAP_STATE = {
     "andar_8": [],
     "andar_5": [],
     "andar_10": [],
-    "andar_nova_capital": [
-      {
-        "id": 69,
-        "name": "Caio CRANE",
-        "emoji": "👤",
-        "gif": "Idle_rotations_8dir (3).gif",
-        "rx": 82.23307838216046,
-        "ry": 74.69116150569988,
-        "rot": 0,
-        "lightOn": true,
-        "scale": 1.25
-      },
-      {
-        "id": 73,
-        "name": "Mihai",
-        "emoji": "👤",
-        "gif": "Idle_rotations_8dir (2).gif",
-        "rx": 83.71988552952362,
-        "ry": 79.4267453843885,
-        "rot": 15,
-        "lightOn": true,
-        "scale": 1.25
-      },
-      {
-        "id": 75,
-        "name": "Pollaco",
-        "emoji": "👤",
-        "gif": "idb-asset:asset_1791601532775_41zaaskirdj",
-        "rx": 88.93734619799821,
-        "ry": 77.75499968074544,
-        "rot": 0,
-        "lightOn": true,
-        "scale": 1
-      },
-      {
-        "id": 76,
-        "name": "Marcel",
-        "emoji": "👤",
-        "gif": "Idle_rotations_8dir (5).gif",
-        "rx": 84.31861052426659,
-        "ry": 78.9708147379404,
-        "rot": 0,
-        "lightOn": true,
-        "scale": 1.5
-      },
-      {
-        "id": 82,
-        "name": "Alaude",
-        "emoji": "👤",
-        "gif": "idb-asset:asset_1791604774197_qty56wo3ngj",
-        "rx": 88.14755463898064,
-        "ry": 75.83646419253421,
-        "rot": 0,
-        "lightOn": true,
-        "scale": 1
-      }
-    ]
+    "andar_nova_capital": []
   },
-  "charID": 82,
+  "charID": 70,
   "enemies": {},
   "events": {
     "andar_1": [
@@ -394,6 +338,23 @@ window.ANTONIETA_DEFAULT_MAP_STATE = {
           "left": "50.679%"
         }
       }
+    ],
+    "scenario_1791507147324_qdq6hv": [
+      {
+        "id": "event_1791507177543_bu9ney",
+        "type": "event",
+        "title": "Uma estranha conhecida",
+        "visibility": "semi",
+        "content": "map-assets/asset_1791507177536_uy9z6ddxt4.png",
+        "mediaType": "image/png",
+        "audioContent": "",
+        "audioType": "",
+        "audioDuration": 0,
+        "position": {
+          "top": "65.193%",
+          "left": "22.177%"
+        }
+      }
     ]
   },
   "scenarios": {
@@ -401,6 +362,14 @@ window.ANTONIETA_DEFAULT_MAP_STATE = {
       "id": "scenario_1790956625708_u69ra6",
       "name": "Corredor do castigo",
       "imgBaseName": "map-assets/asset_1790956625703_z087wlrd5e.png",
+      "imgNightName": "",
+      "imgBlackoutName": "",
+      "customScenario": true
+    },
+    "scenario_1791237320458_gsbc14": {
+      "id": "scenario_1791237320458_gsbc14",
+      "name": "Beco",
+      "imgBaseName": "map-assets/asset_1791237320453_7gieb7ph36n.png",
       "imgNightName": "",
       "imgBlackoutName": "",
       "customScenario": true
@@ -484,10 +453,28 @@ window.ANTONIETA_DEFAULT_MAP_STATE = {
       "imgNightName": "",
       "imgBlackoutName": "",
       "customScenario": true
+    },
+    "scenario_1791507147324_qdq6hv": {
+      "id": "scenario_1791507147324_qdq6hv",
+      "name": "Museu",
+      "imgBaseName": "map-assets/asset_1791507147280_e0b2g8qz6vs.png",
+      "imgNightName": "",
+      "imgBlackoutName": "",
+      "customScenario": true
     }
   },
   "scenarioLinks": {
     "andar_nova_capital": [
+      {
+        "id": "scenario_1791237320458_gsbc14",
+        "type": "scenario",
+        "title": "Beco",
+        "visibility": "semi",
+        "position": {
+          "top": "40.329%",
+          "left": "46.788%"
+        }
+      },
       {
         "id": "scenario_1791237461841_68y4zz",
         "type": "scenario",
@@ -614,9 +601,64 @@ window.ANTONIETA_DEFAULT_MAP_STATE = {
           "left": "70.443%"
         }
       }
+    ],
+    "scenario_1791506635833_chkpv4": [
+      {
+        "id": "scenario_1791507147324_qdq6hv",
+        "type": "scenario",
+        "title": "Museu",
+        "visibility": "semi",
+        "position": {
+          "top": "57.648%",
+          "left": "55.670%"
+        }
+      }
     ]
   },
-  "vanState": null,
+  "vanState": {
+    "active": true,
+    "mapId": "andar_nova_capital",
+    "rx": 65.7901071390675,
+    "ry": 45.80351099122631,
+    "lightRot": 270,
+    "attempts": 6,
+    "status": "restart_required",
+    "heroes": [
+      {
+        "id": 68,
+        "name": "Mihai",
+        "emoji": "👤",
+        "gif": "Idle_rotations_8dir (2).gif",
+        "rx": 74.33428129862882,
+        "ry": 37.688207883991545,
+        "rot": 0,
+        "lightOn": true,
+        "scale": 1.25
+      },
+      {
+        "id": 69,
+        "name": "Caio CRANE",
+        "emoji": "👤",
+        "gif": "Idle_rotations_8dir (3).gif",
+        "rx": 70.74572289493572,
+        "ry": 40.345006343256,
+        "rot": 0,
+        "lightOn": true,
+        "scale": 1.25
+      },
+      {
+        "id": 70,
+        "name": "Marcel",
+        "emoji": "👤",
+        "gif": "Idle_rotations_8dir (5).gif",
+        "rx": 77.74341178213729,
+        "ry": 35.4564971782094,
+        "rot": 0,
+        "lightOn": true,
+        "scale": 1.5
+      }
+    ]
+  },
   "navHistory": [
     "andar_1",
     "andar_cidade_arredores",
@@ -634,6 +676,8 @@ window.ANTONIETA_DEFAULT_MAP_STATE = {
     "andar_cidade_arredores",
     "andar_1",
     "andar_cidade_arredores",
+    "andar_1",
+    "andar_nova_capital",
     "andar_1",
     "andar_nova_capital",
     "andar_1",
